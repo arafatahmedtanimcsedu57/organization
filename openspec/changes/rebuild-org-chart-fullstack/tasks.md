@@ -3,8 +3,10 @@
 - [ ] 1.1 `git init` and commit the current state so the legacy implementation is recoverable (rollback baseline)
 - [ ] 1.2 Set up npm workspaces monorepo with `apps/api`, `apps/web`, `packages/domain`
 - [ ] 1.3 Add root tooling: TypeScript config, ESLint/Prettier, `.gitignore`, `.env.example`
-- [ ] 1.4 Write `docker-compose.yml` (PostgreSQL 16 + api service, healthchecks, named volume)
-- [ ] 1.5 Verify `docker compose up` starts Postgres and the api container connects
+- [ ] 1.4 Write one `docker-compose.yml` covering all services: `db` (PostgreSQL 16, healthcheck, named volume), `api` (`depends_on` db healthy), and `web`
+- [ ] 1.5 Make the api entrypoint run migrations → seed/import (idempotent, from §4) → start, gated on the db healthcheck so it never races the DB
+- [ ] 1.6 Provide `.env.example` with working defaults so `docker compose up` needs zero editing
+- [ ] 1.7 Verify a single `docker compose up` brings up db + api + web + seed and the chart loads end-to-end with seeded data (no second command, no local installs)
 
 ## 2. Shared domain package (`packages/domain`)
 
@@ -96,9 +98,23 @@
 - [ ] 12.3 Add read-only `GET /history` (filter by entity + time); ensure no edit/delete path exists
 - [ ] 12.4 Build the history browser UI (per-entity, reverse-chronological, shows what changed)
 
-## 13. Cleanup, docs & verification
+## 13. Automated tests — features & user interaction (capability: quality-assurance)
 
-- [ ] 13.1 Remove legacy code: `src/*.ts`, `src/buildOrg.test.ts`, `scripts/seed-assignments.ts`, and the `npm run chart` script
-- [ ] 13.2 Update `README.md` with the Docker one-command setup and a maintainer guide (satisfies Req 2)
-- [ ] 13.3 End-to-end check: `docker compose up` → import → chart JSON → PDF → an edit → history entry → chart reflects it
-- [ ] 13.4 Confirm constraints: free DBMS, additive schema only, UTF-8 output, originals in `TryOutProgram/` untouched
+- [ ] 13.1 Set up the test stack: unit/feature runner (Vitest or Jest) + `supertest` for the API, and `@playwright/test` for browser E2E
+- [ ] 13.2 Stand up an ephemeral test database (a Compose test service or throwaway schema) seeded with deterministic fixtures
+- [ ] 13.3 Domain unit tests: tree build, rank order, disambiguation, title normalization, 兼 placement (no DB / no framework)
+- [ ] 13.4 API feature tests — org-chart: hierarchy, rank order, disambiguation, and `(兼)` placement in the `/chart` JSON
+- [ ] 13.5 API feature tests — maintenance: employee/department CRUD plus failure paths (missing department, parent cycle)
+- [ ] 13.6 API feature tests — concurrent duties: reject a second primary; a concurrent posting renders in the target department
+- [ ] 13.7 API feature tests — history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
+- [ ] 13.8 E2E journey A (Playwright): open chart, toggle Tree ⇄ Network, "Download PDF" returns a valid A3 PDF
+- [ ] 13.9 E2E journey B (Playwright): edit an employee → save → chart updates → a history entry appears with before/after
+- [ ] 13.10 E2E journey C (Playwright): add a 兼務 posting → the sourced 兼 chip appears in the target department on the chart
+- [ ] 13.11 Wire the whole suite to run in one command and headless in CI; make E2E deterministic against the seeded fixtures
+
+## 14. Cleanup, docs & verification
+
+- [ ] 14.1 Remove legacy code: `src/*.ts`, `src/buildOrg.test.ts`, `scripts/seed-assignments.ts`, and the `npm run chart` script
+- [ ] 14.2 Update `README.md` with the single `docker compose up` setup, how to run the tests, and a maintainer guide (satisfies Req 2)
+- [ ] 14.3 End-to-end smoke check: one `docker compose up` → seeded chart → PDF → an edit → history entry → chart reflects it
+- [ ] 14.4 Confirm constraints: free DBMS, additive schema only, UTF-8 output, originals in `TryOutProgram/` untouched

@@ -11,7 +11,8 @@ The current solution is a minimal `tsx` script that reads the xlsx masters and e
 - **Import the provided masters into the database** via a seed step, so the app runs from a real datastore instead of parsing xlsx at request time.
 - **Implement concurrent duties (兼務)** as a first-class `assignments` relation that feeds the `(兼)` markers on the chart — Requirement 4 becomes real, not just a proposal.
 - **Implement change history** as an append-only audit trail over every master edit, honoring the "add columns, don't modify" precaution.
-- **Provide reproducible setup**: `docker compose up` brings up the database, API, and seed; documented run instructions satisfy Requirement 2's "maintainable by someone other than the author."
+- **Provide reproducible setup in one command**: a single `docker compose up` brings up the **database, API, web app, and an automatic seed/import** — no second step, no local installs. This single command *is* the "prepare and provide instructions for the dev environment" Requirement 2 asks for.
+- **Add an automated test suite keyed to features and user journeys**: domain unit tests, per-capability API feature tests, and Playwright end-to-end tests that drive the three user journeys (view + export chart; edit a master → history → chart updates; add a 兼務 → chart), runnable headless in one command / in CI.
 
 ## Capabilities
 
@@ -23,6 +24,7 @@ The current solution is a minimal `tsx` script that reads the xlsx masters and e
 - `change-history`: An append-only audit trail recording every create/update/deactivate on the masters (who/when/before/after), browsable in the UI. Covers Requirement 3 (history).
 - `concurrent-duties`: A `user_department_assignments` relation modeling primary + concurrent (兼務) postings per person, with CRUD and per-department titles that render as `(兼)` on the chart. Implements Requirement 4.
 - `design-system`: The Organo Admin (Shopify / Polaris-style) design language for the SPA — centralized tokens, a shared component set (app shell, cards, badges, banners, index table), and the chart presentation rules (indented tree of department cards, color-coded branch rails that terminate at the last child, tiered division/department/group styling, sourced 兼務 chips, Tree ⇄ Network views, and print/PDF that expands every roster in full). Governs how Requirements 1–4 are surfaced to the user.
+- `quality-assurance`: The test coverage the deliverable must meet — pure-domain unit tests, per-capability API feature tests, and Playwright end-to-end tests for the three user journeys — plus the requirement that the whole suite runs deterministically in one command / headless in CI against seeded fixtures.
 
 ### Modified Capabilities
 
@@ -32,7 +34,7 @@ The current solution is a minimal `tsx` script that reads the xlsx masters and e
 
 - **Removed code:** `src/buildOrg.ts`, `src/renderHtml.ts`, `src/readMasters.ts`, `src/config.ts`, `src/model.ts`, `src/index.ts`, `src/buildOrg.test.ts`, `scripts/seed-assignments.ts`, and the `npm run chart` script.
 - **New structure:** monorepo with `apps/api` (NestJS) and `apps/web` (React), plus `docker-compose.yml` and TypeORM migrations.
-- **New dependencies:** `@nestjs/*`, `typeorm`, `pg`, `puppeteer`, React + build tooling (Vite), a validation lib (`class-validator`/`zod`). Adds a Docker requirement for the reviewer.
+- **New dependencies:** `@nestjs/*`, `typeorm`, `pg`, `puppeteer`, React + build tooling (Vite), a validation lib (`class-validator`/`zod`), and test tooling (`vitest`/`jest` + `supertest` for API, `@playwright/test` for E2E). Adds a Docker requirement for the reviewer, met by a single `docker compose up` that runs db + api + web + seed.
 - **Data:** PostgreSQL becomes the system of record; the xlsx files are used only as the import source. Output remains UTF-8 and printable (PDF), per the precautions.
 - **Constraints honored:** free DBMS (PostgreSQL); additive-only schema changes; UTF-8 Japanese output; provided data used only for this project.
 - **Preserved:** `TryOutProgram/` originals are never modified; `docs/assignment-understanding.md` and `docs/concurrent-duties-design.md` remain as background.
