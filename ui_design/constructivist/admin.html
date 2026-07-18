@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintenance · 保守 · 構成 — Organization Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="spine">FIG.02 · <b>保守</b> · MAINTENANCE</div>
+
+<header class="masthead">
+  <div class="wrap-wide masthead-in">
+    <a class="brand" href="index.html"><span class="mark"></span><span><b>Organo</b><span>構成 · 組織図</span></span></a>
+    <nav class="nav">
+      <a href="index.html">Overview</a>
+      <a href="chart.html">Chart 組織図</a>
+      <a href="admin.html" class="is-active">Maintenance 保守</a>
+    </nav>
+  </div>
+</header>
+
+<div class="admin-top">
+  <div class="wrap-wide">
+    <div class="chart-bar">
+      <div>
+        <span class="kicker">Fig. 02 — Maintenance Console</span>
+        <h1 style="font-family:var(--f-disp);font-weight:400;font-size:clamp(2rem,5vw,3.4rem);text-transform:uppercase;letter-spacing:.01em">Master maintenance <span class="jp" style="font-size:.5em">保守</span></h1>
+        <div class="en">Edit sys_users &amp; cmn_department — every change is written to an append-only audit trail.</div>
+      </div>
+      <div class="chart-tools">
+        <span class="tag red">＋ additive schema</span>
+        <button class="btn red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round"/></svg> New record</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab is-active">Employees <span class="jp">従業員</span></button>
+      <button class="tab">Departments <span class="jp">部門</span></button>
+      <button class="tab">Concurrent <span class="jp red">兼務</span></button>
+      <button class="tab">History <span class="jp">履歴</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap-wide">
+  <div class="admin-grid" style="border:4px solid var(--ink);border-top:0">
+    <!-- TABLE -->
+    <section class="panel r" style="--d:.05s">
+      <div class="panel-hd"><h3>Employees</h3><span class="count">95 records · 94 active</span></div>
+      <table class="tbl">
+        <thead><tr><th>#</th><th>UID</th><th>Name · 氏名</th><th>Title</th><th>Department</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="rno">01</td><td class="uid">0002</td><td class="pname">佐藤 曠弌</td><td><span class="rankc">代表取締役</span></td><td class="dept">システム事業部</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">02</td><td class="uid">0492</td><td class="pname">佐藤 悠一郎</td><td><span class="rankc">本部長</span></td><td class="dept">営業本部</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">03</td><td class="uid">0018</td><td class="pname">照沼 邦義</td><td><span class="rankc">事業部長</span> <span class="rankc k">兼 部長</span></td><td class="dept">ITサポート事業部</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">04</td><td class="uid">0536</td><td class="pname">濱井 啓介</td><td><span class="rankc">課長</span> <span class="rankc k">兼 主任</span></td><td class="dept">ソリューション営業部 1課</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">05</td><td class="uid">0272</td><td class="pname">大西 隆洋</td><td><span class="rankc">主任</span></td><td class="dept">SW開発課 2G <span class="red">【大阪】</span></td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">06</td><td class="uid">0471</td><td class="pname">茶之木 理子</td><td><span class="rankc">主任2</span></td><td class="dept">SW開発課 1G</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">07</td><td class="uid">0428</td><td class="pname">高山 美帆</td><td><span class="rankc">主任2</span></td><td class="dept">管理部</td><td><span class="stt"><span class="sq"></span>Active</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+          <tr><td class="rno">08</td><td class="uid">0161</td><td class="pname" style="color:var(--ink-3)">中島 眞澄</td><td><span class="rankc">課員</span></td><td class="dept">ITサポート事業部</td><td><span class="stt off"><span class="sq"></span>Retired</span></td><td><button class="redit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20h4L18 10l-4-4L4 16z" stroke-width="1.6" stroke-linejoin="round"/></svg></button></td></tr>
+        </tbody>
+      </table>
+      <div class="panel-hd" style="border-top:2px solid var(--ink);border-bottom:0"><span class="count">Showing 8 of 95</span><span class="mono" style="font-size:.66rem;color:var(--ink-3)">◄ 1 2 3 … 12 ►</span></div>
+    </section>
+
+    <!-- RECORD -->
+    <aside class="record r" style="--d:.15s">
+      <div class="record-hd"><span class="who">照沼 邦義</span><span class="tag solid red">edit · 0018</span></div>
+      <div class="record-body">
+        <div class="two">
+          <div class="field"><label>Last name 姓</label><input class="inp" value="照沼"></div>
+          <div class="field"><label>First name 名</label><input class="inp" value="邦義"></div>
+        </div>
+        <div class="field"><label>Title 役職</label><input class="inp" value="事業部長"></div>
+        <div class="field"><label>Home department 部門</label><input class="inp" value="ITサポート事業部"></div>
+        <div class="field add"><label>Display override</label><input class="inp" placeholder="—"></div>
+        <div class="field add"><label>Work location</label><input class="inp" placeholder="例: 【大阪】"></div>
+      </div>
+      <div class="record-foot"><button class="btn ghost" style="padding:.55rem .9rem">Cancel</button><button class="btn red" style="padding:.55rem .9rem">Save 保存</button></div>
+    </aside>
+  </div>
+
+  <!-- HISTORY -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="idx">03</span>
+      <h2>Change history <span class="jp">変更履歴</span></h2>
+      <span class="kicker">Append-only · immutable</span>
+    </div>
+    <div class="admin-grid" style="border:4px solid var(--ink)">
+      <div class="panel">
+        <div class="panel-hd"><h3>Audit trail</h3><span class="count">who · when · before → after</span></div>
+        <div class="timeline">
+          <div class="tl kenmu-i">
+            <div class="tl-meta"><span class="tl-act kenmu-i">兼務 add</span><span class="tl-time">2024-04-01 09:14</span><span class="tl-actor">by 袰地 幹也</span></div>
+            <div class="tl-body"><span class="subj">山田 真也</span> — concurrent posting → <span class="jp">購買調達部</span> <span class="diff"><span class="arw">as</span><span class="new">部長 兼務</span></span></div>
+          </div>
+          <div class="tl">
+            <div class="tl-meta"><span class="tl-act">update</span><span class="tl-time">2024-04-01 09:02</span><span class="tl-actor">by 袰地 幹也</span></div>
+            <div class="tl-body"><span class="subj">照沼 邦義</span> — title <span class="diff"><span class="old">課長</span><span class="arw">→</span><span class="new">事業部長</span></span></div>
+          </div>
+          <div class="tl">
+            <div class="tl-meta"><span class="tl-act">update</span><span class="tl-time">2024-03-28 16:47</span><span class="tl-actor">by 阿部 千明</span></div>
+            <div class="tl-body"><span class="subj">大西 隆洋</span> — location <span class="diff"><span class="old">—</span><span class="arw">→</span><span class="new">【大阪】</span></span></div>
+          </div>
+          <div class="tl create">
+            <div class="tl-meta"><span class="tl-act create">create</span><span class="tl-time">2024-03-25 11:20</span><span class="tl-actor">by 阿部 千明</span></div>
+            <div class="tl-body"><span class="subj">塚本 晴佳</span> — new employee → <span class="jp">1課 1G</span> · 課員</div>
+          </div>
+          <div class="tl">
+            <div class="tl-meta"><span class="tl-act">deactivate</span><span class="tl-time">2024-03-20 10:05</span><span class="tl-actor">by 袰地 幹也</span></div>
+            <div class="tl-body"><span class="subj">中島 眞澄</span> — status <span class="diff"><span class="old">Active</span><span class="arw">→</span><span class="new">Retired</span></span></div>
+          </div>
+          <div class="tl create">
+            <div class="tl-meta"><span class="tl-act create">create</span><span class="tl-time">2024-03-18 14:33</span><span class="tl-actor">by 袰地 幹也</span></div>
+            <div class="tl-body"><span class="subj jp">購買調達部</span> — department created · parent <span class="jp">ITサポート事業部</span></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="record" style="border-left:4px solid var(--ink);position:static;padding:1.3rem">
+        <div class="issues">
+          <div class="ih">Data issues <span class="c">4 OPEN</span></div>
+          <div class="ir"><span class="tag red">unmatched</span> <span>芹澤 · 岡本 · 河合 — on legacy chart, not in master</span></div>
+          <div class="ir"><span class="tag red">variant</span> <span>田崎 ↔ 田﨑 kanji mismatch</span></div>
+          <div class="ir"><span class="tag red">synth</span> <span>ソリューション営業部 missing node</span></div>
+          <div class="ir"><span class="tag red">encoding</span> <span>å¥³ → 女 repaired on import</span></div>
+        </div>
+        <p class="mono" style="font-size:.66rem;color:var(--ink-3);margin-top:1rem;line-height:1.7">// valid_from / valid_to columns<br>// double as the foundation for<br>// point-in-time history &amp; 兼務 dating.</p>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<footer class="colophon">
+  <div class="wrap-wide" style="text-align:center">
+    <p class="mono" style="color:var(--ink-3)">構成 · CONSTRUCTIVIST · Sheet 02 / 03 · <a href="../admin.html" class="red">▸ Blueprint theme</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "organization-chart",
+  "version": "1.0.0",
+  "description": "Auto-generates a printable HTML organization chart from the sys_user and cmn_department masters.",
+  "type": "module",
+  "scripts": {
+    "chart": "tsx src/index.ts",
+    "test": "node --import tsx --test src/*.test.ts"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
