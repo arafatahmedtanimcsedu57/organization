@@ -1,7 +1,7 @@
 ## 1. Repository & tooling foundation
 
 - [x] 1.1 `git init` and commit the current state so the legacy implementation is recoverable (rollback baseline)
-- [ ] 1.2 Set up npm workspaces monorepo with `apps/api`, `apps/web`, `packages/domain`
+- [x] 1.2 Set up npm workspaces monorepo with `apps/api`, `apps/web`, `packages/domain`
 - [ ] 1.3 Add root tooling: TypeScript config, ESLint/Prettier, `.gitignore`, `.env.example`
 - [ ] 1.4 Write one `docker-compose.yml` covering all services: `db` (PostgreSQL 16, healthcheck, named volume), `api` (`depends_on` db healthy), and `web`
 - [ ] 1.5 Make the api entrypoint run migrations → seed/import (idempotent, from §4) → start, gated on the db healthcheck so it never races the DB

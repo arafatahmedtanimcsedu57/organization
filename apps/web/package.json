@@ -1,0 +1,11 @@
+{
+  "name": "@org-chart/web",
+  "version": "0.1.0",
+  "description": "React SPA: interactive org chart, admin maintenance UI, change history.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@org-chart/domain": "*"
+  }
+}

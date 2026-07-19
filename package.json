@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Auto-generates a printable HTML organization chart from the sys_user and cmn_department masters.",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "chart": "tsx src/index.ts",
     "test": "node --import tsx --test src/*.test.ts"
