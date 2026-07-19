@@ -5,6 +5,11 @@
   "type": "module",
   "license": "UNLICENSED",
   "private": true,
+  "scripts": {
+    "migration:run": "echo \"[api] migration:run is a placeholder until task 3.3 adds TypeORM migrations\"",
+    "seed": "echo \"[api] seed is a placeholder until task 4.1 adds the import service\"",
+    "start": "echo \"[api] start is a placeholder until task 3.1 scaffolds the NestJS app\" && exec tail -f /dev/null"
+  },
   "dependencies": {
     "@org-chart/domain": "*"
   }
