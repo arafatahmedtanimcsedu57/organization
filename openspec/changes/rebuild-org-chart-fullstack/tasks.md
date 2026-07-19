@@ -20,7 +20,7 @@
 ## 3. Persistence layer (NestJS + TypeORM + Postgres)
 
 - [x] 3.1 Scaffold the NestJS app in `apps/api` with config module reading DB env vars
-- [ ] 3.2 Define entities: `Department`, `Employee`, `Assignment`, `ChangeLog` (per design ER)
+- [x] 3.2 Define entities: `Department`, `Employee`, `Assignment`, `ChangeLog` (per design ER)
 - [ ] 3.3 Generate the initial TypeORM migration and run it against Postgres
 - [ ] 3.4 Add repositories/providers and confirm the schema matches the additive-only design
 
