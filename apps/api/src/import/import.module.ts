@@ -5,8 +5,10 @@ import configuration from '../config/configuration.ts';
 import type { AppConfig } from '../config/configuration.ts';
 import { Department } from '../departments/department.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
+import { Assignment } from '../assignments/assignment.entity.ts';
 import { ReadMastersService } from './read-masters.service.ts';
 import { UpsertMastersService } from './upsert-masters.service.ts';
+import { SeedAssignmentsService } from './seed-assignments.service.ts';
 
 /**
  * `data-import` capability: reads the provided masters at seed time (SheetJS,
@@ -23,13 +25,13 @@ import { UpsertMastersService } from './upsert-masters.service.ts';
       useFactory: (configService: ConfigService<AppConfig, true>) => ({
         type: 'postgres' as const,
         url: configService.get('database.url', { infer: true }),
-        entities: [Department, Employee],
+        entities: [Department, Employee, Assignment],
         synchronize: false,
       }),
     }),
-    TypeOrmModule.forFeature([Department, Employee]),
+    TypeOrmModule.forFeature([Department, Employee, Assignment]),
   ],
-  providers: [ReadMastersService, UpsertMastersService],
-  exports: [ReadMastersService, UpsertMastersService],
+  providers: [ReadMastersService, UpsertMastersService, SeedAssignmentsService],
+  exports: [ReadMastersService, UpsertMastersService, SeedAssignmentsService],
 })
 export class ImportModule {}
