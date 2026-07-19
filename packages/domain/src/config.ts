@@ -27,3 +27,16 @@ export const STAFF_RANK = POSITION_RANK.indexOf("課員");
 export function normalizeTitle(title: string): string {
   return title.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0));
 }
+
+/**
+ * Display-name overrides for the handful of hand-made labels the automatic
+ * last-name rule cannot derive (e.g. a location tag rather than a given-name initial).
+ * Keyed by the person's Sys ID so it is unambiguous. Leave empty to rely purely on
+ * the automatic rule. This keeps such tweaks out of the provided masters.
+ *
+ * Ported from the legacy `src/config.ts`.
+ */
+export const DISPLAY_OVERRIDES: Readonly<Record<string, string>> = {
+  // 隆洋 大西 (主任, SW開発課 2G) is written "大西【大阪】" (Osaka location tag) in the legacy chart.
+  "4df2151147314610d1f9cc39116d438f": "大西【大阪】",
+};

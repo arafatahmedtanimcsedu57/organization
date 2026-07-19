@@ -1,10 +1,11 @@
 /**
  * Places each employee's primary posting into their department's roster, ordered by
  * position rank and split into managers vs. staff (課員). Ported from the legacy
- * `src/buildOrg.ts` (rank-ordering / manager-staff-split portion only — concurrent
- * (兼務) placement and last-name disambiguation are handled separately).
+ * `src/buildOrg.ts` (rank-ordering / manager-staff-split portion, plus last-name
+ * disambiguation — concurrent (兼務) placement is handled separately).
  */
 import { normalizeTitle, POSITION_RANK, STAFF_RANK } from "./config.ts";
+import { computeDisplayNames } from "./disambiguateNames.ts";
 import type { DepartmentTree } from "./buildTree.ts";
 import type { BuildWarning, Employee, Member } from "./model.ts";
 
@@ -26,6 +27,7 @@ const byRankThenName = (a: Member, b: Member): number =>
  */
 export function placeEmployees(tree: DepartmentTree, employees: Employee[]): BuildWarning[] {
   const warnings: BuildWarning[] = [];
+  const displayNames = computeDisplayNames(employees);
 
   for (const employee of employees) {
     const node = tree.byName.get(employee.departmentName);
@@ -46,7 +48,7 @@ export function placeEmployees(tree: DepartmentTree, employees: Employee[]): Bui
     }
 
     const member: Member = {
-      displayName: employee.lastName,
+      displayName: displayNames.get(employee.sysId) ?? employee.lastName,
       title: employee.title,
       rank,
       concurrent: false,
