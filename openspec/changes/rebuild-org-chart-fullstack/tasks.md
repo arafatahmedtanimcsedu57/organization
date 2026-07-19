@@ -58,7 +58,7 @@
 - [x] 8.2 Load Figtree (UI) + Noto Sans JP (Japanese) with system fallbacks; bundle/self-host so the PDF renderer has the fonts offline
 - [x] 8.3 Build the app shell: left nav (Home · Org chart · Employees · Departments · Concurrent duties · Change history · Settings) + top bar (search, notifications, account)
 - [x] 8.4 Build the core component set: Card, Badge (success/info/warn/critical + kenmu), Banner, Button (primary/secondary/plain), IndexTable
-- [ ] 8.5 Add the contextual save bar plus shared loading / empty / error states
+- [x] 8.5 Add the contextual save bar plus shared loading / empty / error states
 - [ ] 8.6 Accessibility & motion pass: visible focus rings, `prefers-reduced-motion`, color-contrast check
 - [ ] 8.7 Baseline A3-landscape print stylesheet (hide shell/nav/actions, white background, expand content)
 

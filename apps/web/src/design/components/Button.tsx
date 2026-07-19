@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-export type ButtonVariant = 'secondary' | 'primary' | 'brand' | 'plain' | 'critical';
+export type ButtonVariant = 'secondary' | 'primary' | 'brand' | 'plain' | 'critical' | 'ghostdark';
 export type ButtonSize = 'md' | 'sm';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,7 +9,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-/** `.btn` — primary/secondary/plain/brand/critical, ported from `ui_design/shopify/styles.css`. */
+/** `.btn` — primary/secondary/plain/brand/critical/ghostdark (for dark surfaces like the save
+ * bar), ported from `ui_design/shopify/styles.css`. */
 export function Button({
   variant = 'secondary',
   size = 'md',
