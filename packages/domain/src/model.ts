@@ -42,6 +42,10 @@ export interface Member {
   rank: number; // position rank index; lower = higher in hierarchy
   concurrent: boolean; // true -> rendered with the (兼) prefix
   sysId: string;
+  /** Home department name; set only when `concurrent` — feeds the sourced (兼) chip. */
+  sourceDepartmentName?: string;
+  /** Home title; set only when `concurrent` — feeds the sourced (兼) chip. */
+  sourceTitle?: string;
 }
 
 /** A department node in the output tree: the department plus its ordered roster and children. */

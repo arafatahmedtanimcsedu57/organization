@@ -14,7 +14,7 @@
 - [x] 2.2 Port tree-build (parent-by-name, 4 roots, orphan warning) from the legacy `buildOrg.ts`
 - [x] 2.3 Port rank ordering + manager/staff split and title normalization (`主任２`→`主任2`)
 - [x] 2.4 Port last-name disambiguation and display-override logic
-- [ ] 2.5 Add concurrent (兼務) placement so `(兼)` postings render in their department, carrying source dept + title for the sourced chip
+- [x] 2.5 Add concurrent (兼務) placement so `(兼)` postings render in their department, carrying source dept + title for the sourced chip
 - [ ] 2.6 Port/extend unit tests; `packages/domain` passes `npm test` with no framework deps
 
 ## 3. Persistence layer (NestJS + TypeORM + Postgres)
