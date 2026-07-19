@@ -5,6 +5,7 @@ import { App } from './App';
 import { store } from './store/store';
 import './design/fonts.css';
 import './design/tokens.css';
+import './design/shell.css';
 
 const container = document.getElementById('root');
 if (!container) {
