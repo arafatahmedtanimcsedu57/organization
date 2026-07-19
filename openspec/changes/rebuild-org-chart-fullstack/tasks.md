@@ -49,7 +49,7 @@
 ## 7. React SPA foundation (`apps/web`)
 
 - [x] 7.1 Scaffold React + Vite + TypeScript with React Router routes (`/`, `/chart`, `/admin/*`, `/history`, `/settings`)
-- [ ] 7.2 Set up RTK Query API client (server state) and Zustand store (UI state: filters, selection, print/view mode)
+- [x] 7.2 Set up RTK Query API client (server state) and Zustand store (UI state: filters, selection, print/view mode)
 - [ ] 7.3 Wire the dev proxy to the NestJS API and add a root layout placeholder the shell will fill
 
 ## 8. Design system foundation (capability: design-system — Organo Admin / Shopify-style)
