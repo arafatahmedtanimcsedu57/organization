@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { Injectable } from '@nestjs/common';
 import * as XLSX from 'xlsx';
 import type { Department, Employee } from '@org-chart/domain';
+import { normalizeText } from './normalize.ts';
 
 /** Read a sheet as an array of plain objects keyed by the header row. */
 function readSheet(filePath: string, sheetName = 'Page 1'): Record<string, unknown>[] {
@@ -11,13 +12,14 @@ function readSheet(filePath: string, sheetName = 'Page 1'): Record<string, unkno
   return XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
 }
 
-/** Trim and coerce a cell to string (SheetJS gives us strings via raw:false). */
-const str = (v: unknown): string => (v == null ? '' : String(v).trim());
+/** Coerce a cell to string and normalize it (mojibake repair, full-width digits, spacing). */
+const str = (v: unknown): string => (v == null ? '' : normalizeText(String(v)));
 
 /**
  * Reads the `sys_user` / `cmn_department` xlsx masters (SheetJS, seed-time only) into
  * the shared `@org-chart/domain` row shapes. Only the "Page 1" sheet of each file is
- * read; encoding/title normalization happens later in the import pipeline, not here.
+ * read. Every cell is normalized (see `./normalize.ts`) so downstream logic — the
+ * database, `@org-chart/domain`, the UI — sees consistent values.
  */
 @Injectable()
 export class ReadMastersService {
