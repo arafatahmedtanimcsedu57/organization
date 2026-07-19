@@ -8,6 +8,7 @@ import type { AppConfig } from '../config/configuration.ts';
 import { ReadMastersService } from './read-masters.service.ts';
 import { UpsertMastersService } from './upsert-masters.service.ts';
 import { SeedAssignmentsService } from './seed-assignments.service.ts';
+import { findPhantomDepartmentHeadWarnings, type ImportWarning } from './import-warnings.ts';
 
 /**
  * Seed-time entrypoint (`npm run seed`): reads the `sys_user` / `cmn_department`
@@ -36,15 +37,26 @@ async function run() {
     );
 
     const departmentIdByName = new Map(departments.map((d) => [d.name, d.id]));
-    const employeeCounts = await upsertMasters.upsertEmployees(employees, departmentIdByName);
+    const employeeResult = await upsertMasters.upsertEmployees(employees, departmentIdByName);
     logger.log(
-      `Employees: ${employeeCounts.inserted} inserted, ${employeeCounts.updated} updated (${employees.length} total)`,
+      `Employees: ${employeeResult.inserted} inserted, ${employeeResult.updated} updated (${employees.length} total)`,
     );
 
     const assignmentCounts = await seedAssignments.seedConcurrentAssignments();
     logger.log(
       `Assignments (兼務): ${assignmentCounts.inserted} inserted, ${assignmentCounts.updated} updated`,
     );
+
+    const warnings: ImportWarning[] = [
+      ...employeeResult.warnings,
+      ...findPhantomDepartmentHeadWarnings(departments, employees),
+    ];
+    if (warnings.length > 0) {
+      logger.warn(`Import warnings (${warnings.length}):`);
+      for (const warning of warnings) logger.warn(`  [${warning.kind}] ${warning.message}`);
+    } else {
+      logger.log('Import warnings: none');
+    }
   } finally {
     await context.close();
   }

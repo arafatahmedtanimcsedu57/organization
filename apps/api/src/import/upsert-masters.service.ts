@@ -4,10 +4,15 @@ import { Repository } from 'typeorm';
 import type { Department as DepartmentRow, Employee as EmployeeRow } from '@org-chart/domain';
 import { Department } from '../departments/department.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
+import { findUnmatchedDepartmentWarnings, type ImportWarning } from './import-warnings.ts';
 
 export interface UpsertCounts {
   inserted: number;
   updated: number;
+}
+
+export interface EmployeeUpsertResult extends UpsertCounts {
+  warnings: ImportWarning[];
 }
 
 /**
@@ -44,10 +49,13 @@ export class UpsertMastersService {
   /**
    * `departmentIdByName` resolves each employee's `Department` (a name string
    * in the source master) to the department's `id`. Employees whose
-   * department name has no match are skipped here; task 4.5 reports them as
-   * import warnings.
+   * department name has no match are skipped from the insert but still
+   * reported via `warnings` (see `findUnmatchedDepartmentWarnings`).
    */
-  async upsertEmployees(rows: EmployeeRow[], departmentIdByName: ReadonlyMap<string, string>): Promise<UpsertCounts> {
+  async upsertEmployees(
+    rows: EmployeeRow[],
+    departmentIdByName: ReadonlyMap<string, string>,
+  ): Promise<EmployeeUpsertResult> {
     const existingIds = new Set((await this.employeeRepo.find({ select: ['sysId'] })).map((e) => e.sysId));
     const resolved = rows.flatMap((r) => {
       const departmentId = departmentIdByName.get(r.departmentName);
@@ -66,6 +74,7 @@ export class UpsertMastersService {
     });
     await this.employeeRepo.save(resolved);
     const inserted = resolved.filter((e) => !existingIds.has(e.sysId)).length;
-    return { inserted, updated: resolved.length - inserted };
+    const warnings = findUnmatchedDepartmentWarnings(rows, departmentIdByName);
+    return { inserted, updated: resolved.length - inserted, warnings };
   }
 }
