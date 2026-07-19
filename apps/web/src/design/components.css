@@ -1,8 +1,9 @@
 /* =====================================================================
    ORGANO ADMIN — core component set
-   Card, Badge, Banner, Button, IndexTable. Ported from
-   ui_design/shopify/styles.css. Every rule consumes tokens from
-   tokens.css — no per-component overrides.
+   Card, Badge, Banner, Button, IndexTable, SaveBar, LoadingState,
+   EmptyState, ErrorState. Ported from ui_design/shopify/styles.css.
+   Every rule consumes tokens from tokens.css — no per-component
+   overrides.
    ===================================================================== */
 
 /* ---- buttons ---- */
@@ -71,6 +72,15 @@
   height: 28px;
   padding: 0 10px;
   font-size: 12px;
+}
+.btn.ghostdark {
+  color: #fff;
+  border-color: #ffffff40;
+  background: transparent;
+  box-shadow: none;
+}
+.btn.ghostdark:hover {
+  background: #ffffff1a;
 }
 
 /* ---- cards ---- */
@@ -229,6 +239,84 @@
 }
 .banner .btn {
   height: 30px;
+}
+
+/* ---- contextual save bar ---- */
+.savebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--action);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-2);
+  margin-bottom: 16px;
+}
+.savebar .msg {
+  font-size: 13px;
+  font-weight: 500;
+}
+.savebar .sb-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- shared loading / empty / error states ---- */
+.state-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 48px 24px;
+  color: var(--text-sub);
+}
+.state-block h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.state-block p {
+  font-size: 13px;
+  max-width: 360px;
+}
+.state-block .state-ico {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--neutral-bg);
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+.state-block .state-ico svg {
+  width: 20px;
+  height: 20px;
+}
+.state-block.error-state .state-ico {
+  background: var(--crit-bg);
+  color: var(--crit-tx);
+}
+.state-block .state-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+}
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border-2);
+  border-top-color: var(--brand);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ---- index table ---- */
