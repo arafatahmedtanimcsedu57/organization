@@ -55,7 +55,7 @@
 ## 8. Design system foundation (capability: design-system — Organo Admin / Shopify-style)
 
 - [x] 8.1 Define design tokens as CSS variables (color, type, spacing, radius, shadow) — port from `ui_design/shopify/styles.css`; single source, no per-component overrides
-- [ ] 8.2 Load Figtree (UI) + Noto Sans JP (Japanese) with system fallbacks; bundle/self-host so the PDF renderer has the fonts offline
+- [x] 8.2 Load Figtree (UI) + Noto Sans JP (Japanese) with system fallbacks; bundle/self-host so the PDF renderer has the fonts offline
 - [ ] 8.3 Build the app shell: left nav (Home · Org chart · Employees · Departments · Concurrent duties · Change history · Settings) + top bar (search, notifications, account)
 - [ ] 8.4 Build the core component set: Card, Badge (success/info/warn/critical + kenmu), Banner, Button (primary/secondary/plain), IndexTable
 - [ ] 8.5 Add the contextual save bar plus shared loading / empty / error states

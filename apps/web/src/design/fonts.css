@@ -1,0 +1,16 @@
+/* =====================================================================
+   Self-hosted type pairing: Figtree (UI) + Noto Sans JP (Japanese).
+   Bundled via @fontsource so the built assets are served from the app's
+   own origin — no Google Fonts CDN call, so the Puppeteer PDF renderer
+   can render Japanese text with zero network access.
+   ===================================================================== */
+
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/figtree/700.css';
+@import '@fontsource/figtree/800.css';
+
+@import '@fontsource/noto-sans-jp/400.css';
+@import '@fontsource/noto-sans-jp/500.css';
+@import '@fontsource/noto-sans-jp/700.css';
