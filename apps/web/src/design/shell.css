@@ -269,6 +269,14 @@ button {
   flex: 0 0 auto;
 }
 
+/* ---- page content ---- */
+.page {
+  padding: 24px 28px 60px;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
 /* ---- narrow viewport: shell collapses; admin work assumes desktop ---- */
 @media (max-width: 1080px) {
   .frame {
@@ -279,6 +287,9 @@ button {
   }
 }
 @media (max-width: 640px) {
+  .page {
+    padding: 16px;
+  }
   .search {
     display: none;
   }

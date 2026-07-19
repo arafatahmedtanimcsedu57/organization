@@ -7,6 +7,7 @@ import './design/fonts.css';
 import './design/tokens.css';
 import './design/shell.css';
 import './design/components.css';
+import './design/print.css';
 
 const container = document.getElementById('root');
 if (!container) {

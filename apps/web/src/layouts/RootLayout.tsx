@@ -9,7 +9,9 @@ export function RootLayout() {
       <Sidebar />
       <div className="main">
         <Topbar />
-        <Outlet />
+        <main className="page">
+          <Outlet />
+        </main>
       </div>
     </div>
   );
