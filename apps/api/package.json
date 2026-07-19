@@ -6,7 +6,10 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "migration:run": "echo \"[api] migration:run is a placeholder until task 3.3 adds TypeORM migrations\"",
+    "typeorm": "node --import @swc-node/register/esm-register $(command -v typeorm) -d src/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
     "seed": "echo \"[api] seed is a placeholder until task 4.1 adds the import service\"",
     "start": "node --import @swc-node/register/esm-register src/main.ts",
     "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts"
