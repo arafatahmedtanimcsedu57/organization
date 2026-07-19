@@ -26,7 +26,7 @@
 
 ## 4. Data import (capability: data-import)
 
-- [ ] 4.1 Build an import command/service using SheetJS to read the `TryOutProgram` masters (seed-time only)
+- [x] 4.1 Build an import command/service using SheetJS to read the `TryOutProgram` masters (seed-time only)
 - [ ] 4.2 Normalize titles/department names and repair known mojibake (`å¥³`→`女`) on import
 - [ ] 4.3 Upsert employees by `Sys ID` and departments by `ID` (idempotent, re-runnable)
 - [ ] 4.4 Seed the three verifiable 兼務 assignment rows

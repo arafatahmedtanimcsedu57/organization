@@ -10,7 +10,7 @@
     "migration:generate": "npm run typeorm -- migration:generate",
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
-    "seed": "echo \"[api] seed is a placeholder until task 4.1 adds the import service\"",
+    "seed": "node --import @swc-node/register/esm-register src/import/import.command.ts",
     "start": "node --import @swc-node/register/esm-register src/main.ts",
     "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts"
   },
@@ -24,7 +24,8 @@
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@swc-node/register": "^1.12.1",
