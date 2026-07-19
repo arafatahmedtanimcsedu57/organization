@@ -5,6 +5,9 @@
   "type": "module",
   "license": "UNLICENSED",
   "private": true,
+  "scripts": {
+    "start": "echo \"[web] start is a placeholder until task 7.1 scaffolds the Vite app\" && exec tail -f /dev/null"
+  },
   "dependencies": {
     "@org-chart/domain": "*"
   }
