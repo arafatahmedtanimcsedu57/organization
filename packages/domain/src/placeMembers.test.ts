@@ -89,6 +89,56 @@ test("unknown title is placed last (in staff) and reported as a warning", () => 
   );
 });
 
+test("unique last name is shown plainly", () => {
+  const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
+  const employees: Employee[] = [
+    { sysId: "1", userId: "1", lastName: "濱井", firstName: "太郎", title: "課員", departmentName: "営業本部" },
+  ];
+
+  placeEmployees(tree, employees);
+
+  const node = tree.byName.get("営業本部");
+  assert.ok(node);
+  assert.equal(node.staff[0]?.displayName, "濱井");
+});
+
+test("shared last name is disambiguated with the given-name initial", () => {
+  const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
+  const employees: Employee[] = [
+    { sysId: "1", userId: "1", lastName: "佐藤", firstName: "悠介", title: "課員", departmentName: "営業本部" },
+    { sysId: "2", userId: "2", lastName: "佐藤", firstName: "晃", title: "課員", departmentName: "営業本部" },
+  ];
+
+  placeEmployees(tree, employees);
+
+  const node = tree.byName.get("営業本部");
+  assert.ok(node);
+  assert.deepEqual(
+    node.staff.map((m) => m.displayName).sort(),
+    ["佐藤(悠)", "佐藤(晃)"].sort(),
+  );
+});
+
+test("a configured display override wins over the computed name", () => {
+  const tree = buildDepartmentTree([dept("1", "SW開発課 2G", "")]);
+  const employees: Employee[] = [
+    {
+      sysId: "4df2151147314610d1f9cc39116d438f",
+      userId: "1",
+      lastName: "大西",
+      firstName: "隆洋",
+      title: "主任",
+      departmentName: "SW開発課 2G",
+    },
+  ];
+
+  placeEmployees(tree, employees);
+
+  const node = tree.byName.get("SW開発課 2G");
+  assert.ok(node);
+  assert.equal(node.managers[0]?.displayName, "大西【大阪】");
+});
+
 test("employee with an unmatched department is skipped and reported as a warning", () => {
   const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
   const employees = [emp("1", "行方不明", "課長", "存在しない部")];
