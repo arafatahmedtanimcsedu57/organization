@@ -37,7 +37,7 @@
 
 - [x] 5.1 Implement `OrgChartService` that loads rows and delegates to `packages/domain`
 - [x] 5.2 Add `GET /chart` returning the department tree + ordered rosters as JSON (branch/tier metadata included)
-- [ ] 5.3 Add `GET /chart/warnings` exposing build/data warnings
+- [x] 5.3 Add `GET /chart/warnings` exposing build/data warnings
 - [ ] 5.4 Add integration tests covering hierarchy, rank order, disambiguation, and `(兼)` placement
 
 ## 6. PDF export (capability: org-chart)
