@@ -42,7 +42,7 @@
 
 ## 6. PDF export (capability: org-chart)
 
-- [ ] 6.1 Add Chromium + `fonts-noto-cjk` to the api Docker image
+- [x] 6.1 Add Chromium + `fonts-noto-cjk` to the api Docker image
 - [ ] 6.2 Implement `GET /chart/pdf` via Puppeteer rendering the SPA `/chart?print=1` route (A3 landscape)
 - [ ] 6.3 Verify the PDF renders Japanese correctly (no tofu), expands every roster in full, and marks `(兼)` distinctly
 
