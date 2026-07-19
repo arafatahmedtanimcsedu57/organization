@@ -59,7 +59,7 @@
 - [x] 8.3 Build the app shell: left nav (Home · Org chart · Employees · Departments · Concurrent duties · Change history · Settings) + top bar (search, notifications, account)
 - [x] 8.4 Build the core component set: Card, Badge (success/info/warn/critical + kenmu), Banner, Button (primary/secondary/plain), IndexTable
 - [x] 8.5 Add the contextual save bar plus shared loading / empty / error states
-- [ ] 8.6 Accessibility & motion pass: visible focus rings, `prefers-reduced-motion`, color-contrast check
+- [x] 8.6 Accessibility & motion pass: visible focus rings, `prefers-reduced-motion`, color-contrast check
 - [ ] 8.7 Baseline A3-landscape print stylesheet (hide shell/nav/actions, white background, expand content)
 
 ## 9. Interactive chart tree component (capabilities: org-chart + design-system)
