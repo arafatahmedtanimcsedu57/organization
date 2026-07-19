@@ -10,7 +10,7 @@
 
 ## 2. Shared domain package (`packages/domain`)
 
-- [ ] 2.1 Define framework-free types (`Employee`, `Department`, `Assignment`, `OrgNode`, `BuildWarning`)
+- [x] 2.1 Define framework-free types (`Employee`, `Department`, `Assignment`, `OrgNode`, `BuildWarning`)
 - [ ] 2.2 Port tree-build (parent-by-name, 4 roots, orphan warning) from the legacy `buildOrg.ts`
 - [ ] 2.3 Port rank ordering + manager/staff split and title normalization (`主任２`→`主任2`)
 - [ ] 2.4 Port last-name disambiguation and display-override logic
