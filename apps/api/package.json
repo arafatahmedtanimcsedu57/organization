@@ -1,0 +1,11 @@
+{
+  "name": "@org-chart/api",
+  "version": "0.1.0",
+  "description": "NestJS REST API: persistence, import, org-chart, PDF export, admin CRUD, history.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@org-chart/domain": "*"
+  }
+}
