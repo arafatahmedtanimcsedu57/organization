@@ -10,6 +10,13 @@ export interface AppConfig {
     /** Directory containing the provided `sys_user.xlsx` / `cmn_department.xlsx` masters. */
     sourceDir: string;
   };
+  pdf: {
+    /** Base URL of the running SPA; Puppeteer navigates to `${webBaseUrl}/chart?print=1`. */
+    webBaseUrl: string;
+    /** Path to a system Chromium binary (puppeteer-core ships no browser of its own). */
+    chromiumExecutablePath?: string;
+    timeoutMs: number;
+  };
 }
 
 /** Repo root, four levels up from this file (apps/api/src/config -> repo root). */
@@ -28,6 +35,11 @@ export default (): AppConfig => {
     },
     import: {
       sourceDir: process.env.IMPORT_SOURCE_DIR || path.join(repoRoot, 'TryOutProgram'),
+    },
+    pdf: {
+      webBaseUrl: process.env.WEB_BASE_URL || `http://web:${process.env.WEB_PORT || 5173}`,
+      chromiumExecutablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      timeoutMs: Number(process.env.PDF_TIMEOUT_MS) || 30_000,
     },
   };
 };

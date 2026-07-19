@@ -7,6 +7,7 @@ import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
 import { OrgChartController } from './org-chart.controller.ts';
 import { OrgChartService } from './org-chart.service.ts';
+import type { ChartPdfService } from './chart-pdf.service.ts';
 import type { ChartNode } from './chart-node.ts';
 
 /** Minimal in-memory stand-in for the slice of `Repository<T>` the service calls (`.find`). */
@@ -61,7 +62,8 @@ function buildFixtureController(): OrgChartController {
     fakeRepo(employees),
     fakeRepo(assignments as unknown as Assignment[]),
   );
-  return new OrgChartController(service);
+  const pdfService = {} as ChartPdfService; // unused by the JSON-only scenarios below
+  return new OrgChartController(service, pdfService);
 }
 
 function findNode(nodes: ChartNode[], name: string): ChartNode | undefined {
