@@ -6,9 +6,23 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "echo \"[web] start is a placeholder until task 7.1 scaffolds the Vite app\" && exec tail -f /dev/null"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "start": "vite build && vite preview --host 0.0.0.0 --port ${WEB_PORT:-5173}"
   },
   "dependencies": {
-    "@org-chart/domain": "*"
+    "@org-chart/domain": "*",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "typescript": "^5.7.2",
+    "vite": "^8.1.5"
   }
 }
