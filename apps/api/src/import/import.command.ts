@@ -7,12 +7,13 @@ import { ImportModule } from './import.module.ts';
 import type { AppConfig } from '../config/configuration.ts';
 import { ReadMastersService } from './read-masters.service.ts';
 import { UpsertMastersService } from './upsert-masters.service.ts';
+import { SeedAssignmentsService } from './seed-assignments.service.ts';
 
 /**
  * Seed-time entrypoint (`npm run seed`): reads the `sys_user` / `cmn_department`
  * masters with SheetJS and upserts them into Postgres, keyed by department `id`
- * and employee `Sys ID` so re-running is idempotent. The 兼務 seed rows are
- * added by a later `data-import` task.
+ * and employee `Sys ID` so re-running is idempotent. Also seeds the three
+ * verifiable 兼務 (concurrent-duty) assignment rows.
  */
 async function run() {
   const logger = new Logger('Import');
@@ -23,6 +24,7 @@ async function run() {
     const sourceDir = configService.get('import.sourceDir', { infer: true });
     const readMasters = context.get(ReadMastersService);
     const upsertMasters = context.get(UpsertMastersService);
+    const seedAssignments = context.get(SeedAssignmentsService);
 
     const departments = readMasters.readDepartments(path.join(sourceDir, 'cmn_department.xlsx'));
     const employees = readMasters.readEmployees(path.join(sourceDir, 'sys_user.xlsx'));
@@ -37,6 +39,11 @@ async function run() {
     const employeeCounts = await upsertMasters.upsertEmployees(employees, departmentIdByName);
     logger.log(
       `Employees: ${employeeCounts.inserted} inserted, ${employeeCounts.updated} updated (${employees.length} total)`,
+    );
+
+    const assignmentCounts = await seedAssignments.seedConcurrentAssignments();
+    logger.log(
+      `Assignments (兼務): ${assignmentCounts.inserted} inserted, ${assignmentCounts.updated} updated`,
     );
   } finally {
     await context.close();
