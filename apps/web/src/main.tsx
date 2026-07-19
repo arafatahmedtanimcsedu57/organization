@@ -6,6 +6,7 @@ import { store } from './store/store';
 import './design/fonts.css';
 import './design/tokens.css';
 import './design/shell.css';
+import './design/components.css';
 
 const container = document.getElementById('root');
 if (!container) {
