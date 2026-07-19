@@ -9,6 +9,7 @@ RUN npm ci --workspace=@org-chart/domain --workspace=@org-chart/api --include-wo
 
 COPY packages/domain packages/domain
 COPY apps/api apps/api
+COPY TryOutProgram TryOutProgram
 
 WORKDIR /app/apps/api
 RUN chmod +x docker-entrypoint.sh
