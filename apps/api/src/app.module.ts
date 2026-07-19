@@ -13,6 +13,7 @@ import { DepartmentsModule } from './departments/departments.module.ts';
 import { EmployeesModule } from './employees/employees.module.ts';
 import { AssignmentsModule } from './assignments/assignments.module.ts';
 import { HistoryModule } from './history/history.module.ts';
+import { OrgChartModule } from './org-chart/org-chart.module.ts';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { HistoryModule } from './history/history.module.ts';
     EmployeesModule,
     AssignmentsModule,
     HistoryModule,
+    OrgChartModule,
   ],
   controllers: [AppController],
   providers: [AppService],
