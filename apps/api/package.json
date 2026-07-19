@@ -8,9 +8,20 @@
   "scripts": {
     "migration:run": "echo \"[api] migration:run is a placeholder until task 3.3 adds TypeORM migrations\"",
     "seed": "echo \"[api] seed is a placeholder until task 4.1 adds the import service\"",
-    "start": "echo \"[api] start is a placeholder until task 3.1 scaffolds the NestJS app\" && exec tail -f /dev/null"
+    "start": "node --import @swc-node/register/esm-register src/main.ts",
+    "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts"
   },
   "dependencies": {
-    "@org-chart/domain": "*"
+    "@nestjs/common": "^11.1.28",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.28",
+    "@nestjs/platform-express": "^11.1.28",
+    "@org-chart/domain": "*",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@swc-node/register": "^1.12.1",
+    "@swc/core": "^1.15.43"
   }
 }
