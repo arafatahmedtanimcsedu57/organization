@@ -31,7 +31,7 @@
 - [x] 4.3 Upsert employees by `Sys ID` and departments by `ID` (idempotent, re-runnable)
 - [x] 4.4 Seed the three verifiable 兼務 assignment rows
 - [x] 4.5 Collect and expose import warnings (unmatched departments, phantom names)
-- [ ] 4.6 Verify counts after import: 20 departments, 4 roots, 95 employees, 3 concurrent
+- [x] 4.6 Verify counts after import: 20 departments, 4 roots, 95 employees, 3 concurrent
 
 ## 5. Org-chart API (capability: org-chart)
 
