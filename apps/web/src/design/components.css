@@ -397,7 +397,8 @@
   opacity: 0;
   transition: opacity 0.12s var(--ease);
 }
-.itable tbody tr:hover .rowact {
+.itable tbody tr:hover .rowact,
+.itable tbody tr:focus-within .rowact {
   opacity: 1;
 }
 .rowact svg {
