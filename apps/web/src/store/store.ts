@@ -3,6 +3,7 @@ import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux
 import { chartApi } from './api/chartApi';
 import { employeesApi } from './api/employeesApi';
 import { departmentsApi } from './api/departmentsApi';
+import { assignmentsApi } from './api/assignmentsApi';
 
 /** Server state only: every `packages/domain`-shaped resource is fetched/cached/invalidated
  * through RTK Query API slices (see `design.md` §6). UI-only state lives in `uiStore` (Zustand). */
@@ -11,9 +12,15 @@ export const store = configureStore({
     [chartApi.reducerPath]: chartApi.reducer,
     [employeesApi.reducerPath]: employeesApi.reducer,
     [departmentsApi.reducerPath]: departmentsApi.reducer,
+    [assignmentsApi.reducerPath]: assignmentsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(chartApi.middleware, employeesApi.middleware, departmentsApi.middleware),
+    getDefaultMiddleware().concat(
+      chartApi.middleware,
+      employeesApi.middleware,
+      departmentsApi.middleware,
+      assignmentsApi.middleware,
+    ),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
