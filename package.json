@@ -8,8 +8,6 @@
     "packages/*"
   ],
   "scripts": {
-    "chart": "tsx src/index.ts",
-    "test": "node --import tsx --test src/*.test.ts",
     "test:all": "bash scripts/test-all.sh",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -17,9 +15,6 @@
   },
   "license": "UNLICENSED",
   "private": true,
-  "dependencies": {
-    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
-  },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "@types/node": "^22.10.0",
@@ -27,7 +22,6 @@
     "eslint-config-prettier": "^9.1.2",
     "globals": "^15.15.0",
     "prettier": "^3.9.5",
-    "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.64.0",
     "vitest": "^4.1.10"
