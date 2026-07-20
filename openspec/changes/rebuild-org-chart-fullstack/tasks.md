@@ -115,6 +115,6 @@
 ## 14. Cleanup, docs & verification
 
 - [x] 14.1 Remove legacy code: `src/*.ts`, `src/buildOrg.test.ts`, `scripts/seed-assignments.ts`, and the `npm run chart` script
-- [ ] 14.2 Update `README.md` with the single `docker compose up` setup, how to run the tests, and a maintainer guide (satisfies Req 2)
+- [x] 14.2 Update `README.md` with the single `docker compose up` setup, how to run the tests, and a maintainer guide (satisfies Req 2)
 - [ ] 14.3 End-to-end smoke check: one `docker compose up` → seeded chart → PDF → an edit → history entry → chart reflects it
 - [ ] 14.4 Confirm constraints: free DBMS, additive schema only, UTF-8 output, originals in `TryOutProgram/` untouched

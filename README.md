@@ -1,95 +1,138 @@
 # Organization Chart Auto-Output App
 
-Automatically generates a **printable organization chart** (HTML → PDF) from the two Syslabo
-masters — `sys_user` (employees) and `cmn_department` (departments) — reproducing the information
-in the hand-made `組織図(Current Organizational Chart).xlsx`.
+A full-stack app that automatically generates a **printable organization chart** (interactive
+React view → A3 PDF) from the two Syslabo masters — `sys_user` (employees) and `cmn_department`
+(departments) — reproducing the hand-made `組織図(Current Organizational Chart).xlsx`, and adds a
+maintenance UI with change history and a working concurrent-duties (兼務) model.
 
-Built for the Syslabo assignment. It covers Requirements **1 & 2** (the generator + reproducible
-setup) and Requirement **4** (a concurrent-duties / 兼務 data model, wired in so the chart can
-actually show the `(兼)` entries). See [`docs/concurrent-duties-design.md`](docs/concurrent-duties-design.md).
+Built for the Syslabo assignment. Covers all four requirements:
 
-![Sample output](docs/sample-chart.png)
+- **1 & 2** — the chart generator itself, and a reproducible one-command dev environment.
+- **3** — a maintenance UI for employees/departments/assignments with an append-only change-history browser.
+- **4** — concurrent duties (兼務) as a first-class relation, feeding the `(兼)` chips on the chart.
+
+See [`docs/assignment-understanding.md`](docs/assignment-understanding.md) and
+[`docs/concurrent-duties-design.md`](docs/concurrent-duties-design.md) for the background design notes.
+
+## Architecture
+
+```
+apps/api        NestJS REST API — TypeORM + PostgreSQL, xlsx import, org-chart, PDF export
+                 (Puppeteer), employee/department/assignment CRUD, append-only history.
+apps/web        React SPA (Vite) — interactive org chart (Tree ⇄ Network), admin area for the
+                 masters, history browser. Organo Admin (Shopify/Polaris-style) design system.
+packages/domain Framework-free domain core shared by api and web: department tree, rank
+                 ordering, name disambiguation, title normalization, 兼務 placement.
+data/           Working copies of the provided xlsx masters, used only as the import source.
+docker-compose.yml   db (Postgres) + api + web, wired together; a test-only db-test service.
+```
 
 ## Requirements
 
-- **Node.js 20 or newer** (check with `node --version`). That's the only prerequisite —
-  everything else is installed by `npm install`.
+- **Docker** and **Docker Compose** (the only prerequisite to run the app).
+- **Node.js 20+** and npm, only if you want to run things outside Docker (e.g. `npm run lint`,
+  or the test suite, which drives Docker itself for the databases).
 
 ## Setup & usage
 
 ```bash
-npm install          # install dependencies (SheetJS, TypeScript, tsx)
-npm run chart        # read data/*.xlsx → write dist/organization-chart.html
+cp .env.example .env   # optional — defaults already work
+docker compose up --build
 ```
 
-Then open **`dist/organization-chart.html`** in any browser. To produce a PDF, use the browser's
-**Print** dialog (Ctrl/Cmd + P) → *Save as PDF*. The print stylesheet targets **A3 landscape**;
-adjust paper size/orientation in the dialog if you prefer.
+This single command brings up **the database, the API, and the web app**, and the API's
+entrypoint automatically **waits for Postgres, runs migrations, and imports/seeds the masters**
+from `data/*.xlsx` before starting — no separate seed step.
 
-`npm run chart` also prints a summary and flags any data problems, e.g.:
+Once it's up:
 
+- **Web app:** http://localhost:5173 — chart at `/chart`, admin at `/admin`, history at `/history`.
+- **API:** http://localhost:3000 — see the controllers below.
+
+Stop with `Ctrl+C`, or `docker compose down` (add `-v` to also drop the `db-data` volume and
+start from a clean database next time).
+
+## Maintainer guide
+
+### Everyday maintenance (no code changes)
+
+Use the **admin UI** at `/admin` (Employees, Departments, Assignments tabs):
+
+- **Employees / Departments** — create, edit, and deactivate. Schema changes are additive-only
+  (new columns, never repurposed ones), per the assignment's precautions.
+- **Assignments** — a person's **primary** posting plus any **concurrent (兼務)** postings.
+  Adding a concurrent assignment is what makes a person's `(兼)` chip appear in another
+  department on the chart; a second *primary* posting for the same person is rejected.
+- Every create/update/deactivate across these three is recorded automatically; browse it at
+  `/history` (reverse-chronological, before/after, no edit or delete path — the log is
+  append-only by design).
+
+### API surface (`apps/api`, NestJS)
+
+| Controller | Base path | Purpose |
+| --- | --- | --- |
+| `OrgChartController` | `/chart` | Chart JSON + PDF export (Puppeteer, A3) |
+| `EmployeesController` | `/employees` | CRUD |
+| `DepartmentsController` | `/departments` | CRUD |
+| `AssignmentsController` | `/assignments` | Primary/concurrent posting CRUD |
+| `HistoryController` | `/history` | Read-only change-log query (filter by entity/time) |
+
+### Domain core (`packages/domain`)
+
+The department tree (parent-by-name from `cmn_department`, **not** `sys_user.Manager` — empty for
+every row), position-rank ordering, shared-last-name disambiguation, and title normalization
+(`主任２` full-width === `主任2`) all live here, framework-free, and are unit-tested directly.
+
+### Re-importing the masters
+
+The API re-runs its import/seed step on every container start (safe/idempotent). To re-import
+manually against a running stack:
+
+```bash
+docker compose exec api npm run seed
 ```
-✓ Wrote dist/organization-chart.html
-  20 departments · 4 roots · 95 people placed · 3 concurrent (兼務) entries
-  No data warnings.
+
+To change the source data, edit the working copies in `data/*.xlsx` (never the originals in
+`TryOutProgram/`) and re-run the seed.
+
+### Database migrations
+
+```bash
+docker compose exec api npm run migration:generate -- src/migrations/<Name>
+docker compose exec api npm run migration:run
 ```
-
-## How it works
-
-```
-data/*.xlsx ──▶ readMasters ──▶ buildOrg ──▶ renderHtml ──▶ dist/organization-chart.html
-                (SheetJS)        (domain)      (HTML+CSS)
-```
-
-- **`src/readMasters.ts`** — parses the three xlsx files (SheetJS handles Japanese/UTF-8).
-- **`src/buildOrg.ts`** — the domain core: builds the department tree, places each person into
-  their department, orders each roster by position rank, disambiguates shared last names, and
-  applies concurrent (兼務) postings.
-- **`src/renderHtml.ts`** — renders the "tree + rosters" layout as one self-contained HTML file
-  with inline print CSS.
-- **`src/config.ts`** — **the file a maintainer edits** (see below).
-- **`src/index.ts`** — CLI glue.
-
-## Maintaining it (no code changes needed for the common cases)
-
-Everything routine lives in **`src/config.ts`**:
-
-| To change… | Edit in `src/config.ts` |
-|---|---|
-| Chart heading / year | `CHART_TITLE` |
-| Position order / add a new title | `POSITION_RANK` |
-| Japanese→English department labels | `DEPARTMENT_EN` |
-| A special-case display name (e.g. a location tag) | `DISPLAY_OVERRIDES` |
-| Input/output file locations | `PATHS` |
-
-**Employee / department changes:** edit the xlsx files in `data/` (kept as copies of the
-originals in `TryOutProgram/`) and re-run `npm run chart`.
-
-**Concurrent duties (兼務):** edit `data/user_assignments.xlsx` (add/remove rows keyed by Sys ID)
-and re-run. Regenerate the seed anytime with `npx tsx scripts/seed-assignments.ts`.
-
-### Name display rule
-People are shown by **last name only**. When two people share a last name, the given-name's first
-character is appended in parentheses (`佐藤(悠)` / `佐藤(晃)`). Hand-crafted exceptions (e.g. the
-`大西【大阪】` location tag) are pinned in `DISPLAY_OVERRIDES`.
 
 ## Tests
 
+One command runs the whole suite headless (domain unit tests → API feature tests → Playwright
+E2E), the same way CI does (`.github/workflows/ci.yml`):
+
 ```bash
-npm test             # node:test unit tests for the domain core (buildOrg)
+npm run test:all
 ```
 
-## Data notes
+This spins up the ephemeral `db-test` Postgres service for API feature tests, then the full
+`docker compose` stack (reset to the same deterministic fixtures) for the three Playwright
+journeys: view/export the chart, edit a master and see chart + history update, and add a 兼務
+posting and see its chip appear in the target department.
 
-- The provided masters are copied into `data/` and read as-is; the originals in `TryOutProgram/`
-  are never modified.
-- Two inconsistencies between the legacy chart and the master data (a missing `ソリューション営業部`
-  department, and how 代表取締役 佐藤 is depicted) are documented in
-  [`docs/concurrent-duties-design.md`](docs/concurrent-duties-design.md).
-- Output is UTF-8 HTML, so Japanese prints correctly.
+To run a layer individually:
 
-## Not included (this iteration)
+```bash
+npm test --workspace=@org-chart/domain     # domain unit tests
+npm test --workspace=@org-chart/api        # API feature tests (needs db-test — see below)
+npx playwright test --config=apps/web/playwright.config.ts   # E2E (needs the full stack running)
+```
 
-Requirement 3 (a CRUD maintenance UI with change-history) is out of scope. The Requirement-4
-model already includes `valid_from` / `valid_to` columns that a future history feature can build on.
-# organization
+```bash
+npm run test:db:up --workspace=@org-chart/api    # start the ephemeral db-test service
+npm run test:db:down --workspace=@org-chart/api  # tear it down
+```
+
+## Constraints honored
+
+- **Free DBMS** — PostgreSQL.
+- **Additive schema only** — master-table changes add columns rather than modifying existing ones.
+- **UTF-8 output** — the chart and PDF render Japanese correctly.
+- **Originals untouched** — `TryOutProgram/*.xlsx` are read-only reference; `data/*.xlsx` are the
+  working copies actually imported.
