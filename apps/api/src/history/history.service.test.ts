@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { test } from 'vitest';
 
 import type { FindManyOptions, ObjectLiteral, Repository } from 'typeorm';
 import { HistoryService } from './history.service.ts';

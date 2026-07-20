@@ -100,7 +100,7 @@
 
 ## 13. Automated tests — features & user interaction (capability: quality-assurance)
 
-- [ ] 13.1 Set up the test stack: unit/feature runner (Vitest or Jest) + `supertest` for the API, and `@playwright/test` for browser E2E
+- [x] 13.1 Set up the test stack: unit/feature runner (Vitest or Jest) + `supertest` for the API, and `@playwright/test` for browser E2E
 - [ ] 13.2 Stand up an ephemeral test database (a Compose test service or throwaway schema) seeded with deterministic fixtures
 - [ ] 13.3 Domain unit tests: tree build, rank order, disambiguation, title normalization, 兼 placement (no DB / no framework)
 - [ ] 13.4 API feature tests — org-chart: hierarchy, rank order, disambiguation, and `(兼)` placement in the `/chart` JSON
