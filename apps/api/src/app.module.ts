@@ -14,6 +14,7 @@ import { EmployeesModule } from './employees/employees.module.ts';
 import { AssignmentsModule } from './assignments/assignments.module.ts';
 import { HistoryModule } from './history/history.module.ts';
 import { OrgChartModule } from './org-chart/org-chart.module.ts';
+import { AuditModule } from './common/audit.module.ts';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { OrgChartModule } from './org-chart/org-chart.module.ts';
     AssignmentsModule,
     HistoryModule,
     OrgChartModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],

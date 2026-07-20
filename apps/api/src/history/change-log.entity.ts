@@ -28,8 +28,8 @@ export class ChangeLog {
   changedAt!: Date;
 
   @Column({ name: 'before', type: 'jsonb', nullable: true })
-  before!: unknown | null;
+  before!: Record<string, unknown> | null;
 
   @Column({ name: 'after', type: 'jsonb', nullable: true })
-  after!: unknown | null;
+  after!: Record<string, unknown> | null;
 }
