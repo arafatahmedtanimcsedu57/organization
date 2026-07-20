@@ -1,8 +1,9 @@
 /* =====================================================================
    ORG CHART — recursive tree of department cards
-   Baseline structure only (department card + rank-ordered roster lines);
-   spacing rhythm, connector rails, branch colors, and tier styling are
-   layered on top by later passes. Ported from `ui_design/shopify/styles.css`.
+   Spacing rhythm (large gap between top-level divisions, tighter gap
+   between siblings) plus connector rails that terminate at the last
+   child. Branch colors and tier styling are layered on top by later
+   passes. Ported from `ui_design/shopify/styles.css`.
    ===================================================================== */
 
 .tree {
@@ -17,6 +18,8 @@
   position: relative;
 }
 
+/* Nested groups hang off a rail that STOPS at the last child (each node
+   draws its own rail segment; the last one only reaches its elbow). */
 .children {
   margin-left: 26px;
   padding-left: 26px;
@@ -24,6 +27,34 @@
   flex-direction: column;
   gap: 14px;
   margin-top: 14px;
+}
+
+.children > .node::before {
+  /* horizontal elbow into the card */
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 26px;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--rail, var(--border-strong));
+}
+
+.children > .node::after {
+  /* vertical rail segment */
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: -14px;
+  width: 2px;
+  height: 40px;
+  border-radius: 2px;
+  background: var(--rail, var(--border-strong));
+}
+
+.children > .node:not(:last-child)::after {
+  height: calc(100% + 14px);
 }
 
 .dept {
