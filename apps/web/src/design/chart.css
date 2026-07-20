@@ -202,3 +202,12 @@
   font-weight: 400;
   color: var(--text-sub);
 }
+
+/* Expand affordance for an oversized roster line (interactive view only —
+   print/PDF (9.8) always renders every member, so this button never appears there). */
+.line .ppl .roster-expand {
+  height: auto;
+  padding: 2px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+}
