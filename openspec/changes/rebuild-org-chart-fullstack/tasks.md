@@ -81,7 +81,7 @@
 - [x] 10.2 Departments CRUD API including parent selection and cycle prevention
 - [x] 10.3 Employees admin UI: IndexTable list + create/edit panel + deactivate, via RTK Query
 - [x] 10.4 Departments admin UI: list, create, edit (parent picker), deactivate
-- [ ] 10.5 Wire the contextual save bar (Unsaved → Save/Discard) and validation errors into the edit panels
+- [x] 10.5 Wire the contextual save bar (Unsaved → Save/Discard) and validation errors into the edit panels
 - [ ] 10.6 Verify edits are reflected in the chart after regeneration; deactivation is non-destructive
 
 ## 11. Concurrent duties (capability: concurrent-duties)

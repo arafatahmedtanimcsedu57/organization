@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState } from '../../design/components';
+import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState, SaveBar } from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
 import {
   useCreateDepartmentMutation,
@@ -34,6 +34,14 @@ function errorMessage(error: unknown): string {
   return 'Something went wrong. Please try again.';
 }
 
+type DepartmentFieldErrors = Partial<Record<keyof DepartmentFormState, string>>;
+
+function validate(form: DepartmentFormState): DepartmentFieldErrors {
+  const errors: DepartmentFieldErrors = {};
+  if (!form.name.trim()) errors.name = 'Name is required.';
+  return errors;
+}
+
 /** Walks the parent-by-name chain to find every descendant of `name`, so the parent picker can exclude them (would-be cycle). */
 function descendantNames(name: string, departments: Department[]): Set<string> {
   const descendants = new Set<string>();
@@ -54,16 +62,26 @@ export function DepartmentsPage() {
 
   const [panel, setPanel] = useState<'create' | string | null>(null);
   const [form, setForm] = useState<DepartmentFormState>(EMPTY_FORM);
+  const [baseline, setBaseline] = useState<DepartmentFormState>(EMPTY_FORM);
+  const [attemptedSave, setAttemptedSave] = useState(false);
 
   const editingDepartment = panel && panel !== 'create' ? departments?.find((department) => department.id === panel) : undefined;
   const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
   const saveError = panel === 'create' ? createState.error : updateState.error;
+  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
+  const fieldErrors = validate(form);
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
   useEffect(() => {
     if (panel === 'create') {
       setForm(EMPTY_FORM);
+      setBaseline(EMPTY_FORM);
+      setAttemptedSave(false);
     } else if (editingDepartment) {
-      setForm(toFormState(editingDepartment));
+      const state = toFormState(editingDepartment);
+      setForm(state);
+      setBaseline(state);
+      setAttemptedSave(false);
     }
   }, [panel, editingDepartment]);
 
@@ -80,9 +98,18 @@ export function DepartmentsPage() {
   function closePanel() {
     setPanel(null);
     setForm(EMPTY_FORM);
+    setBaseline(EMPTY_FORM);
+    setAttemptedSave(false);
+  }
+
+  function discardChanges() {
+    setForm(baseline);
+    setAttemptedSave(false);
   }
 
   async function handleSave() {
+    setAttemptedSave(true);
+    if (hasFieldErrors) return;
     const body = { name: form.name, parentName: form.parentName, head: form.head };
     if (panel === 'create') {
       const result = await createDepartment(body);
@@ -133,6 +160,18 @@ export function DepartmentsPage() {
 
   return (
     <div className="page">
+      {panel && isDirty ? (
+        <SaveBar
+          message={
+            panel === 'create'
+              ? 'Adding a new department — unsaved changes'
+              : `Editing ${editingDepartment?.name ?? ''} — unsaved changes`
+          }
+          saving={saving}
+          onSave={handleSave}
+          onDiscard={discardChanges}
+        />
+      ) : null}
       <div className="page-head">
         <div>
           <div className="breadcrumb">Home · Maintenance</div>
@@ -186,6 +225,7 @@ export function DepartmentsPage() {
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
               />
+              {attemptedSave && fieldErrors.name ? <div className="err">{fieldErrors.name}</div> : null}
             </div>
             <div className="field">
               <label htmlFor="dept-parent">Parent department</label>
@@ -226,7 +266,7 @@ export function DepartmentsPage() {
             <Button variant="secondary" onClick={closePanel} disabled={saving}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSave} disabled={saving || !form.name}>
+            <Button variant="primary" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
           </Card.Footer>
