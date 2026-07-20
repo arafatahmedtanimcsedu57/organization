@@ -65,7 +65,7 @@
 ## 9. Interactive chart tree component (capabilities: org-chart + design-system)
 
 - [x] 9.1 Build the recursive tree-of-cards from the `/chart` JSON: department card + rank-ordered roster lines
-- [ ] 9.2 Apply the spacing rhythm (large gap between top-level divisions, tighter gap between siblings) so no cards touch, and connector rails that terminate at the last child
+- [x] 9.2 Apply the spacing rhythm (large gap between top-level divisions, tighter gap between siblings) so no cards touch, and connector rails that terminate at the last child
 - [ ] 9.3 Color-code each division branch: rail + card accent stripe + node marker cascade to the whole subtree
 - [ ] 9.4 Tier styling: division vs. department vs. group cards (tinted header + larger name for divisions)
 - [ ] 9.5 Render roster lines: position label + wrapped 課員 grid; disambiguated names (given-name initial) and location tags (`【大阪】`)
