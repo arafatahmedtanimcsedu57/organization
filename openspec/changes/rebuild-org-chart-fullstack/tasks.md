@@ -109,7 +109,7 @@
 - [x] 13.7 API feature tests — history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
 - [x] 13.8 E2E journey A (Playwright): open chart, toggle Tree ⇄ Network, "Download PDF" returns a valid A3 PDF
 - [x] 13.9 E2E journey B (Playwright): edit an employee → save → chart updates → a history entry appears with before/after
-- [ ] 13.10 E2E journey C (Playwright): add a 兼務 posting → the sourced 兼 chip appears in the target department on the chart
+- [x] 13.10 E2E journey C (Playwright): add a 兼務 posting → the sourced 兼 chip appears in the target department on the chart
 - [ ] 13.11 Wire the whole suite to run in one command and headless in CI; make E2E deterministic against the seeded fixtures
 
 ## 14. Cleanup, docs & verification
