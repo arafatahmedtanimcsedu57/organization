@@ -16,7 +16,7 @@ export function DeptNode({ node }: { node: ChartNode }) {
 
   return (
     <div className="node" style={branchStyle}>
-      <div className="dept">
+      <div className={`dept dept--${node.tier}`}>
         <div className="dept-hd">
           <span className="dot" aria-hidden="true" />
           <span className="dn">{node.name}</span>

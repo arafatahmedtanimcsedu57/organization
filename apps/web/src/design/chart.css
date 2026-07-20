@@ -117,6 +117,32 @@
   color: var(--text-disabled);
 }
 
+/* Tier styling — division cards are visually elevated above nested department
+   and group cards so the org tier reads at a glance, without reading labels. */
+.dept--division > .dept-hd {
+  background: var(--tint, var(--surface-sub));
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.dept--division > .dept-hd .dn {
+  font-size: 16px;
+}
+
+.dept--department > .dept-hd .dn {
+  font-size: 14px;
+}
+
+.dept--group > .dept-hd {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.dept--group > .dept-hd .dn {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
 .roster {
   padding: 6px 13px 11px;
   display: flex;
