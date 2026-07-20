@@ -36,11 +36,20 @@ export function RosterLines({ managers, staff }: RosterLinesProps) {
         <div className="line" key={`${group.title}-${i}`}>
           <span className="pos">{group.title}</span>
           <div className="ppl">
-            {group.members.map((member) => (
-              <span className="p" key={member.sysId}>
-                {member.displayName}
-              </span>
-            ))}
+            {group.members.map((member) =>
+              member.concurrent ? (
+                <span className="p kenmu" key={member.sysId}>
+                  <span className="kenmu-mark">兼</span> {member.displayName}
+                  <span className="kenmu-src">
+                    ← {member.sourceDepartmentName} {member.sourceTitle}
+                  </span>
+                </span>
+              ) : (
+                <span className="p" key={member.sysId}>
+                  {member.displayName}
+                </span>
+              ),
+            )}
           </div>
         </div>
       ))}
