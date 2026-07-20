@@ -68,7 +68,7 @@
 - [x] 9.2 Apply the spacing rhythm (large gap between top-level divisions, tighter gap between siblings) so no cards touch, and connector rails that terminate at the last child
 - [x] 9.3 Color-code each division branch: rail + card accent stripe + node marker cascade to the whole subtree
 - [x] 9.4 Tier styling: division vs. department vs. group cards (tinted header + larger name for divisions)
-- [ ] 9.5 Render roster lines: position label + wrapped 課員 grid; disambiguated names (given-name initial) and location tags (`【大阪】`)
+- [x] 9.5 Render roster lines: position label + wrapped 課員 grid; disambiguated names (given-name initial) and location tags (`【大阪】`)
 - [ ] 9.6 Render 兼務 as a sourced chip (dashed connector → chip naming source dept + title), visually distinct from primary members
 - [ ] 9.7 Oversized-roster truncation with an expand affordance (`＋N 課員`) in the interactive view only
 - [ ] 9.8 Print mode: `?print=1` expands every roster in full (no truncation) and applies the A3 print CSS — this is the route the PDF endpoint (6.2) renders
