@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { test } from 'vitest';
 
 import { buildDepartmentTree } from "./buildTree.ts";
 import type { Department } from "./model.ts";

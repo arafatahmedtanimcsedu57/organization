@@ -12,7 +12,8 @@
     "migration:revert": "npm run typeorm -- migration:revert",
     "seed": "node --import @swc-node/register/esm-register src/import/import.command.ts",
     "start": "node --import @swc-node/register/esm-register src/main.ts",
-    "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts"
+    "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.28",
@@ -32,6 +33,9 @@
   },
   "devDependencies": {
     "@swc-node/register": "^1.12.1",
-    "@swc/core": "^1.15.43"
+    "@swc/core": "^1.15.43",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
+    "unplugin-swc": "^1.5.9"
   }
 }

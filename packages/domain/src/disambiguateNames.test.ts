@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { test } from 'vitest';
 
 import { computeDisplayNames } from "./disambiguateNames.ts";
 import type { Employee } from "./model.ts";
