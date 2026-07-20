@@ -17,6 +17,27 @@ services:
       retries: 10
       start_period: 5s
 
+  # Ephemeral test database for `apps/api` feature tests. Not part of the default
+  # `docker compose up`; start explicitly with `docker compose up -d db-test`.
+  # Data lives on tmpfs (no named volume) so it never survives a container restart.
+  db-test:
+    image: postgres:16
+    restart: "no"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-orgchart}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-orgchart}
+      POSTGRES_DB: ${TEST_POSTGRES_DB:-orgchart_test}
+    ports:
+      - "${TEST_POSTGRES_PORT:-5433}:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-orgchart} -d ${TEST_POSTGRES_DB:-orgchart_test}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
   api:
     build:
       context: .
