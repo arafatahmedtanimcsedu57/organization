@@ -211,3 +211,116 @@
   font-size: 12px;
   border-radius: 999px;
 }
+
+/* =====================================================================
+   NETWORK VIEW — Tree ⇄ Network switch (9.9): department nodes placed by
+   a dendrogram layout (SVG lines beneath, HTML cards on top so text stays
+   selectable/accessible). Reporting lines pick up the same branch colors
+   as the tree; 兼務 postings render as dashed brand-green arrows between
+   the source and target department nodes, labeled with the person.
+   ===================================================================== */
+
+.network {
+  position: relative;
+  margin: 22px 20px 26px;
+}
+
+.network-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.network-edge {
+  fill: none;
+  stroke-width: 2;
+  opacity: 0.85;
+}
+
+.network-kenmu-edge {
+  fill: none;
+  stroke: var(--brand);
+  stroke-width: 1.75;
+  stroke-dasharray: 5 4;
+}
+
+.kenmu-arrowhead {
+  fill: var(--brand);
+}
+
+.network-kenmu-label {
+  font-family: var(--f-jp);
+  font-size: 10.5px;
+  fill: var(--brand-dark);
+}
+
+.network-nodes {
+  position: relative;
+}
+
+.network-node {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.network-node::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rail, var(--border-strong));
+}
+
+.network-node .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--rail, var(--border-strong));
+}
+
+.network-node .nn-name {
+  font-family: var(--f-jp);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.network-node .nn-en {
+  font-size: 10.5px;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.network-node .nn-count {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-disabled);
+  flex: 0 0 auto;
+}
+
+.network-node--division {
+  background: var(--tint, var(--surface-sub));
+}
+
+.network-node--division .nn-name {
+  font-size: 14px;
+}
