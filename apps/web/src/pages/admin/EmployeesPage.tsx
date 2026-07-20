@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { POSITION_RANK } from '@org-chart/domain';
-import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState } from '../../design/components';
+import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState, SaveBar } from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
 import {
   useCreateEmployeeMutation,
@@ -46,6 +46,17 @@ function initials(employee: Employee): string {
   return employee.lastName.slice(0, 1);
 }
 
+type EmployeeFieldErrors = Partial<Record<keyof EmployeeFormState, string>>;
+
+function validate(form: EmployeeFormState): EmployeeFieldErrors {
+  const errors: EmployeeFieldErrors = {};
+  if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
+  if (!form.firstName.trim()) errors.firstName = 'First name is required.';
+  if (!form.title.trim()) errors.title = 'Title is required.';
+  if (!form.departmentId) errors.departmentId = 'Department is required.';
+  return errors;
+}
+
 export function EmployeesPage() {
   const { data: employees, error, isLoading, refetch } = useGetEmployeesQuery();
   const { data: departments } = useGetDepartmentsQuery();
@@ -55,16 +66,26 @@ export function EmployeesPage() {
 
   const [panel, setPanel] = useState<'create' | string | null>(null);
   const [form, setForm] = useState<EmployeeFormState>(EMPTY_FORM);
+  const [baseline, setBaseline] = useState<EmployeeFormState>(EMPTY_FORM);
+  const [attemptedSave, setAttemptedSave] = useState(false);
 
   const editingEmployee = panel && panel !== 'create' ? employees?.find((employee) => employee.sysId === panel) : undefined;
   const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
   const saveError = panel === 'create' ? createState.error : updateState.error;
+  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
+  const fieldErrors = validate(form);
+  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
   useEffect(() => {
     if (panel === 'create') {
       setForm(EMPTY_FORM);
+      setBaseline(EMPTY_FORM);
+      setAttemptedSave(false);
     } else if (editingEmployee) {
-      setForm(toFormState(editingEmployee));
+      const state = toFormState(editingEmployee);
+      setForm(state);
+      setBaseline(state);
+      setAttemptedSave(false);
     }
   }, [panel, editingEmployee]);
 
@@ -81,9 +102,18 @@ export function EmployeesPage() {
   function closePanel() {
     setPanel(null);
     setForm(EMPTY_FORM);
+    setBaseline(EMPTY_FORM);
+    setAttemptedSave(false);
+  }
+
+  function discardChanges() {
+    setForm(baseline);
+    setAttemptedSave(false);
   }
 
   async function handleSave() {
+    setAttemptedSave(true);
+    if (hasFieldErrors) return;
     if (panel === 'create') {
       const result = await createEmployee(form);
       if (!('error' in result)) closePanel();
@@ -140,6 +170,18 @@ export function EmployeesPage() {
 
   return (
     <div className="page">
+      {panel && isDirty ? (
+        <SaveBar
+          message={
+            panel === 'create'
+              ? 'Adding a new employee — unsaved changes'
+              : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} — unsaved changes`
+          }
+          saving={saving}
+          onSave={handleSave}
+          onDiscard={discardChanges}
+        />
+      ) : null}
       <div className="page-head">
         <div>
           <div className="breadcrumb">Home · Maintenance</div>
@@ -194,6 +236,7 @@ export function EmployeesPage() {
                   value={form.lastName}
                   onChange={(event) => setForm({ ...form, lastName: event.target.value })}
                 />
+                {attemptedSave && fieldErrors.lastName ? <div className="err">{fieldErrors.lastName}</div> : null}
               </div>
               <div className="field">
                 <label htmlFor="emp-first-name">First name 名</label>
@@ -203,6 +246,7 @@ export function EmployeesPage() {
                   value={form.firstName}
                   onChange={(event) => setForm({ ...form, firstName: event.target.value })}
                 />
+                {attemptedSave && fieldErrors.firstName ? <div className="err">{fieldErrors.firstName}</div> : null}
               </div>
             </div>
             <div className="field">
@@ -219,6 +263,7 @@ export function EmployeesPage() {
                   <option key={rank} value={rank} />
                 ))}
               </datalist>
+              {attemptedSave && fieldErrors.title ? <div className="err">{fieldErrors.title}</div> : null}
             </div>
             <div className="field">
               <label htmlFor="emp-department">Home department 部門</label>
@@ -239,6 +284,7 @@ export function EmployeesPage() {
                     </option>
                   ))}
               </select>
+              {attemptedSave && fieldErrors.departmentId ? <div className="err">{fieldErrors.departmentId}</div> : null}
             </div>
             {saveError ? <div className="err">{errorMessage(saveError)}</div> : null}
           </Card.Section>
@@ -252,11 +298,7 @@ export function EmployeesPage() {
             <Button variant="secondary" onClick={closePanel} disabled={saving}>
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              onClick={handleSave}
-              disabled={saving || !form.lastName || !form.firstName || !form.title || !form.departmentId}
-            >
+            <Button variant="primary" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
           </Card.Footer>
