@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
-import { useGetChartQuery } from '../store/api/chartApi';
+import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
 import { useUiStore } from '../store/uiStore';
+import { DataIssuesStrip } from './chart/DataIssuesStrip';
+import { Legend } from './chart/Legend';
 import { NetworkView } from './chart/NetworkView';
 import { OrgTree } from './chart/OrgTree';
 
@@ -13,6 +15,7 @@ import { OrgTree } from './chart/OrgTree';
  * PDF layout this app ships), regardless of which view the maintainer had open interactively. */
 export function ChartPage() {
   const { data, error, isLoading, refetch } = useGetChartQuery();
+  const { data: warningsData } = useGetChartWarningsQuery();
   const [searchParams] = useSearchParams();
   const printMode = searchParams.get('print') === '1';
   const setPrintMode = useUiStore((state) => state.setPrintMode);
@@ -43,12 +46,22 @@ export function ChartPage() {
             >
               Network
             </Button>
+            <a className="btn brand sm" href="/api/chart/pdf" download="organization-chart.pdf">
+              Download PDF
+            </a>
           </div>
         ) : null}
       </div>
 
+      {!printMode ? <DataIssuesStrip warnings={warningsData?.warnings ?? []} /> : null}
+
       <Card>
         <Card.Header title="Chart" />
+        {data && data.roots.length > 0 ? (
+          <Card.Section>
+            <Legend roots={data.roots} />
+          </Card.Section>
+        ) : null}
         {isLoading ? (
           <Card.Body>
             <LoadingState message="Loading the org chart…" />

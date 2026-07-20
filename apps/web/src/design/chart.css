@@ -213,6 +213,55 @@
 }
 
 /* =====================================================================
+   LEGEND — explains branch colors + the 兼務 chip so the chart (on
+   screen or in the exported PDF) is readable without the surrounding
+   UI. Sits in a `.card-sec` above the tree/network content (9.10).
+   ===================================================================== */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.legend-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-sub);
+  font-family: var(--f-jp);
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.legend-kenmu {
+  padding: 1px 8px;
+}
+
+/* =====================================================================
+   DATA ISSUES STRIP — non-fatal BuildWarnings from the last build,
+   maintenance-facing only (hidden from print/PDF via `.no-print`).
+   ===================================================================== */
+
+.data-issue-item {
+  display: inline-block;
+  font-size: 13px;
+}
+
+/* =====================================================================
    NETWORK VIEW — Tree ⇄ Network switch (9.9): department nodes placed by
    a dendrogram layout (SVG lines beneath, HTML cards on top so text stays
    selectable/accessible). Reporting lines pick up the same branch colors
