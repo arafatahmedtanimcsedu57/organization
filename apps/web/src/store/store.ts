@@ -4,6 +4,7 @@ import { chartApi } from './api/chartApi';
 import { employeesApi } from './api/employeesApi';
 import { departmentsApi } from './api/departmentsApi';
 import { assignmentsApi } from './api/assignmentsApi';
+import { historyApi } from './api/historyApi';
 
 /** Server state only: every `packages/domain`-shaped resource is fetched/cached/invalidated
  * through RTK Query API slices (see `design.md` §6). UI-only state lives in `uiStore` (Zustand). */
@@ -13,6 +14,7 @@ export const store = configureStore({
     [employeesApi.reducerPath]: employeesApi.reducer,
     [departmentsApi.reducerPath]: departmentsApi.reducer,
     [assignmentsApi.reducerPath]: assignmentsApi.reducer,
+    [historyApi.reducerPath]: historyApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -20,6 +22,7 @@ export const store = configureStore({
       employeesApi.middleware,
       departmentsApi.middleware,
       assignmentsApi.middleware,
+      historyApi.middleware,
     ),
 });
 

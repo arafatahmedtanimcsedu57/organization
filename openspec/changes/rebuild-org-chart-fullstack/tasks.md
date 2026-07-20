@@ -96,7 +96,7 @@
 - [x] 12.1 Implement an audit interceptor / TypeORM subscriber writing `ChangeLog` on every create/update/deactivate
 - [x] 12.2 Capture actor, timestamp, action, and before/after JSON for employees, departments, and assignments
 - [x] 12.3 Add read-only `GET /history` (filter by entity + time); ensure no edit/delete path exists
-- [ ] 12.4 Build the history browser UI (per-entity, reverse-chronological, shows what changed)
+- [x] 12.4 Build the history browser UI (per-entity, reverse-chronological, shows what changed)
 
 ## 13. Automated tests — features & user interaction (capability: quality-assurance)
 
