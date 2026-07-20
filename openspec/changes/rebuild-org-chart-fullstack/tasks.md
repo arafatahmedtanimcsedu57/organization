@@ -77,7 +77,7 @@
 
 ## 10. Master maintenance UI (capability: master-data-management)
 
-- [ ] 10.1 Employees CRUD API (create/read/update/deactivate) with `class-validator` DTOs
+- [x] 10.1 Employees CRUD API (create/read/update/deactivate) with `class-validator` DTOs
 - [ ] 10.2 Departments CRUD API including parent selection and cycle prevention
 - [ ] 10.3 Employees admin UI: IndexTable list + create/edit panel + deactivate, via RTK Query
 - [ ] 10.4 Departments admin UI: list, create, edit (parent picker), deactivate
