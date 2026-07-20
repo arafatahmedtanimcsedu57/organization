@@ -86,7 +86,7 @@
 
 ## 11. Concurrent duties (capability: concurrent-duties)
 
-- [ ] 11.1 Assignments CRUD API with per-department title, `is_primary`, `assignment_type`, `valid_from/valid_to`
+- [x] 11.1 Assignments CRUD API with per-department title, `is_primary`, `assignment_type`, `valid_from/valid_to`
 - [ ] 11.2 Enforce exactly one primary posting per person; reject a second primary
 - [ ] 11.3 Assignments admin UI to add/edit/remove concurrent postings
 - [ ] 11.4 Verify a new concurrent posting appears on the chart with the sourced `(兼)` chip in the target department
