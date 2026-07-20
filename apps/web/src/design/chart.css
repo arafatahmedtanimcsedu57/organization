@@ -1,0 +1,101 @@
+/* =====================================================================
+   ORG CHART — recursive tree of department cards
+   Baseline structure only (department card + rank-ordered roster lines);
+   spacing rhythm, connector rails, branch colors, and tier styling are
+   layered on top by later passes. Ported from `ui_design/shopify/styles.css`.
+   ===================================================================== */
+
+.tree {
+  padding: 22px 20px 26px;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.node {
+  position: relative;
+}
+
+.children {
+  margin-left: 26px;
+  padding-left: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.dept {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  overflow: hidden;
+}
+
+.dept-hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px 10px 15px;
+  background: var(--surface-sub);
+  border-bottom: 1px solid var(--border-2);
+}
+
+.dept-hd .dn {
+  font-family: var(--f-jp);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-strong);
+}
+
+.dept-hd .en {
+  font-size: 11.5px;
+  color: var(--text-sub);
+}
+
+.dept-hd .did {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-disabled);
+}
+
+.roster {
+  padding: 6px 13px 11px;
+  display: flex;
+  flex-direction: column;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 4px 0;
+}
+
+.line + .line {
+  border-top: 1px solid var(--border-2);
+}
+
+.line .pos {
+  font-size: 11.5px;
+  color: var(--text-sub);
+  font-weight: 600;
+}
+
+.line .ppl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  align-items: center;
+}
+
+.line .ppl .p {
+  font-family: var(--f-jp);
+  font-size: 13.5px;
+  color: var(--text);
+}
