@@ -1,9 +1,24 @@
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, EmptyState, ErrorState, LoadingState } from '../design/components';
 import { useGetChartQuery } from '../store/api/chartApi';
+import { useUiStore } from '../store/uiStore';
 import { OrgTree } from './chart/OrgTree';
 
+/** `?print=1` is the route the PDF endpoint (6.2) navigates to: it forces every roster to
+ * render in full (no truncation affordance) so Puppeteer's print-media PDF omits no one; the
+ * A3/chrome-hiding rules themselves come from the existing `@media print` stylesheet (8.7),
+ * which Puppeteer's `page.pdf()` applies automatically. */
 export function ChartPage() {
   const { data, error, isLoading, refetch } = useGetChartQuery();
+  const [searchParams] = useSearchParams();
+  const printMode = searchParams.get('print') === '1';
+  const setPrintMode = useUiStore((state) => state.setPrintMode);
+
+  useEffect(() => {
+    setPrintMode(printMode);
+    return () => setPrintMode(false);
+  }, [printMode, setPrintMode]);
 
   return (
     <div className="page">
@@ -29,7 +44,7 @@ export function ChartPage() {
             <EmptyState title="No departments yet" description="Import the masters to populate the chart." />
           </Card.Body>
         ) : (
-          <OrgTree roots={data.roots} />
+          <OrgTree roots={data.roots} printMode={printMode} />
         )}
       </Card>
     </div>
