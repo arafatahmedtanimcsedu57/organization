@@ -10,6 +10,7 @@
   "scripts": {
     "chart": "tsx src/index.ts",
     "test": "node --import tsx --test src/*.test.ts",
+    "test:all": "bash scripts/test-all.sh",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
