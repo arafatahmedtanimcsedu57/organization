@@ -13,7 +13,10 @@
     "seed": "node --import @swc-node/register/esm-register src/import/import.command.ts",
     "start": "node --import @swc-node/register/esm-register src/main.ts",
     "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:db:up": "docker compose -f ../../docker-compose.yml up -d db-test --wait",
+    "test:db:down": "docker compose -f ../../docker-compose.yml rm -sf db-test",
+    "test:db:seed": "node --import @swc-node/register/esm-register src/test/reset-test-database.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.28",
