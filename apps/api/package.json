@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:db:up": "docker compose -f ../../docker-compose.yml up -d db-test --wait",
     "test:db:down": "docker compose -f ../../docker-compose.yml rm -sf db-test",
-    "test:db:seed": "node --import @swc-node/register/esm-register src/test/reset-test-database.ts"
+    "test:db:seed": "node --import @swc-node/register/esm-register src/test/reset-test-database.ts",
+    "test:e2e:seed": "node --import @swc-node/register/esm-register src/test/reset-e2e-database.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.28",

@@ -22,6 +22,17 @@ function testDatabaseUrl(): string {
   return url;
 }
 
+/** A `DataSource` against an arbitrary Postgres URL, wired with the same entities/migrations used everywhere else. */
+export function createDataSource(url: string): DataSource {
+  return new DataSource({
+    type: 'postgres',
+    url,
+    entities: [Department, Employee, Assignment, ChangeLog],
+    migrations: [migrationsGlob],
+    synchronize: false,
+  });
+}
+
 /**
  * A `DataSource` pointed at the ephemeral test Postgres service (`db-test` in
  * `docker-compose.yml`), never at the dev/prod database. Feature tests use this
@@ -29,13 +40,7 @@ function testDatabaseUrl(): string {
  * runs without touching real data.
  */
 export function createTestDataSource(): DataSource {
-  return new DataSource({
-    type: 'postgres',
-    url: testDatabaseUrl(),
-    entities: [Department, Employee, Assignment, ChangeLog],
-    migrations: [migrationsGlob],
-    synchronize: false,
-  });
+  return createDataSource(testDatabaseUrl());
 }
 
 /**
