@@ -29,10 +29,13 @@ function groupByTitle(members: Member[]): RosterLineGroup[] {
 export interface RosterLinesProps {
   managers: Member[];
   staff: Member[];
+  /** Print/PDF mode (9.8): every roster renders in full, so the `＋N` expand affordance never
+   * appears and no member is left out of the DOM (unlike the interactive view's truncation). */
+  printMode?: boolean;
 }
 
 /** `.roster` — the department card's rank-ordered lines: one per title group, managers then staff. */
-export function RosterLines({ managers, staff }: RosterLinesProps) {
+export function RosterLines({ managers, staff, printMode = false }: RosterLinesProps) {
   const groups = [...groupByTitle(managers), ...groupByTitle(staff)];
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   if (groups.length === 0) return null;
@@ -40,7 +43,7 @@ export function RosterLines({ managers, staff }: RosterLinesProps) {
   return (
     <div className="roster">
       {groups.map((group, i) => {
-        const isTruncated = !expanded.has(i) && group.members.length > ROSTER_TRUNCATE_THRESHOLD;
+        const isTruncated = !printMode && !expanded.has(i) && group.members.length > ROSTER_TRUNCATE_THRESHOLD;
         const visible = isTruncated ? group.members.slice(0, ROSTER_TRUNCATE_THRESHOLD) : group.members;
         const hiddenCount = group.members.length - visible.length;
 

@@ -7,7 +7,7 @@ import { RosterLines } from './RosterLines';
  * The branch color is set as `--rail`/`--tint` CSS custom properties once, on the top-level
  * division node; because custom properties inherit, every descendant's rail, accent stripe,
  * and marker pick it up via `var(--rail, …)` without re-setting it at each level. */
-export function DeptNode({ node }: { node: ChartNode }) {
+export function DeptNode({ node, printMode = false }: { node: ChartNode; printMode?: boolean }) {
   let branchStyle: CSSProperties | undefined;
   if (node.tier === 'division') {
     const { rail, tint } = branchColorFor(node.branchId);
@@ -23,12 +23,12 @@ export function DeptNode({ node }: { node: ChartNode }) {
           {node.nameEn ? <span className="en">{node.nameEn}</span> : null}
           <span className="did">{node.id}</span>
         </div>
-        <RosterLines managers={node.managers} staff={node.staff} />
+        <RosterLines managers={node.managers} staff={node.staff} printMode={printMode} />
       </div>
       {node.children.length > 0 ? (
         <div className="children">
           {node.children.map((child) => (
-            <DeptNode key={child.id} node={child} />
+            <DeptNode key={child.id} node={child} printMode={printMode} />
           ))}
         </div>
       ) : null}
