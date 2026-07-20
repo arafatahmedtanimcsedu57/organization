@@ -106,7 +106,7 @@
 - [x] 13.4 API feature tests — org-chart: hierarchy, rank order, disambiguation, and `(兼)` placement in the `/chart` JSON
 - [x] 13.5 API feature tests — maintenance: employee/department CRUD plus failure paths (missing department, parent cycle)
 - [x] 13.6 API feature tests — concurrent duties: reject a second primary; a concurrent posting renders in the target department
-- [ ] 13.7 API feature tests — history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
+- [x] 13.7 API feature tests — history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
 - [ ] 13.8 E2E journey A (Playwright): open chart, toggle Tree ⇄ Network, "Download PDF" returns a valid A3 PDF
 - [ ] 13.9 E2E journey B (Playwright): edit an employee → save → chart updates → a history entry appears with before/after
 - [ ] 13.10 E2E journey C (Playwright): add a 兼務 posting → the sourced 兼 chip appears in the target department on the chart
