@@ -73,7 +73,7 @@
 - [x] 9.7 Oversized-roster truncation with an expand affordance (`＋N 課員`) in the interactive view only
 - [x] 9.8 Print mode: `?print=1` expands every roster in full (no truncation) and applies the A3 print CSS — this is the route the PDF endpoint (6.2) renders
 - [x] 9.9 Network view: nodes + reporting lines + dashed 兼務 arrows, with an in-place Tree ⇄ Network switch
-- [ ] 9.10 Legend + data-issues strip, and a "Download PDF" action calling `GET /chart/pdf`
+- [x] 9.10 Legend + data-issues strip, and a "Download PDF" action calling `GET /chart/pdf`
 
 ## 10. Master maintenance UI (capability: master-data-management)
 
