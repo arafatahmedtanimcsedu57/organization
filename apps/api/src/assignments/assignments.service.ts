@@ -31,13 +31,17 @@ export class AssignmentsService {
   async create(dto: CreateAssignmentDto): Promise<Assignment> {
     await this.assertEmployeeExists(dto.employeeSysId);
     await this.assertDepartmentExists(dto.departmentId);
+    const isPrimary = dto.isPrimary ?? false;
+    if (isPrimary) {
+      await this.assertNoExistingPrimary(dto.employeeSysId);
+    }
 
     const assignment = this.assignmentRepo.create({
       employeeSysId: dto.employeeSysId,
       departmentId: dto.departmentId,
       title: dto.title,
       assignmentType: dto.assignmentType,
-      isPrimary: dto.isPrimary ?? false,
+      isPrimary,
       validFrom: dto.validFrom ?? null,
       validTo: dto.validTo ?? null,
     });
@@ -46,6 +50,9 @@ export class AssignmentsService {
 
   async update(id: string, dto: UpdateAssignmentDto): Promise<Assignment> {
     const assignment = await this.findOne(id);
+    if (dto.isPrimary && !assignment.isPrimary) {
+      await this.assertNoExistingPrimary(assignment.employeeSysId, id);
+    }
     Object.assign(assignment, dto);
     return this.assignmentRepo.save(assignment);
   }
@@ -66,6 +73,18 @@ export class AssignmentsService {
     const department = await this.departmentRepo.findOne({ where: { id: departmentId } });
     if (!department) {
       throw new BadRequestException(`Department ${departmentId} does not exist`);
+    }
+  }
+
+  /** `concurrent-duties` spec: exactly one posting per person may be flagged primary. */
+  private async assertNoExistingPrimary(employeeSysId: string, excludeId?: string): Promise<void> {
+    const existing = await this.assignmentRepo.findOne({
+      where: { employeeSysId, isPrimary: true },
+    });
+    if (existing && existing.id !== excludeId) {
+      throw new BadRequestException(
+        `Employee ${employeeSysId} already has a primary posting (assignment ${existing.id})`,
+      );
     }
   }
 }
