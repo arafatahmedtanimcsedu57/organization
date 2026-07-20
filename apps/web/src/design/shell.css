@@ -276,6 +276,18 @@ button {
   margin: 0 auto;
   width: 100%;
 }
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.ph-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
 
 /* ---- narrow viewport: shell collapses; admin work assumes desktop ---- */
 @media (max-width: 1080px) {

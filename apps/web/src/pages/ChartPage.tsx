@@ -1,19 +1,23 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, EmptyState, ErrorState, LoadingState } from '../design/components';
+import { Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
 import { useGetChartQuery } from '../store/api/chartApi';
 import { useUiStore } from '../store/uiStore';
+import { NetworkView } from './chart/NetworkView';
 import { OrgTree } from './chart/OrgTree';
 
 /** `?print=1` is the route the PDF endpoint (6.2) navigates to: it forces every roster to
  * render in full (no truncation affordance) so Puppeteer's print-media PDF omits no one; the
  * A3/chrome-hiding rules themselves come from the existing `@media print` stylesheet (8.7),
- * which Puppeteer's `page.pdf()` applies automatically. */
+ * which Puppeteer's `page.pdf()` applies automatically. Print always renders the Tree (the
+ * PDF layout this app ships), regardless of which view the maintainer had open interactively. */
 export function ChartPage() {
   const { data, error, isLoading, refetch } = useGetChartQuery();
   const [searchParams] = useSearchParams();
   const printMode = searchParams.get('print') === '1';
   const setPrintMode = useUiStore((state) => state.setPrintMode);
+  const viewMode = useUiStore((state) => state.viewMode);
+  const setViewMode = useUiStore((state) => state.setViewMode);
 
   useEffect(() => {
     setPrintMode(printMode);
@@ -27,6 +31,20 @@ export function ChartPage() {
           <div className="breadcrumb">Home · Organization chart</div>
           <h1>Organization chart</h1>
         </div>
+        {!printMode ? (
+          <div className="ph-actions no-print" role="group" aria-label="Chart view">
+            <Button variant={viewMode === 'tree' ? 'primary' : 'secondary'} size="sm" onClick={() => setViewMode('tree')}>
+              Tree
+            </Button>
+            <Button
+              variant={viewMode === 'network' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setViewMode('network')}
+            >
+              Network
+            </Button>
+          </div>
+        ) : null}
       </div>
 
       <Card>
@@ -43,6 +61,8 @@ export function ChartPage() {
           <Card.Body>
             <EmptyState title="No departments yet" description="Import the masters to populate the chart." />
           </Card.Body>
+        ) : !printMode && viewMode === 'network' ? (
+          <NetworkView roots={data.roots} />
         ) : (
           <OrgTree roots={data.roots} printMode={printMode} />
         )}
