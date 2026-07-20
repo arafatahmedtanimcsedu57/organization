@@ -1,9 +1,12 @@
 /* =====================================================================
    ORG CHART — recursive tree of department cards
    Spacing rhythm (large gap between top-level divisions, tighter gap
-   between siblings) plus connector rails that terminate at the last
-   child. Branch colors and tier styling are layered on top by later
-   passes. Ported from `ui_design/shopify/styles.css`.
+   between siblings), connector rails that terminate at the last child,
+   and branch coloring: `--rail`/`--tint` are set once on each top-level
+   division's `.node` (see DeptNode.tsx) and inherit down through every
+   descendant, so the rail, accent stripe, and marker all pick up the
+   same color without per-node classes. Tier styling is layered on top
+   by a later pass. Ported from `ui_design/shopify/styles.css`.
    ===================================================================== */
 
 .tree {
@@ -66,6 +69,17 @@
   overflow: hidden;
 }
 
+/* branch accent stripe down the card's left edge */
+.dept::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--rail, transparent);
+}
+
 .dept-hd {
   display: flex;
   align-items: center;
@@ -73,6 +87,15 @@
   padding: 10px 13px 10px 15px;
   background: var(--surface-sub);
   border-bottom: 1px solid var(--border-2);
+}
+
+.dept-hd .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--rail, var(--border-strong));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rail, transparent) 18%, transparent);
 }
 
 .dept-hd .dn {
