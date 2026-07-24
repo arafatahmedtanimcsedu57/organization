@@ -27,25 +27,31 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ];
 
+const NAV_BASE =
+  'flex items-center gap-[9px] px-2.5 py-1.5 rounded-sm text-[13px] font-medium transition-[background] duration-[120ms] ease-brand [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:shrink-0';
+const NAV_INACTIVE = 'text-ink hover:bg-surface-hover [&_svg]:text-sub';
+const NAV_ACTIVE = 'bg-surface shadow-1 font-semibold text-strong [&_svg]:text-action';
+
+/** `.sidebar` is kept as a hook so the print stylesheet can hide it. */
 export function Sidebar() {
   return (
-    <aside className="sidebar">
-      <div className="side-brand">
-        <span className="logo">
-          <span className="jp">組</span>
+    <aside className="sidebar bg-surface-sub border-r border-line flex flex-col sticky top-0 h-screen">
+      <div className="flex items-center gap-[0.55rem] px-[14px] py-3 h-[var(--topbar-h)] border-b border-line">
+        <span className="w-7 h-7 rounded-[7px] bg-brand grid place-items-center text-white font-extrabold shrink-0 shadow-[inset_0_-1px_0_rgba(0,0,0,0.15)]">
+          <span className="font-jp font-extrabold text-[15px]">組</span>
         </span>
-        <span className="store">
-          <b>Organo</b>
-          <small>株式会社シスラボ</small>
+        <span className="flex flex-col leading-[1.2]">
+          <b className="font-bold text-[14px] text-strong">Organo</b>
+          <small className="text-[11px] text-sub font-medium">株式会社シスラボ</small>
         </span>
       </div>
-      <nav className="nav" aria-label="Main">
+      <nav className="p-2 flex flex-col gap-px overflow-y-auto flex-1" aria-label="Main">
         {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+            className={({ isActive }) => `${NAV_BASE} ${isActive ? NAV_ACTIVE : NAV_INACTIVE}`}
           >
             <Icon />
             {label}

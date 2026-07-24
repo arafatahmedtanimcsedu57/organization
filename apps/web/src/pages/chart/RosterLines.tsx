@@ -41,26 +41,35 @@ export function RosterLines({ managers, staff, printMode = false }: RosterLinesP
   if (groups.length === 0) return null;
 
   return (
-    <div className="roster">
+    <div className="pt-[6px] px-[13px] pb-[11px] flex flex-col">
       {groups.map((group, i) => {
-        const isTruncated = !printMode && !expanded.has(i) && group.members.length > ROSTER_TRUNCATE_THRESHOLD;
-        const visible = isTruncated ? group.members.slice(0, ROSTER_TRUNCATE_THRESHOLD) : group.members;
+        const isTruncated =
+          !printMode && !expanded.has(i) && group.members.length > ROSTER_TRUNCATE_THRESHOLD;
+        const visible = isTruncated
+          ? group.members.slice(0, ROSTER_TRUNCATE_THRESHOLD)
+          : group.members;
         const hiddenCount = group.members.length - visible.length;
 
         return (
-          <div className="line" key={`${group.title}-${i}`}>
-            <span className="pos">{group.title}</span>
-            <div className="ppl">
+          <div
+            className="line grid grid-cols-[96px_1fr] gap-3 items-baseline py-1 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-line-2"
+            key={`${group.title}-${i}`}
+          >
+            <span className="pos text-[11.5px] text-sub font-semibold">{group.title}</span>
+            <div className="flex flex-wrap gap-x-[10px] gap-y-[5px] items-center">
               {visible.map((member) =>
                 member.concurrent ? (
-                  <span className="p kenmu" key={member.sysId}>
-                    <span className="kenmu-mark">兼</span> {member.displayName}
-                    <span className="kenmu-src">
+                  <span
+                    className="p kenmu font-jp text-[13.5px] inline-flex items-baseline gap-1 pl-2 pr-2.5 py-0.5 border border-dashed border-brand rounded-full bg-brand-tint text-brand-dark"
+                    key={member.sysId}
+                  >
+                    <span className="kenmu-mark font-bold">兼</span> {member.displayName}
+                    <span className="kenmu-src text-[11px] font-normal text-sub">
                       ← {member.sourceDepartmentName} {member.sourceTitle}
                     </span>
                   </span>
                 ) : (
-                  <span className="p" key={member.sysId}>
+                  <span className="p font-jp text-[13.5px] text-ink" key={member.sysId}>
                     {member.displayName}
                   </span>
                 ),
@@ -69,7 +78,7 @@ export function RosterLines({ managers, staff, printMode = false }: RosterLinesP
                 <Button
                   variant="plain"
                   size="sm"
-                  className="roster-expand"
+                  className="!h-auto py-0.5 !rounded-full"
                   onClick={() => setExpanded((prev) => new Set(prev).add(i))}
                 >
                   ＋{hiddenCount} {group.title}

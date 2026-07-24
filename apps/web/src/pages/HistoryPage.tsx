@@ -1,6 +1,25 @@
 import { useMemo, useState } from 'react';
-import { Badge, Card, EmptyState, ErrorState, IndexTable, LoadingState } from '../design/components';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  IndexTable,
+  LoadingState,
+} from '../design/components';
 import type { IndexTableColumn } from '../design/components';
+import {
+  PAGE,
+  PAGE_HEAD,
+  PAGE_TITLE,
+  FIELD,
+  LABEL,
+  INPUT,
+  PERSON,
+  PERSON_NAME,
+  PERSON_SUB,
+} from '../design/formStyles';
 import {
   useGetHistoryQuery,
   type ChangeLogAction,
@@ -48,7 +67,10 @@ const FIELD_LABEL: Record<string, string> = {
 };
 
 function fieldLabel(key: string): string {
-  return FIELD_LABEL[key] ?? key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
+  return (
+    FIELD_LABEL[key] ??
+    key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase())
+  );
 }
 
 /** Snapshot keys that identify the row itself rather than describing a change. */
@@ -61,7 +83,10 @@ interface FieldDiff {
 }
 
 /** Diffs two entity snapshots field-by-field; a `null` side (create/hard-delete) shows every remaining field as the change. */
-function diffSnapshots(before: Record<string, unknown> | null, after: Record<string, unknown> | null): FieldDiff[] {
+function diffSnapshots(
+  before: Record<string, unknown> | null,
+  after: Record<string, unknown> | null,
+): FieldDiff[] {
   const keys = new Set([...Object.keys(before ?? {}), ...Object.keys(after ?? {})]);
   const diffs: FieldDiff[] = [];
   for (const key of keys) {
@@ -86,17 +111,23 @@ function formatValue(key: string, value: unknown, lookups: NameLookups): string 
   return String(value);
 }
 
-function entityDisplayName(entry: ChangeLogEntry, lookups: NameLookups, assignments: Assignment[] | undefined): string {
+function entityDisplayName(
+  entry: ChangeLogEntry,
+  lookups: NameLookups,
+  assignments: Assignment[] | undefined,
+): string {
   if (entry.entity === 'employee') return lookups.employeeName(entry.entityId);
   if (entry.entity === 'department') return lookups.departmentName(entry.entityId);
 
   const assignment = assignments?.find((row) => row.id === entry.entityId);
-  if (assignment) return `${lookups.employeeName(assignment.employeeSysId)} @ ${lookups.departmentName(assignment.departmentId)}`;
+  if (assignment)
+    return `${lookups.employeeName(assignment.employeeSysId)} @ ${lookups.departmentName(assignment.departmentId)}`;
 
   const snapshot = entry.after ?? entry.before;
   const employeeSysId = snapshot?.employeeSysId as string | undefined;
   const departmentId = snapshot?.departmentId as string | undefined;
-  if (employeeSysId && departmentId) return `${lookups.employeeName(employeeSysId)} @ ${lookups.departmentName(departmentId)}`;
+  if (employeeSysId && departmentId)
+    return `${lookups.employeeName(employeeSysId)} @ ${lookups.departmentName(departmentId)}`;
   return entry.entityId;
 }
 
@@ -153,10 +184,10 @@ export function HistoryPage() {
       key: 'entity',
       header: 'Entity',
       render: (entry) => (
-        <div className="person">
+        <div className={PERSON}>
           <span>
-            <b>{entityDisplayName(entry, lookups, assignments)}</b>
-            <small>{ENTITY_LABEL[entry.entity]}</small>
+            <b className={PERSON_NAME}>{entityDisplayName(entry, lookups, assignments)}</b>
+            <small className={PERSON_SUB}>{ENTITY_LABEL[entry.entity]}</small>
           </span>
         </div>
       ),
@@ -165,17 +196,24 @@ export function HistoryPage() {
       key: 'action',
       header: 'Action',
       width: '110px',
-      render: (entry) => <Badge tone={ACTION_TONE[entry.action]}>{ACTION_LABEL[entry.action]}</Badge>,
+      render: (entry) => (
+        <Badge tone={ACTION_TONE[entry.action]}>{ACTION_LABEL[entry.action]}</Badge>
+      ),
     },
-    { key: 'actor', header: 'Actor', width: '100px', render: (entry) => <span>{entry.actor}</span> },
+    {
+      key: 'actor',
+      header: 'Actor',
+      width: '100px',
+      render: (entry) => <span>{entry.actor}</span>,
+    },
     {
       key: 'changes',
       header: 'What changed',
       render: (entry) => {
         const diffs = diffSnapshots(entry.before, entry.after);
-        if (diffs.length === 0) return <span style={{ color: 'var(--text-sub)' }}>No field changes</span>;
+        if (diffs.length === 0) return <span className="text-sub">No field changes</span>;
         return (
-          <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12.5 }}>
+          <ul className="m-0 pl-4 text-[12.5px]">
             {diffs.map((diff) => (
               <li key={diff.key}>
                 <b>{fieldLabel(diff.key)}:</b>{' '}
@@ -192,9 +230,15 @@ export function HistoryPage() {
 
   const entityIdOptions =
     entity === 'employee'
-      ? (employees ?? []).map((employee) => ({ value: employee.sysId, label: `${employee.lastName} ${employee.firstName} (${employee.userId})` }))
+      ? (employees ?? []).map((employee) => ({
+          value: employee.sysId,
+          label: `${employee.lastName} ${employee.firstName} (${employee.userId})`,
+        }))
       : entity === 'department'
-        ? (departments ?? []).map((department) => ({ value: department.id, label: department.name }))
+        ? (departments ?? []).map((department) => ({
+            value: department.id,
+            label: department.name,
+          }))
         : entity === 'assignment'
           ? (assignments ?? []).map((assignment) => ({
               value: assignment.id,
@@ -203,25 +247,29 @@ export function HistoryPage() {
           : [];
 
   return (
-    <div className="page">
-      <div className="page-head">
+    <div className={PAGE}>
+      <div className={PAGE_HEAD}>
         <div>
           <div className="breadcrumb">Home · Change history</div>
-          <h1>Change history</h1>
+          <h1 className={PAGE_TITLE}>Change history</h1>
         </div>
       </div>
 
       <Card>
         <Card.Header title="Filters" />
         <Card.Section>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-            <div className="field">
-              <label htmlFor="hist-entity">Entity type</label>
+          <div className="grid grid-cols-4 gap-3">
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="hist-entity">
+                Entity type
+              </label>
               <select
                 id="hist-entity"
-                className="inp"
+                className={INPUT}
                 value={entity}
-                onChange={(event) => handleEntityChange(event.target.value as '' | ChangeLogEntityType)}
+                onChange={(event) =>
+                  handleEntityChange(event.target.value as '' | ChangeLogEntityType)
+                }
               >
                 <option value="">All</option>
                 <option value="employee">Employee</option>
@@ -229,16 +277,20 @@ export function HistoryPage() {
                 <option value="assignment">Concurrent duty</option>
               </select>
             </div>
-            <div className="field">
-              <label htmlFor="hist-entity-id">Specific record</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="hist-entity-id">
+                Specific record
+              </label>
               <select
                 id="hist-entity-id"
-                className="inp"
+                className={INPUT}
                 value={entityId}
                 onChange={(event) => setEntityId(event.target.value)}
                 disabled={!entity}
               >
-                <option value="">All {entity ? ENTITY_LABEL[entity].toLowerCase() + 's' : 'records'}</option>
+                <option value="">
+                  All {entity ? ENTITY_LABEL[entity].toLowerCase() + 's' : 'records'}
+                </option>
                 {entityIdOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -246,19 +298,35 @@ export function HistoryPage() {
                 ))}
               </select>
             </div>
-            <div className="field">
-              <label htmlFor="hist-from">From</label>
-              <input id="hist-from" type="date" className="inp" value={from} onChange={(event) => setFrom(event.target.value)} />
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="hist-from">
+                From
+              </label>
+              <input
+                id="hist-from"
+                type="date"
+                className={INPUT}
+                value={from}
+                onChange={(event) => setFrom(event.target.value)}
+              />
             </div>
-            <div className="field">
-              <label htmlFor="hist-to">To</label>
-              <input id="hist-to" type="date" className="inp" value={to} onChange={(event) => setTo(event.target.value)} />
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="hist-to">
+                To
+              </label>
+              <input
+                id="hist-to"
+                type="date"
+                className={INPUT}
+                value={to}
+                onChange={(event) => setTo(event.target.value)}
+              />
             </div>
           </div>
           {hasFilters ? (
-            <button type="button" className="btn plain sm" onClick={clearFilters}>
+            <Button variant="plain" size="sm" onClick={clearFilters}>
               Clear filters
-            </button>
+            </Button>
           ) : null}
         </Card.Section>
       </Card>
@@ -278,7 +346,12 @@ export function HistoryPage() {
             columns={columns}
             rows={entries ?? []}
             rowKey={(entry) => entry.id}
-            emptyState={<EmptyState title="No history yet" description="Changes to employees, departments, and concurrent duties will appear here." />}
+            emptyState={
+              <EmptyState
+                title="No history yet"
+                description="Changes to employees, departments, and concurrent duties will appear here."
+              />
+            }
           />
         )}
       </Card>

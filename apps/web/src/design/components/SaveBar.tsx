@@ -12,7 +12,8 @@ export interface SaveBarProps {
 }
 
 /** `.savebar` — contextual save bar (`Unsaved ▸ Save/Discard`), shown at the top of an edit
- * panel while it has unsaved changes. Ported from `ui_design/shopify/styles.css` / `admin.html`. */
+ * panel while it has unsaved changes. The `savebar` class is kept as a hook so the print
+ * stylesheet can hide it. */
 export function SaveBar({
   message,
   saving = false,
@@ -22,12 +23,16 @@ export function SaveBar({
   discardLabel = 'Discard',
 }: SaveBarProps) {
   return (
-    <div className="savebar" role="region" aria-label="Unsaved changes">
-      <Badge plain style={{ background: '#ffffff22', color: '#fff' }}>
+    <div
+      className="savebar flex items-center gap-3 bg-action text-white px-4 py-2 rounded-lg shadow-2 mb-4"
+      role="region"
+      aria-label="Unsaved changes"
+    >
+      <Badge plain className="bg-[#ffffff22] text-white">
         Unsaved
       </Badge>
-      <span className="msg">{message}</span>
-      <div className="sb-actions">
+      <span className="text-[13px] font-medium">{message}</span>
+      <div className="ml-auto flex gap-2">
         <Button variant="ghostdark" size="sm" onClick={onDiscard} disabled={saving}>
           {discardLabel}
         </Button>

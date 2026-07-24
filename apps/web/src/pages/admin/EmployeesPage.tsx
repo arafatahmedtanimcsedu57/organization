@@ -1,7 +1,33 @@
 import { useEffect, useState } from 'react';
 import { POSITION_RANK } from '@org-chart/domain';
-import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState, SaveBar } from '../../design/components';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  IndexTable,
+  LoadingState,
+  SaveBar,
+} from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
+import {
+  PAGE,
+  PAGE_HEAD,
+  PH_ACTIONS,
+  PAGE_TITLE,
+  FIELD,
+  LABEL,
+  INPUT,
+  FIELD_ERR,
+  TWO,
+  UID,
+  PERSON,
+  PERSON_AVATAR,
+  PERSON_NAME,
+  PERSON_SUB,
+  DEPT,
+} from '../../design/formStyles';
 import {
   useCreateEmployeeMutation,
   useDeactivateEmployeeMutation,
@@ -69,7 +95,10 @@ export function EmployeesPage() {
   const [baseline, setBaseline] = useState<EmployeeFormState>(EMPTY_FORM);
   const [attemptedSave, setAttemptedSave] = useState(false);
 
-  const editingEmployee = panel && panel !== 'create' ? employees?.find((employee) => employee.sysId === panel) : undefined;
+  const editingEmployee =
+    panel && panel !== 'create'
+      ? employees?.find((employee) => employee.sysId === panel)
+      : undefined;
   const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
   const saveError = panel === 'create' ? createState.error : updateState.error;
   const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
@@ -125,28 +154,43 @@ export function EmployeesPage() {
 
   async function handleDeactivate() {
     if (!editingEmployee) return;
-    if (!window.confirm(`Deactivate ${editingEmployee.lastName} ${editingEmployee.firstName}? They will no longer appear on the chart.`)) {
+    if (
+      !window.confirm(
+        `Deactivate ${editingEmployee.lastName} ${editingEmployee.firstName}? They will no longer appear on the chart.`,
+      )
+    ) {
       return;
     }
     await deactivateEmployee(editingEmployee.sysId);
     closePanel();
   }
 
-  const departmentName = (departmentId: string) => departments?.find((department) => department.id === departmentId)?.name ?? departmentId;
+  const departmentName = (departmentId: string) =>
+    departments?.find((department) => department.id === departmentId)?.name ?? departmentId;
 
   const columns: IndexTableColumn<Employee>[] = [
-    { key: 'uid', header: 'UID', width: '90px', render: (employee) => <span className="uid">{employee.userId}</span> },
+    {
+      key: 'uid',
+      header: 'UID',
+      width: '90px',
+      render: (employee) => <span className={UID}>{employee.userId}</span>,
+    },
     {
       key: 'employee',
       header: 'Employee',
       render: (employee) => (
-        <div className="person">
-          <span className="avatar">{initials(employee)}</span>
+        <div className={PERSON}>
+          <span className={PERSON_AVATAR}>{initials(employee)}</span>
           <span>
-            <b style={employee.active ? undefined : { color: 'var(--text-sub)' }}>
+            <b
+              className={PERSON_NAME}
+              style={employee.active ? undefined : { color: 'var(--color-sub)' }}
+            >
               {employee.lastName} {employee.firstName}
             </b>
-            <small>{employee.active ? `Sys ${employee.sysId.slice(0, 6)}…` : 'Deactivated'}</small>
+            <small className={PERSON_SUB}>
+              {employee.active ? `Sys ${employee.sysId.slice(0, 6)}…` : 'Deactivated'}
+            </small>
           </span>
         </div>
       ),
@@ -154,22 +198,23 @@ export function EmployeesPage() {
     {
       key: 'title',
       header: 'Title',
-      render: (employee) => (
-        <Badge plain style={{ background: 'var(--neutral-bg)' }}>
-          {employee.title}
-        </Badge>
-      ),
+      render: (employee) => <Badge plain>{employee.title}</Badge>,
     },
-    { key: 'department', header: 'Department', render: (employee) => <span className="dept">{departmentName(employee.departmentId)}</span> },
+    {
+      key: 'department',
+      header: 'Department',
+      render: (employee) => <span className={DEPT}>{departmentName(employee.departmentId)}</span>,
+    },
     {
       key: 'status',
       header: 'Status',
-      render: (employee) => (employee.active ? <Badge tone="success">Active</Badge> : <Badge>Inactive</Badge>),
+      render: (employee) =>
+        employee.active ? <Badge tone="success">Active</Badge> : <Badge>Inactive</Badge>,
     },
   ];
 
   return (
-    <div className="page">
+    <div className={PAGE}>
       {panel && isDirty ? (
         <SaveBar
           message={
@@ -182,12 +227,12 @@ export function EmployeesPage() {
           onDiscard={discardChanges}
         />
       ) : null}
-      <div className="page-head">
+      <div className={PAGE_HEAD}>
         <div>
           <div className="breadcrumb">Home · Maintenance</div>
-          <h1>Employees</h1>
+          <h1 className={PAGE_TITLE}>Employees</h1>
         </div>
-        <div className="ph-actions">
+        <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
             Add employee
           </Button>
@@ -211,11 +256,13 @@ export function EmployeesPage() {
             rowKey={(employee) => employee.sysId}
             highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
             rowActions={(employee) => (
-              <button type="button" className="btn plain sm" onClick={() => openEdit(employee)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(employee)}>
                 Edit
-              </button>
+              </Button>
             )}
-            emptyState={<EmptyState title="No employees yet" description="Add an employee to get started." />}
+            emptyState={
+              <EmptyState title="No employees yet" description="Add an employee to get started." />
+            }
           />
         )}
       </Card>
@@ -227,33 +274,43 @@ export function EmployeesPage() {
             actions={editingEmployee ? <Badge plain>{editingEmployee.userId}</Badge> : undefined}
           />
           <Card.Section>
-            <div className="two">
-              <div className="field">
-                <label htmlFor="emp-last-name">Last name 姓</label>
+            <div className={TWO}>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="emp-last-name">
+                  Last name 姓
+                </label>
                 <input
                   id="emp-last-name"
-                  className="inp"
+                  className={INPUT}
                   value={form.lastName}
                   onChange={(event) => setForm({ ...form, lastName: event.target.value })}
                 />
-                {attemptedSave && fieldErrors.lastName ? <div className="err">{fieldErrors.lastName}</div> : null}
+                {attemptedSave && fieldErrors.lastName ? (
+                  <div className={FIELD_ERR}>{fieldErrors.lastName}</div>
+                ) : null}
               </div>
-              <div className="field">
-                <label htmlFor="emp-first-name">First name 名</label>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="emp-first-name">
+                  First name 名
+                </label>
                 <input
                   id="emp-first-name"
-                  className="inp"
+                  className={INPUT}
                   value={form.firstName}
                   onChange={(event) => setForm({ ...form, firstName: event.target.value })}
                 />
-                {attemptedSave && fieldErrors.firstName ? <div className="err">{fieldErrors.firstName}</div> : null}
+                {attemptedSave && fieldErrors.firstName ? (
+                  <div className={FIELD_ERR}>{fieldErrors.firstName}</div>
+                ) : null}
               </div>
             </div>
-            <div className="field">
-              <label htmlFor="emp-title">Title 役職</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="emp-title">
+                Title 役職
+              </label>
               <input
                 id="emp-title"
-                className="inp"
+                className={INPUT}
                 list="position-ranks"
                 value={form.title}
                 onChange={(event) => setForm({ ...form, title: event.target.value })}
@@ -263,13 +320,17 @@ export function EmployeesPage() {
                   <option key={rank} value={rank} />
                 ))}
               </datalist>
-              {attemptedSave && fieldErrors.title ? <div className="err">{fieldErrors.title}</div> : null}
+              {attemptedSave && fieldErrors.title ? (
+                <div className={FIELD_ERR}>{fieldErrors.title}</div>
+              ) : null}
             </div>
-            <div className="field">
-              <label htmlFor="emp-department">Home department 部門</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="emp-department">
+                Home department 部門
+              </label>
               <select
                 id="emp-department"
-                className="inp"
+                className={INPUT}
                 value={form.departmentId}
                 onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
               >
@@ -284,9 +345,11 @@ export function EmployeesPage() {
                     </option>
                   ))}
               </select>
-              {attemptedSave && fieldErrors.departmentId ? <div className="err">{fieldErrors.departmentId}</div> : null}
+              {attemptedSave && fieldErrors.departmentId ? (
+                <div className={FIELD_ERR}>{fieldErrors.departmentId}</div>
+              ) : null}
             </div>
-            {saveError ? <div className="err">{errorMessage(saveError)}</div> : null}
+            {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
           </Card.Section>
           <Card.Footer>
             {editingEmployee?.active ? (
@@ -294,7 +357,7 @@ export function EmployeesPage() {
                 Deactivate
               </Button>
             ) : null}
-            <span style={{ flex: 1 }} />
+            <span className="flex-1" />
             <Button variant="secondary" onClick={closePanel} disabled={saving}>
               Cancel
             </Button>

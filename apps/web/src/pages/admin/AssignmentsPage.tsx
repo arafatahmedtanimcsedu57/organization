@@ -1,7 +1,29 @@
 import { useEffect, useState } from 'react';
 import { POSITION_RANK } from '@org-chart/domain';
-import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState, SaveBar } from '../../design/components';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  IndexTable,
+  LoadingState,
+  SaveBar,
+} from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
+import {
+  PAGE,
+  PAGE_HEAD,
+  PH_ACTIONS,
+  PAGE_TITLE,
+  FIELD,
+  LABEL,
+  INPUT,
+  FIELD_ERR,
+  TWO,
+  PERSON,
+  DEPT,
+} from '../../design/formStyles';
 import {
   useCreateAssignmentMutation,
   useGetAssignmentsQuery,
@@ -88,7 +110,10 @@ export function AssignmentsPage() {
   const [baseline, setBaseline] = useState<AssignmentFormState>(EMPTY_FORM);
   const [attemptedSave, setAttemptedSave] = useState(false);
 
-  const editingAssignment = panel && panel !== 'create' ? assignments?.find((assignment) => assignment.id === panel) : undefined;
+  const editingAssignment =
+    panel && panel !== 'create'
+      ? assignments?.find((assignment) => assignment.id === panel)
+      : undefined;
   const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
   const saveError = panel === 'create' ? createState.error : updateState.error;
   const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
@@ -162,44 +187,63 @@ export function AssignmentsPage() {
 
   async function handleRemove() {
     if (!editingAssignment) return;
-    const employee = employees?.find((candidate) => candidate.sysId === editingAssignment.employeeSysId);
-    if (!window.confirm(`Remove this posting for ${personName(employee, editingAssignment.employeeSysId)}?`)) {
+    const employee = employees?.find(
+      (candidate) => candidate.sysId === editingAssignment.employeeSysId,
+    );
+    if (
+      !window.confirm(
+        `Remove this posting for ${personName(employee, editingAssignment.employeeSysId)}?`,
+      )
+    ) {
       return;
     }
     await removeAssignment(editingAssignment.id);
     closePanel();
   }
 
-  const employeeName = (sysId: string) => personName(employees?.find((employee) => employee.sysId === sysId), sysId);
-  const departmentName = (departmentId: string) => departments?.find((department) => department.id === departmentId)?.name ?? departmentId;
+  const employeeName = (sysId: string) =>
+    personName(
+      employees?.find((employee) => employee.sysId === sysId),
+      sysId,
+    );
+  const departmentName = (departmentId: string) =>
+    departments?.find((department) => department.id === departmentId)?.name ?? departmentId;
 
   const columns: IndexTableColumn<Assignment>[] = [
     {
       key: 'person',
       header: 'Person',
-      render: (assignment) => <span className="person">{employeeName(assignment.employeeSysId)}</span>,
+      render: (assignment) => (
+        <span className={PERSON}>{employeeName(assignment.employeeSysId)}</span>
+      ),
     },
-    { key: 'department', header: 'Department', render: (assignment) => <span className="dept">{departmentName(assignment.departmentId)}</span> },
+    {
+      key: 'department',
+      header: 'Department',
+      render: (assignment) => (
+        <span className={DEPT}>{departmentName(assignment.departmentId)}</span>
+      ),
+    },
     {
       key: 'title',
       header: 'Title',
-      render: (assignment) => (
-        <Badge plain style={{ background: 'var(--neutral-bg)' }}>
-          {assignment.title}
-        </Badge>
-      ),
+      render: (assignment) => <Badge plain>{assignment.title}</Badge>,
     },
     {
       key: 'type',
       header: 'Type',
       render: (assignment) =>
-        assignment.assignmentType === 'concurrent' ? <Badge tone="kenmu">兼務</Badge> : <Badge tone="brand">Primary</Badge>,
+        assignment.assignmentType === 'concurrent' ? (
+          <Badge tone="kenmu">兼務</Badge>
+        ) : (
+          <Badge tone="brand">Primary</Badge>
+        ),
     },
     {
       key: 'valid',
       header: 'Valid from / to',
       render: (assignment) => (
-        <span className="dept">
+        <span className="font-jp text-ink text-[13px]">
           {assignment.validFrom ?? '—'} → {assignment.validTo ?? '—'}
         </span>
       ),
@@ -207,21 +251,25 @@ export function AssignmentsPage() {
   ];
 
   return (
-    <div className="page">
+    <div className={PAGE}>
       {panel && isDirty ? (
         <SaveBar
-          message={panel === 'create' ? 'Adding a new posting — unsaved changes' : `Editing posting — unsaved changes`}
+          message={
+            panel === 'create'
+              ? 'Adding a new posting — unsaved changes'
+              : `Editing posting — unsaved changes`
+          }
           saving={saving}
           onSave={handleSave}
           onDiscard={discardChanges}
         />
       ) : null}
-      <div className="page-head">
+      <div className={PAGE_HEAD}>
         <div>
           <div className="breadcrumb">Home · Maintenance</div>
-          <h1>Concurrent duties (兼務)</h1>
+          <h1 className={PAGE_TITLE}>Concurrent duties (兼務)</h1>
         </div>
-        <div className="ph-actions">
+        <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
             Add posting
           </Button>
@@ -245,11 +293,16 @@ export function AssignmentsPage() {
             rowKey={(assignment) => assignment.id}
             highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
             rowActions={(assignment) => (
-              <button type="button" className="btn plain sm" onClick={() => openEdit(assignment)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(assignment)}>
                 Edit
-              </button>
+              </Button>
             )}
-            emptyState={<EmptyState title="No postings yet" description="Add a posting to place someone on a second department." />}
+            emptyState={
+              <EmptyState
+                title="No postings yet"
+                description="Add a posting to place someone on a second department."
+              />
+            }
           />
         )}
       </Card>
@@ -258,12 +311,14 @@ export function AssignmentsPage() {
         <Card>
           <Card.Header title={panel === 'create' ? 'Add posting' : 'Edit posting'} />
           <Card.Section>
-            <div className="two">
-              <div className="field">
-                <label htmlFor="asn-person">Person</label>
+            <div className={TWO}>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-person">
+                  Person
+                </label>
                 <select
                   id="asn-person"
-                  className="inp"
+                  className={INPUT}
                   value={form.employeeSysId}
                   disabled={panel !== 'create'}
                   onChange={(event) => setForm({ ...form, employeeSysId: event.target.value })}
@@ -279,13 +334,17 @@ export function AssignmentsPage() {
                       </option>
                     ))}
                 </select>
-                {attemptedSave && fieldErrors.employeeSysId ? <div className="err">{fieldErrors.employeeSysId}</div> : null}
+                {attemptedSave && fieldErrors.employeeSysId ? (
+                  <div className={FIELD_ERR}>{fieldErrors.employeeSysId}</div>
+                ) : null}
               </div>
-              <div className="field">
-                <label htmlFor="asn-department">Department</label>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-department">
+                  Department
+                </label>
                 <select
                   id="asn-department"
-                  className="inp"
+                  className={INPUT}
                   value={form.departmentId}
                   disabled={panel !== 'create'}
                   onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
@@ -294,21 +353,27 @@ export function AssignmentsPage() {
                     Select a department…
                   </option>
                   {(departments ?? [])
-                    .filter((department) => department.active || department.id === form.departmentId)
+                    .filter(
+                      (department) => department.active || department.id === form.departmentId,
+                    )
                     .map((department) => (
                       <option key={department.id} value={department.id}>
                         {department.name}
                       </option>
                     ))}
                 </select>
-                {attemptedSave && fieldErrors.departmentId ? <div className="err">{fieldErrors.departmentId}</div> : null}
+                {attemptedSave && fieldErrors.departmentId ? (
+                  <div className={FIELD_ERR}>{fieldErrors.departmentId}</div>
+                ) : null}
               </div>
             </div>
-            <div className="field">
-              <label htmlFor="asn-title">Title in this department 役職</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="asn-title">
+                Title in this department 役職
+              </label>
               <input
                 id="asn-title"
-                className="inp"
+                className={INPUT}
                 list="position-ranks"
                 value={form.title}
                 onChange={(event) => setForm({ ...form, title: event.target.value })}
@@ -318,62 +383,76 @@ export function AssignmentsPage() {
                   <option key={rank} value={rank} />
                 ))}
               </datalist>
-              {attemptedSave && fieldErrors.title ? <div className="err">{fieldErrors.title}</div> : null}
+              {attemptedSave && fieldErrors.title ? (
+                <div className={FIELD_ERR}>{fieldErrors.title}</div>
+              ) : null}
             </div>
-            <div className="two">
-              <div className="field">
-                <label htmlFor="asn-type">Posting type</label>
+            <div className={TWO}>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-type">
+                  Posting type
+                </label>
                 <select
                   id="asn-type"
-                  className="inp"
+                  className={INPUT}
                   value={form.assignmentType}
                   onChange={(event) => {
                     const assignmentType = event.target.value as AssignmentType;
-                    setForm({ ...form, assignmentType, isPrimary: assignmentType === 'primary' ? form.isPrimary : false });
+                    setForm({
+                      ...form,
+                      assignmentType,
+                      isPrimary: assignmentType === 'primary' ? form.isPrimary : false,
+                    });
                   }}
                 >
                   <option value="concurrent">Concurrent (兼務)</option>
                   <option value="primary">Primary</option>
                 </select>
               </div>
-              <div className="field">
-                <label htmlFor="asn-is-primary">
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-is-primary">
                   <input
                     id="asn-is-primary"
                     type="checkbox"
                     checked={form.isPrimary}
                     disabled={form.assignmentType !== 'primary'}
                     onChange={(event) => setForm({ ...form, isPrimary: event.target.checked })}
-                    style={{ marginRight: 6 }}
+                    className="mr-1.5"
                   />
                   Primary posting (home department)
                 </label>
               </div>
             </div>
-            <div className="two">
-              <div className="field">
-                <label htmlFor="asn-valid-from">Valid from</label>
+            <div className={TWO}>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-valid-from">
+                  Valid from
+                </label>
                 <input
                   id="asn-valid-from"
                   type="date"
-                  className="inp"
+                  className={INPUT}
                   value={form.validFrom}
                   onChange={(event) => setForm({ ...form, validFrom: event.target.value })}
                 />
               </div>
-              <div className="field">
-                <label htmlFor="asn-valid-to">Valid to</label>
+              <div className={FIELD}>
+                <label className={LABEL} htmlFor="asn-valid-to">
+                  Valid to
+                </label>
                 <input
                   id="asn-valid-to"
                   type="date"
-                  className="inp"
+                  className={INPUT}
                   value={form.validTo}
                   onChange={(event) => setForm({ ...form, validTo: event.target.value })}
                 />
-                {attemptedSave && fieldErrors.validTo ? <div className="err">{fieldErrors.validTo}</div> : null}
+                {attemptedSave && fieldErrors.validTo ? (
+                  <div className={FIELD_ERR}>{fieldErrors.validTo}</div>
+                ) : null}
               </div>
             </div>
-            {saveError ? <div className="err">{errorMessage(saveError)}</div> : null}
+            {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
           </Card.Section>
           <Card.Footer>
             {panel !== 'create' ? (
@@ -381,7 +460,7 @@ export function AssignmentsPage() {
                 Remove
               </Button>
             ) : null}
-            <span style={{ flex: 1 }} />
+            <span className="flex-1" />
             <Button variant="secondary" onClick={closePanel} disabled={saving}>
               Cancel
             </Button>

@@ -10,7 +10,9 @@ import { expect, test } from '@playwright/test';
  * emits a MediaBox in points; A3 landscape is ~1190.55 x 841.89pt. Parsed straight out of
  * the raw PDF bytes since the page dictionary is written uncompressed by Chromium. */
 function readMediaBoxPt(pdfBytes: Buffer): { width: number; height: number } {
-  const match = /\/MediaBox\s*\[\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\]/.exec(pdfBytes.toString('latin1'));
+  const match = /\/MediaBox\s*\[\s*([\d.]+)\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\]/.exec(
+    pdfBytes.toString('latin1'),
+  );
   if (!match) throw new Error('no /MediaBox found in PDF output');
   const [, x1, y1, x2, y2] = match.map(Number);
   return { width: x2 - x1, height: y2 - y1 };
@@ -53,6 +55,7 @@ test('view the chart, toggle Tree/Network, and download a valid A3 PDF', async (
 
   const { width, height } = readMediaBoxPt(pdfBytes);
   expect(width).toBeGreaterThan(height); // landscape
-  expect(width).toBeCloseTo(1190.55, 0);
-  expect(height).toBeCloseTo(841.89, 0);
+  // A3 landscape is 1190.55 × 841.89pt; allow ±2pt for the installed Chromium's A3 rounding.
+  expect(Math.abs(width - 1190.55)).toBeLessThan(2);
+  expect(Math.abs(height - 841.89)).toBeLessThan(2);
 });

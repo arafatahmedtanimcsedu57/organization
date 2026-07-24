@@ -6,13 +6,18 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   children: ReactNode;
 }
 
+/** `.card` is kept as a hook so the print stylesheet can flatten it; all visual styling is utilities. */
+const CARD_BASE = 'card bg-surface rounded-lg shadow-1 mb-4';
+const CARD_INTERACTIVE =
+  'transition-[box-shadow,transform] duration-150 ease-brand hover:shadow-2 hover:-translate-y-px';
+
 function CardBase({ interactive = false, className, children, ...rest }: CardProps) {
-  const classes = ['card'];
-  if (interactive) classes.push('interactive');
-  if (className) classes.push(className);
+  const classes = [CARD_BASE, interactive ? CARD_INTERACTIVE : '', className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <section className={classes.join(' ')} {...rest}>
+    <section className={classes} {...rest}>
       {children}
     </section>
   );
@@ -25,27 +30,27 @@ export interface CardHeaderProps {
 
 function CardHeader({ title, actions }: CardHeaderProps) {
   return (
-    <div className="card-head">
-      <h2>{title}</h2>
-      {actions ? <div className="ch-actions">{actions}</div> : null}
+    <div className="flex items-center gap-2.5 px-4 py-[14px]">
+      <h2 className="text-[14px] font-semibold text-strong">{title}</h2>
+      {actions ? <div className="ch-actions ml-auto flex gap-1.5">{actions}</div> : null}
     </div>
   );
 }
 
 function CardBody({ children }: { children: ReactNode }) {
-  return <div className="card-body">{children}</div>;
+  return <div className="px-4 pb-4">{children}</div>;
 }
 
-/** A bordered sub-section within a card (`.card-sec`) — stacks for multi-part cards. */
+/** A bordered sub-section within a card — stacks for multi-part cards. */
 function CardSection({ children }: { children: ReactNode }) {
-  return <div className="card-sec">{children}</div>;
+  return <div className="p-4 border-t border-line-2">{children}</div>;
 }
 
 function CardFooter({ children }: { children: ReactNode }) {
-  return <div className="card-foot">{children}</div>;
+  return <div className="px-4 py-3 border-t border-line-2 flex gap-2 justify-end">{children}</div>;
 }
 
-/** `.card` — white rounded surface with soft shadow, ported from `ui_design/shopify/styles.css`. */
+/** `.card` — white rounded surface with soft shadow. */
 export const Card = Object.assign(CardBase, {
   Header: CardHeader,
   Body: CardBody,

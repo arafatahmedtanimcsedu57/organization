@@ -14,7 +14,7 @@ function escapeRegExp(value: string): string {
 test('add a concurrent posting and see the sourced 兼 chip on the chart', async ({ page }) => {
   // --- Employees → pick the first row for its identity + home department/title ---
   await page.goto('/admin/employees');
-  await expect(page.getByRole('heading', { name: 'Employees' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Employees', level: 1 })).toBeVisible();
 
   const row = page.locator('.itable tbody tr').first();
   const userId = (await row.locator('td').nth(0).innerText()).trim();
@@ -31,24 +31,39 @@ test('add a concurrent posting and see the sourced 兼 chip on the chart', async
 
   await page.locator('#asn-person').selectOption({ label: `${fullName} (${userId})` });
 
-  const departmentOptions = await page.locator('#asn-department option:not([disabled])').allTextContents();
-  const targetDepartment = departmentOptions.map((text) => text.trim()).find((text) => text !== homeDepartment);
-  if (!targetDepartment) throw new Error('no other department available to post the concurrent duty into');
+  const departmentOptions = await page
+    .locator('#asn-department option:not([disabled])')
+    .allTextContents();
+  const targetDepartment = departmentOptions
+    .map((text) => text.trim())
+    .find((text) => text !== homeDepartment);
+  if (!targetDepartment)
+    throw new Error('no other department available to post the concurrent duty into');
   await page.locator('#asn-department').selectOption({ label: targetDepartment });
 
   const postingTitle = '部長';
   await page.locator('#asn-title').fill(postingTitle);
 
-  await page.getByRole('region', { name: 'Unsaved changes' }).getByRole('button', { name: 'Save' }).click();
+  await page
+    .getByRole('region', { name: 'Unsaved changes' })
+    .getByRole('button', { name: 'Save' })
+    .click();
 
   await expect(page.getByRole('heading', { name: 'Add posting' })).toHaveCount(0);
-  const newRow = page.locator('.itable tbody tr', { has: page.locator('.person', { hasText: fullName }) }).first();
-  await expect(newRow.locator('.dept')).toHaveText(targetDepartment);
+  // Identify the newly-added posting by person AND target department: the person may already have
+  // a (seeded) 兼務 in another department, so filtering by name alone can match the wrong row.
+  const newRow = page
+    .locator('.itable tbody tr')
+    .filter({ has: page.locator('.person', { hasText: fullName }) })
+    .filter({ has: page.locator('.dept', { hasText: targetDepartment }) });
+  await expect(newRow).toHaveCount(1);
   await expect(newRow).toContainText('兼務');
 
   // --- Org chart shows the sourced 兼 chip in the target department ---
   await page.goto('/chart');
-  const deptName = page.locator('.dn').filter({ hasText: new RegExp(`^${escapeRegExp(targetDepartment)}$`) });
+  const deptName = page
+    .locator('.dn')
+    .filter({ hasText: new RegExp(`^${escapeRegExp(targetDepartment)}$`) });
   const deptCard = deptName.locator('xpath=../..');
   const kenmuChip = deptCard.locator('.p.kenmu').filter({ hasText: lastName });
   await expect(kenmuChip).toBeVisible();

@@ -14,7 +14,7 @@ function escapeRegExp(value: string): string {
 test('edit an employee, see the chart and change history update', async ({ page }) => {
   // --- Employees → pick the first row → edit its title → Save (the write path) ---
   await page.goto('/admin/employees');
-  await expect(page.getByRole('heading', { name: 'Employees' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Employees', level: 1 })).toBeVisible();
 
   const row = page.locator('.itable tbody tr').first();
   const userId = (await row.locator('td').nth(0).innerText()).trim();
@@ -30,14 +30,19 @@ test('edit an employee, see the chart and change history update', async ({ page 
   await expect(titleInput).toHaveValue(beforeTitle);
   await titleInput.fill(afterTitle);
 
-  await page.getByRole('region', { name: 'Unsaved changes' }).getByRole('button', { name: 'Save' }).click();
+  await page
+    .getByRole('region', { name: 'Unsaved changes' })
+    .getByRole('button', { name: 'Save' })
+    .click();
 
   await expect(page.getByRole('heading', { name: 'Edit employee' })).toHaveCount(0);
   await expect(row.locator('td').nth(2)).toHaveText(afterTitle);
 
   // --- Org chart re-renders with the edit ---
   await page.goto('/chart');
-  const deptName = page.locator('.dn').filter({ hasText: new RegExp(`^${escapeRegExp(departmentName)}$`) });
+  const deptName = page
+    .locator('.dn')
+    .filter({ hasText: new RegExp(`^${escapeRegExp(departmentName)}$`) });
   const deptCard = deptName.locator('xpath=../..');
   const titleLine = deptCard.locator('.line').filter({
     has: page.locator('.pos', { hasText: new RegExp(`^${escapeRegExp(afterTitle)}$`) }),

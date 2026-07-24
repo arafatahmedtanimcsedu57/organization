@@ -1,0 +1,189 @@
+/* =====================================================================
+   ORGANO ADMIN — Tailwind entry (single authored stylesheet)
+   Everything the app needs that is NOT a utility lives here:
+     1. the Tailwind import (Preflight + utilities)
+     2. self-hosted fonts (@fontsource — offline, so Puppeteer renders JP)
+     3. @theme — the design tokens, exposed as Tailwind utilities
+        (bg-surface, text-sub, border-line, rounded-lg, shadow-1, font-jp…)
+     4. @layer base — body defaults, focus ring, selection, reduced motion
+     5. the A3-landscape print rules (chrome hidden, surfaces flattened)
+   All component/screen styling is authored as Tailwind utilities in the
+   JSX; there are no per-screen stylesheets. Ported from the former
+   tokens.css / shell.css / components.css / chart.css / print.css.
+   ===================================================================== */
+
+@import 'tailwindcss';
+
+/* ---- self-hosted type: Figtree (UI) + Noto Sans JP (Japanese) ----
+   Bundled so the built assets serve from our own origin — no Google
+   Fonts CDN call, so the Puppeteer PDF renderer needs zero network. */
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/figtree/700.css';
+@import '@fontsource/figtree/800.css';
+@import '@fontsource/noto-sans-jp/400.css';
+@import '@fontsource/noto-sans-jp/500.css';
+@import '@fontsource/noto-sans-jp/700.css';
+
+/* =====================================================================
+   Design tokens — single source of truth, consumed as utilities.
+   ===================================================================== */
+@theme {
+  /* surfaces → bg-bg / bg-surface / bg-surface-sub / bg-surface-hover / bg-surface-press */
+  --color-bg: #f1f2f4;
+  --color-surface: #ffffff;
+  --color-surface-sub: #fafbfb;
+  --color-surface-hover: #f6f6f7;
+  --color-surface-press: #f1f2f4;
+
+  /* text → text-ink (default) / text-strong / text-sub / text-muted */
+  --color-ink: #303030;
+  --color-strong: #1a1a1a;
+  --color-sub: #616161;
+  --color-muted: #8a8a8a;
+
+  /* borders → border-line / border-line-2 / border-line-strong */
+  --color-line: #e3e3e3;
+  --color-line-2: #ebebeb;
+  --color-line-strong: #cbcccd;
+
+  /* brand + action */
+  --color-brand: #008060; /* Shopify green */
+  --color-brand-dark: #004c3f;
+  --color-brand-tint: #f0faf6;
+  --color-action: #1a1a1a; /* dark primary button */
+  --color-action-hover: #303030;
+
+  /* status tones → bg-<tone> + text-<tone>-ink + border-<tone>-line */
+  --color-success: #e5f4ec;
+  --color-success-ink: #0c5132;
+  --color-success-line: #a6e0c0;
+  --color-info: #e9f2fd;
+  --color-info-ink: #00527c;
+  --color-info-line: #a7cdf5;
+  --color-warn: #fdf3e6;
+  --color-warn-ink: #5e4200;
+  --color-warn-line: #f2c98d;
+  --color-crit: #fdecec;
+  --color-crit-ink: #8e1010;
+  --color-crit-line: #f3aaaa;
+  --color-neutral: #ebebeb;
+  --color-neutral-ink: #4a4a4a;
+
+  /* geometry → rounded-sm/md/lg/xl (our scale overrides the defaults) */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* elevation → shadow-1 / shadow-2 / shadow-pop */
+  --shadow-1: 0 1px 2px rgba(26, 26, 26, 0.07), 0 0 0 1px rgba(26, 26, 26, 0.04);
+  --shadow-2: 0 4px 12px rgba(26, 26, 26, 0.1), 0 0 0 1px rgba(26, 26, 26, 0.04);
+  --shadow-pop: 0 12px 28px rgba(26, 26, 26, 0.16);
+
+  /* motion → ease-brand */
+  --ease-brand: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* type → font-ui / font-jp / font-mono */
+  --font-ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-jp: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+}
+
+/* Layout dimensions — referenced via arbitrary utilities
+   (grid-cols-[var(--sidebar-w)_1fr], h-[var(--topbar-h)], w-[var(--sidebar-w)]). */
+:root {
+  --sidebar-w: 232px;
+  --topbar-h: 56px;
+}
+
+/* =====================================================================
+   Base layer — global element defaults on top of Preflight.
+   ===================================================================== */
+@layer base {
+  body {
+    font-family: var(--font-ui);
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.003em;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  button {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 1px;
+    border-radius: 3px;
+  }
+  ::selection {
+    background: #cdeee0;
+  }
+}
+
+/* Motion-safe: honor prefers-reduced-motion by neutralizing animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================================
+   Print — A3 landscape. Hide app chrome (structural hook classes are
+   kept in the markup for exactly this), flatten surfaces, and let the
+   page expand to fill the sheet. View-specific print rules (e.g. the
+   chart's full-roster expansion) layer on top via `print:` utilities.
+   ===================================================================== */
+@media print {
+  .sidebar,
+  .topbar,
+  .savebar,
+  .page-head .ph-actions,
+  .ch-actions,
+  .rowact,
+  .table-foot,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .frame,
+  .main {
+    display: block;
+  }
+
+  .page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .card,
+  .dept {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  @page {
+    size: A3 landscape;
+    margin: 12mm;
+  }
+}

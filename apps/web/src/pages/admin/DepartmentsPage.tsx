@@ -1,6 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Badge, Button, Card, EmptyState, ErrorState, IndexTable, LoadingState, SaveBar } from '../../design/components';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  ErrorState,
+  IndexTable,
+  LoadingState,
+  SaveBar,
+} from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
+import {
+  PAGE,
+  PAGE_HEAD,
+  PH_ACTIONS,
+  PAGE_TITLE,
+  FIELD,
+  LABEL,
+  INPUT,
+  FIELD_ERR,
+  UID,
+  DEPT,
+} from '../../design/formStyles';
 import {
   useCreateDepartmentMutation,
   useDeactivateDepartmentMutation,
@@ -48,7 +69,9 @@ function descendantNames(name: string, departments: Department[]): Set<string> {
   let frontier = [name];
   while (frontier.length) {
     const children = departments.filter((department) => frontier.includes(department.parentName));
-    frontier = children.map((child) => child.name).filter((childName) => !descendants.has(childName));
+    frontier = children
+      .map((child) => child.name)
+      .filter((childName) => !descendants.has(childName));
     frontier.forEach((childName) => descendants.add(childName));
   }
   return descendants;
@@ -65,7 +88,10 @@ export function DepartmentsPage() {
   const [baseline, setBaseline] = useState<DepartmentFormState>(EMPTY_FORM);
   const [attemptedSave, setAttemptedSave] = useState(false);
 
-  const editingDepartment = panel && panel !== 'create' ? departments?.find((department) => department.id === panel) : undefined;
+  const editingDepartment =
+    panel && panel !== 'create'
+      ? departments?.find((department) => department.id === panel)
+      : undefined;
   const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
   const saveError = panel === 'create' ? createState.error : updateState.error;
   const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
@@ -122,7 +148,11 @@ export function DepartmentsPage() {
 
   async function handleDeactivate() {
     if (!editingDepartment) return;
-    if (!window.confirm(`Deactivate ${editingDepartment.name}? It will no longer appear on the chart.`)) {
+    if (
+      !window.confirm(
+        `Deactivate ${editingDepartment.name}? It will no longer appear on the chart.`,
+      )
+    ) {
       return;
     }
     await deactivateDepartment(editingDepartment.id);
@@ -130,17 +160,27 @@ export function DepartmentsPage() {
   }
 
   const excludedParentNames = editingDepartment
-    ? new Set([editingDepartment.name, ...descendantNames(editingDepartment.name, departments ?? [])])
+    ? new Set([
+        editingDepartment.name,
+        ...descendantNames(editingDepartment.name, departments ?? []),
+      ])
     : new Set<string>();
 
   const columns: IndexTableColumn<Department>[] = [
-    { key: 'id', header: 'ID', width: '90px', render: (department) => <span className="uid">{department.id}</span> },
+    {
+      key: 'id',
+      header: 'ID',
+      width: '90px',
+      render: (department) => <span className={UID}>{department.id}</span>,
+    },
     {
       key: 'department',
       header: 'Department',
       render: (department) => (
         <span>
-          <b style={department.active ? undefined : { color: 'var(--text-sub)' }}>{department.name}</b>
+          <b style={department.active ? undefined : { color: 'var(--color-sub)' }}>
+            {department.name}
+          </b>
         </span>
       ),
     },
@@ -148,18 +188,27 @@ export function DepartmentsPage() {
       key: 'parent',
       header: 'Parent',
       render: (department) =>
-        department.parentName ? <span className="dept">{department.parentName}</span> : <Badge plain>Root</Badge>,
+        department.parentName ? (
+          <span className={DEPT}>{department.parentName}</span>
+        ) : (
+          <Badge plain>Root</Badge>
+        ),
     },
-    { key: 'head', header: 'Head', render: (department) => <span className="dept">{department.head || '—'}</span> },
+    {
+      key: 'head',
+      header: 'Head',
+      render: (department) => <span className={DEPT}>{department.head || '—'}</span>,
+    },
     {
       key: 'status',
       header: 'Status',
-      render: (department) => (department.active ? <Badge tone="success">Active</Badge> : <Badge>Inactive</Badge>),
+      render: (department) =>
+        department.active ? <Badge tone="success">Active</Badge> : <Badge>Inactive</Badge>,
     },
   ];
 
   return (
-    <div className="page">
+    <div className={PAGE}>
       {panel && isDirty ? (
         <SaveBar
           message={
@@ -172,12 +221,12 @@ export function DepartmentsPage() {
           onDiscard={discardChanges}
         />
       ) : null}
-      <div className="page-head">
+      <div className={PAGE_HEAD}>
         <div>
           <div className="breadcrumb">Home · Maintenance</div>
-          <h1>Departments</h1>
+          <h1 className={PAGE_TITLE}>Departments</h1>
         </div>
-        <div className="ph-actions">
+        <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
             Add department
           </Button>
@@ -201,11 +250,16 @@ export function DepartmentsPage() {
             rowKey={(department) => department.id}
             highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
             rowActions={(department) => (
-              <button type="button" className="btn plain sm" onClick={() => openEdit(department)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(department)}>
                 Edit
-              </button>
+              </Button>
             )}
-            emptyState={<EmptyState title="No departments yet" description="Add a department to get started." />}
+            emptyState={
+              <EmptyState
+                title="No departments yet"
+                description="Add a department to get started."
+              />
+            }
           />
         )}
       </Card>
@@ -217,27 +271,37 @@ export function DepartmentsPage() {
             actions={editingDepartment ? <Badge plain>{editingDepartment.id}</Badge> : undefined}
           />
           <Card.Section>
-            <div className="field">
-              <label htmlFor="dept-name">Name 部門名</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-name">
+                Name 部門名
+              </label>
               <input
                 id="dept-name"
-                className="inp"
+                className={INPUT}
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
               />
-              {attemptedSave && fieldErrors.name ? <div className="err">{fieldErrors.name}</div> : null}
+              {attemptedSave && fieldErrors.name ? (
+                <div className={FIELD_ERR}>{fieldErrors.name}</div>
+              ) : null}
             </div>
-            <div className="field">
-              <label htmlFor="dept-parent">Parent department</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-parent">
+                Parent department
+              </label>
               <select
                 id="dept-parent"
-                className="inp"
+                className={INPUT}
                 value={form.parentName}
                 onChange={(event) => setForm({ ...form, parentName: event.target.value })}
               >
                 <option value="">No parent (root)</option>
                 {(departments ?? [])
-                  .filter((department) => (department.active || department.name === form.parentName) && !excludedParentNames.has(department.name))
+                  .filter(
+                    (department) =>
+                      (department.active || department.name === form.parentName) &&
+                      !excludedParentNames.has(department.name),
+                  )
                   .map((department) => (
                     <option key={department.id} value={department.name}>
                       {department.name}
@@ -245,16 +309,18 @@ export function DepartmentsPage() {
                   ))}
               </select>
             </div>
-            <div className="field">
-              <label htmlFor="dept-head">Department head 部門長</label>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-head">
+                Department head 部門長
+              </label>
               <input
                 id="dept-head"
-                className="inp"
+                className={INPUT}
                 value={form.head}
                 onChange={(event) => setForm({ ...form, head: event.target.value })}
               />
             </div>
-            {saveError ? <div className="err">{errorMessage(saveError)}</div> : null}
+            {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
           </Card.Section>
           <Card.Footer>
             {editingDepartment?.active ? (
@@ -262,7 +328,7 @@ export function DepartmentsPage() {
                 Deactivate
               </Button>
             ) : null}
-            <span style={{ flex: 1 }} />
+            <span className="flex-1" />
             <Button variant="secondary" onClick={closePanel} disabled={saving}>
               Cancel
             </Button>

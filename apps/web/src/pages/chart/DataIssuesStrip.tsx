@@ -18,9 +18,12 @@ export function DataIssuesStrip({ warnings }: { warnings: BuildWarning[] }) {
 
   return (
     <div className="no-print">
-      <Banner tone="warn" title={`${warnings.length} data issue${warnings.length === 1 ? '' : 's'} found`}>
+      <Banner
+        tone="warn"
+        title={`${warnings.length} data issue${warnings.length === 1 ? '' : 's'} found`}
+      >
         {warnings.map((warning, i) => (
-          <span className="data-issue-item" key={i}>
+          <span className="inline-block text-[13px]" key={i}>
             <strong>{KIND_LABEL[warning.kind]}:</strong> {warning.message}
             {i < warnings.length - 1 ? <br /> : null}
           </span>

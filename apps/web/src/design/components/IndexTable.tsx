@@ -22,7 +22,12 @@ export interface IndexTableProps<Row> {
   emptyState?: ReactNode;
 }
 
-/** `.itable` — Shopify-style index table with optional selection + row actions, ported from `ui_design/shopify/styles.css`. */
+const TH_BASE =
+  'text-[12px] font-semibold text-sub px-4 py-[9px] border-b border-line-2 bg-surface-sub';
+const TD_BASE = 'px-4 py-[11px] border-b border-line-2 align-middle';
+
+/** `.itable` — index table with optional selection + row actions. The `itable` class is kept as a
+ * hook (E2E selectors + the print stylesheet); all visual styling is Tailwind utilities. */
 export function IndexTable<Row>({
   columns,
   rows,
@@ -39,12 +44,16 @@ export function IndexTable<Row>({
   }
 
   return (
-    <table className="itable">
+    <table className="itable w-full border-collapse">
       <thead>
         <tr>
           {selectable ? <th style={{ width: 34 }} /> : null}
           {columns.map((column) => (
-            <th key={column.key} style={column.width ? { width: column.width } : undefined} className={column.align === 'right' ? 'num' : undefined}>
+            <th
+              key={column.key}
+              style={column.width ? { width: column.width } : undefined}
+              className={`${TH_BASE} ${column.align === 'right' ? 'text-right' : 'text-left'}`}
+            >
               {column.header}
             </th>
           ))}
@@ -58,25 +67,33 @@ export function IndexTable<Row>({
           const highlighted = highlightedKeys?.has(key) ?? false;
 
           return (
-            <tr key={key} style={highlighted ? { background: 'var(--brand-tint)' } : undefined}>
+            <tr
+              key={key}
+              className="group transition-[background] duration-100 ease-brand hover:bg-surface-hover [&:last-child>td]:border-b-0"
+              style={highlighted ? { background: 'var(--color-brand-tint)' } : undefined}
+            >
               {selectable ? (
-                <td>
+                <td className={TD_BASE}>
                   <button
                     type="button"
-                    className="cbx"
+                    className={`w-4 h-4 rounded-[4px] border-[1.5px] inline-block align-middle p-0 ${
+                      selected ? 'bg-brand border-brand' : 'border-line-strong'
+                    }`}
                     role="checkbox"
                     aria-checked={selected}
                     onClick={() => onToggleRow?.(key)}
-                    style={selected ? { background: 'var(--brand)', borderColor: 'var(--brand)' } : undefined}
                   />
                 </td>
               ) : null}
               {columns.map((column) => (
-                <td key={column.key} className={column.align === 'right' ? 'num' : undefined}>
+                <td
+                  key={column.key}
+                  className={`${TD_BASE} ${column.align === 'right' ? 'text-right' : ''}`}
+                >
                   {column.render(row)}
                 </td>
               ))}
-              {rowActions ? <td>{rowActions(row)}</td> : null}
+              {rowActions ? <td className={TD_BASE}>{rowActions(row)}</td> : null}
             </tr>
           );
         })}
@@ -90,12 +107,12 @@ export interface IndexTableFooterProps {
   children?: ReactNode;
 }
 
-/** `.table-foot` — row-count summary + pager, sits below an `IndexTable`. */
+/** `.table-foot` — row-count summary + pager, sits below an `IndexTable`. Kept as a print hook. */
 export function IndexTableFooter({ summary, children }: IndexTableFooterProps) {
   return (
-    <div className="table-foot">
-      <span style={{ fontSize: 12.5, color: 'var(--text-sub)' }}>{summary}</span>
-      {children ? <div className="pager">{children}</div> : null}
+    <div className="table-foot flex items-center justify-between px-4 py-[11px]">
+      <span className="text-[12.5px] text-sub">{summary}</span>
+      {children ? <div className="flex gap-1">{children}</div> : null}
     </div>
   );
 }

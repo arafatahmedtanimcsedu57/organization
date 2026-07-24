@@ -2,14 +2,15 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 
-/** App shell: left nav + top bar wrapping every route (design-system capability). */
+/** App shell: left nav + top bar wrapping every route (design-system capability).
+ * `.frame` / `.main` / `.page` are kept as hooks so the print stylesheet can reflow them. */
 export function RootLayout() {
   return (
-    <div className="frame">
+    <div className="frame grid min-h-screen grid-cols-[var(--sidebar-w)_1fr] max-[1080px]:grid-cols-[1fr]">
       <Sidebar />
-      <div className="main">
+      <div className="main flex flex-col min-w-0">
         <Topbar />
-        <main className="page">
+        <main className="page px-7 pt-6 pb-[60px] max-w-[1180px] mx-auto w-full max-[640px]:p-4">
           <Outlet />
         </main>
       </div>

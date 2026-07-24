@@ -9,7 +9,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json tsconfig.base.json ./
 COPY packages/domain/package.json packages/domain/package.json
 COPY apps/api/package.json apps/api/package.json
 RUN npm ci --workspace=@org-chart/domain --workspace=@org-chart/api --include-workspace-root

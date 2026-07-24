@@ -8,22 +8,29 @@ export function Legend({ roots }: { roots: ChartNode[] }) {
   if (roots.length === 0) return null;
 
   return (
-    <div className="legend" aria-label="Chart legend">
-      <div className="legend-group">
+    <div className="flex flex-wrap gap-x-[22px] gap-y-2" aria-label="Chart legend">
+      <div className="flex flex-wrap items-center gap-x-[14px] gap-y-1.5">
         {roots.map((root) => {
           const { rail } = branchColorFor(root.branchId);
           return (
-            <span className="legend-item" key={root.id}>
-              <span className="legend-swatch" style={{ background: rail }} aria-hidden="true" />
+            <span
+              className="inline-flex items-center gap-1.5 text-[12px] text-sub font-jp"
+              key={root.id}
+            >
+              <span
+                className="w-2.5 h-2.5 rounded-full shrink-0"
+                style={{ background: rail }}
+                aria-hidden="true"
+              />
               {root.name}
             </span>
           );
         })}
       </div>
-      <div className="legend-group">
-        <span className="legend-item">
-          <span className="p kenmu legend-kenmu">
-            <span className="kenmu-mark">兼</span>
+      <div className="flex flex-wrap items-center gap-x-[14px] gap-y-1.5">
+        <span className="inline-flex items-center gap-1.5 text-[12px] text-sub font-jp">
+          <span className="p kenmu inline-flex items-baseline gap-1 py-[1px] px-2 border border-dashed border-brand rounded-full bg-brand-tint text-brand-dark font-jp text-[13.5px]">
+            <span className="kenmu-mark font-bold">兼</span>
           </span>
           兼務（concurrent duty — chip names the source department + title）
         </span>

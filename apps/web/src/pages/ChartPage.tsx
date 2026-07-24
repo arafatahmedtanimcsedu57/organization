@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
+import { PAGE, PAGE_HEAD, PAGE_TITLE, PH_ACTIONS } from '../design/formStyles';
 import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
 import { useUiStore } from '../store/uiStore';
 import { DataIssuesStrip } from './chart/DataIssuesStrip';
@@ -28,15 +29,19 @@ export function ChartPage() {
   }, [printMode, setPrintMode]);
 
   return (
-    <div className="page">
-      <div className="page-head">
+    <div className={PAGE}>
+      <div className={PAGE_HEAD}>
         <div>
           <div className="breadcrumb">Home · Organization chart</div>
-          <h1>Organization chart</h1>
+          <h1 className={PAGE_TITLE}>Organization chart</h1>
         </div>
         {!printMode ? (
-          <div className="ph-actions no-print" role="group" aria-label="Chart view">
-            <Button variant={viewMode === 'tree' ? 'primary' : 'secondary'} size="sm" onClick={() => setViewMode('tree')}>
+          <div className={`${PH_ACTIONS} no-print`} role="group" aria-label="Chart view">
+            <Button
+              variant={viewMode === 'tree' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setViewMode('tree')}
+            >
               Tree
             </Button>
             <Button
@@ -46,7 +51,11 @@ export function ChartPage() {
             >
               Network
             </Button>
-            <a className="btn brand sm" href="/api/chart/pdf" download="organization-chart.pdf">
+            <a
+              className="inline-flex items-center gap-1.5 h-[28px] px-[10px] rounded-md text-[12px] font-semibold border bg-brand text-white border-brand hover:bg-brand-dark transition-[background,box-shadow,transform] duration-[120ms] ease-brand"
+              href="/api/chart/pdf"
+              download="organization-chart.pdf"
+            >
               Download PDF
             </a>
           </div>
@@ -72,7 +81,10 @@ export function ChartPage() {
           </Card.Body>
         ) : !data || data.roots.length === 0 ? (
           <Card.Body>
-            <EmptyState title="No departments yet" description="Import the masters to populate the chart." />
+            <EmptyState
+              title="No departments yet"
+              description="Import the masters to populate the chart."
+            />
           </Card.Body>
         ) : !printMode && viewMode === 'network' ? (
           <NetworkView roots={data.roots} />
