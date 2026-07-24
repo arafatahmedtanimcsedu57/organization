@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
 import { POSITION_RANK } from '@org-chart/domain';
 import {
   Badge,
+  Breadcrumb,
   Button,
   Card,
   EmptyState,
@@ -34,6 +34,8 @@ import {
 } from '../../store/api/assignmentsApi';
 import { useGetEmployeesQuery, type Employee } from '../../store/api/employeesApi';
 import { useGetDepartmentsQuery } from '../../store/api/departmentsApi';
+import { errorMessage } from '../../store/api/errorMessage';
+import { useEditorPanel, type FieldErrors } from './useEditorPanel';
 
 interface AssignmentFormState {
   employeeSysId: string;
@@ -67,27 +69,12 @@ function toFormState(assignment: Assignment): AssignmentFormState {
   };
 }
 
-/** Extracts a Nest `ValidationPipe`/`BadRequestException` message out of an RTK Query error. */
-function errorMessage(error: unknown): string {
-  if (error && typeof error === 'object' && 'data' in error) {
-    const data = (error as { data?: unknown }).data;
-    if (data && typeof data === 'object' && 'message' in data) {
-      const message = (data as { message?: unknown }).message;
-      if (Array.isArray(message)) return message.join(', ');
-      if (typeof message === 'string') return message;
-    }
-  }
-  return 'Something went wrong. Please try again.';
-}
-
 function personName(employee: Employee | undefined, sysId: string): string {
   return employee ? `${employee.lastName} ${employee.firstName}` : sysId;
 }
 
-type AssignmentFieldErrors = Partial<Record<keyof AssignmentFormState, string>>;
-
-function validate(form: AssignmentFormState): AssignmentFieldErrors {
-  const errors: AssignmentFieldErrors = {};
+function validate(form: AssignmentFormState): FieldErrors<AssignmentFormState> {
+  const errors: FieldErrors<AssignmentFormState> = {};
   if (!form.employeeSysId) errors.employeeSysId = 'Person is required.';
   if (!form.departmentId) errors.departmentId = 'Department is required.';
   if (!form.title.trim()) errors.title = 'Title is required.';
@@ -105,80 +92,54 @@ export function AssignmentsPage() {
   const [updateAssignment, updateState] = useUpdateAssignmentMutation();
   const [removeAssignment] = useRemoveAssignmentMutation();
 
-  const [panel, setPanel] = useState<'create' | string | null>(null);
-  const [form, setForm] = useState<AssignmentFormState>(EMPTY_FORM);
-  const [baseline, setBaseline] = useState<AssignmentFormState>(EMPTY_FORM);
-  const [attemptedSave, setAttemptedSave] = useState(false);
-
-  const editingAssignment =
-    panel && panel !== 'create'
-      ? assignments?.find((assignment) => assignment.id === panel)
-      : undefined;
-  const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
-  const saveError = panel === 'create' ? createState.error : updateState.error;
-  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
-  const fieldErrors = validate(form);
-  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
-
-  useEffect(() => {
-    if (panel === 'create') {
-      setForm(EMPTY_FORM);
-      setBaseline(EMPTY_FORM);
-      setAttemptedSave(false);
-    } else if (editingAssignment) {
-      const state = toFormState(editingAssignment);
-      setForm(state);
-      setBaseline(state);
-      setAttemptedSave(false);
-    }
-  }, [panel, editingAssignment]);
-
-  function openCreate() {
-    createState.reset();
-    setPanel('create');
-  }
-
-  function openEdit(assignment: Assignment) {
-    updateState.reset();
-    setPanel(assignment.id);
-  }
-
-  function closePanel() {
-    setPanel(null);
-    setForm(EMPTY_FORM);
-    setBaseline(EMPTY_FORM);
-    setAttemptedSave(false);
-  }
-
-  function discardChanges() {
-    setForm(baseline);
-    setAttemptedSave(false);
-  }
+  const {
+    panel,
+    editingRow: editingAssignment,
+    isCreating,
+    form,
+    setForm,
+    attemptedSave,
+    isDirty,
+    fieldErrors,
+    saving,
+    saveError,
+    openCreate,
+    openEdit,
+    closePanel,
+    discardChanges,
+    beginSave,
+  } = useEditorPanel<Assignment, AssignmentFormState>({
+    emptyForm: EMPTY_FORM,
+    resolveRow: (id) => assignments?.find((assignment) => assignment.id === id),
+    toFormState,
+    validate,
+    createState,
+    updateState,
+  });
 
   async function handleSave() {
-    setAttemptedSave(true);
-    if (hasFieldErrors) return;
-    const body = {
-      employeeSysId: form.employeeSysId,
-      departmentId: form.departmentId,
-      title: form.title,
-      assignmentType: form.assignmentType,
-      isPrimary: form.isPrimary,
-      validFrom: form.validFrom || undefined,
-      validTo: form.validTo || undefined,
-    };
-    if (panel === 'create') {
-      const result = await createAssignment(body);
+    const values = beginSave();
+    if (!values) return;
+    if (isCreating) {
+      const result = await createAssignment({
+        employeeSysId: values.employeeSysId,
+        departmentId: values.departmentId,
+        title: values.title,
+        assignmentType: values.assignmentType,
+        isPrimary: values.isPrimary,
+        validFrom: values.validFrom || undefined,
+        validTo: values.validTo || undefined,
+      });
       if (!('error' in result)) closePanel();
     } else if (panel) {
       const result = await updateAssignment({
         id: panel,
         body: {
-          title: form.title,
-          assignmentType: form.assignmentType,
-          isPrimary: form.isPrimary,
-          validFrom: form.validFrom || null,
-          validTo: form.validTo || null,
+          title: values.title,
+          assignmentType: values.assignmentType,
+          isPrimary: values.isPrimary,
+          validFrom: values.validFrom || null,
+          validTo: values.validTo || null,
         },
       });
       if (!('error' in result)) closePanel();
@@ -255,7 +216,7 @@ export function AssignmentsPage() {
       {panel && isDirty ? (
         <SaveBar
           message={
-            panel === 'create'
+            isCreating
               ? 'Adding a new posting — unsaved changes'
               : `Editing posting — unsaved changes`
           }
@@ -266,7 +227,13 @@ export function AssignmentsPage() {
       ) : null}
       <div className={PAGE_HEAD}>
         <div>
-          <div className="breadcrumb">Home · Maintenance</div>
+          <Breadcrumb
+            items={[
+              { label: 'Home', to: '/' },
+              { label: 'Maintenance', to: '/admin' },
+              { label: 'Concurrent duties (兼務)' },
+            ]}
+          />
           <h1 className={PAGE_TITLE}>Concurrent duties (兼務)</h1>
         </div>
         <div className={PH_ACTIONS}>
@@ -291,9 +258,9 @@ export function AssignmentsPage() {
             columns={columns}
             rows={assignments ?? []}
             rowKey={(assignment) => assignment.id}
-            highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
+            highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(assignment) => (
-              <Button variant="plain" size="sm" onClick={() => openEdit(assignment)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(assignment.id)}>
                 Edit
               </Button>
             )}
@@ -309,7 +276,7 @@ export function AssignmentsPage() {
 
       {panel ? (
         <Card>
-          <Card.Header title={panel === 'create' ? 'Add posting' : 'Edit posting'} />
+          <Card.Header title={isCreating ? 'Add posting' : 'Edit posting'} />
           <Card.Section>
             <div className={TWO}>
               <div className={FIELD}>
@@ -320,7 +287,7 @@ export function AssignmentsPage() {
                   id="asn-person"
                   className={INPUT}
                   value={form.employeeSysId}
-                  disabled={panel !== 'create'}
+                  disabled={!isCreating}
                   onChange={(event) => setForm({ ...form, employeeSysId: event.target.value })}
                 >
                   <option value="" disabled>
@@ -346,7 +313,7 @@ export function AssignmentsPage() {
                   id="asn-department"
                   className={INPUT}
                   value={form.departmentId}
-                  disabled={panel !== 'create'}
+                  disabled={!isCreating}
                   onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
                 >
                   <option value="" disabled>
@@ -455,7 +422,7 @@ export function AssignmentsPage() {
             {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
           </Card.Section>
           <Card.Footer>
-            {panel !== 'create' ? (
+            {!isCreating ? (
               <Button variant="plain" onClick={handleRemove}>
                 Remove
               </Button>

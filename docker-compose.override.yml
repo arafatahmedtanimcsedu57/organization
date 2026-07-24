@@ -1,0 +1,38 @@
+# Development override — auto-merged by `docker compose` on top of docker-compose.yml.
+#
+# Purpose: live code reload. Source is bind-mounted into the containers and the apps
+# run in watch mode (Vite dev server with HMR for web, `node --watch` for the api),
+# so edits on the host reflect in the browser without a rebuild.
+#
+# The base docker-compose.yml is the production setup (frozen image, static build) and
+# is left untouched. To run production locally, disable this override:
+#   docker compose -f docker-compose.yml up -d --build
+#
+# The anonymous `*/node_modules` volumes keep the image's installed dependencies from
+# being hidden by the host bind mounts.
+
+services:
+  web:
+    # Vite dev server (HMR). server.host/port/proxy come from apps/web/vite.config.ts.
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages/domain:/app/packages/domain
+      - /app/apps/web/node_modules
+      - /app/packages/domain/node_modules
+
+  api:
+    # Same startup steps as apps/api/docker-entrypoint.sh, but end in `start:dev`
+    # (node --watch) instead of `start`. Inlined so it doesn't depend on the host
+    # script's execute bit once apps/api is bind-mounted over the image copy.
+    entrypoint:
+      - sh
+      - -c
+      - node scripts/wait-for-db.mjs && npm run migration:run && npm run seed && npm run start:dev
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./packages/domain:/app/packages/domain
+      - /app/apps/api/node_modules
+      - /app/packages/domain/node_modules

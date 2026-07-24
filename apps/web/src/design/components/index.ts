@@ -4,6 +4,9 @@ export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
 export { Badge } from './Badge';
 export type { BadgeProps, BadgeTone } from './Badge';
 
+export { Breadcrumb } from './Breadcrumb';
+export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
+
 export { Banner } from './Banner';
 export type { BannerProps, BannerTone } from './Banner';
 

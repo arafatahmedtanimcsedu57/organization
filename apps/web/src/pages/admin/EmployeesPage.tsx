@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
 import { POSITION_RANK } from '@org-chart/domain';
 import {
   Badge,
+  Breadcrumb,
   Button,
   Card,
   EmptyState,
@@ -36,6 +36,8 @@ import {
   type Employee,
 } from '../../store/api/employeesApi';
 import { useGetDepartmentsQuery } from '../../store/api/departmentsApi';
+import { errorMessage } from '../../store/api/errorMessage';
+import { useEditorPanel, type FieldErrors } from './useEditorPanel';
 
 interface EmployeeFormState {
   lastName: string;
@@ -55,27 +57,12 @@ function toFormState(employee: Employee): EmployeeFormState {
   };
 }
 
-/** Extracts a Nest `ValidationPipe`/`BadRequestException` message out of an RTK Query error. */
-function errorMessage(error: unknown): string {
-  if (error && typeof error === 'object' && 'data' in error) {
-    const data = (error as { data?: unknown }).data;
-    if (data && typeof data === 'object' && 'message' in data) {
-      const message = (data as { message?: unknown }).message;
-      if (Array.isArray(message)) return message.join(', ');
-      if (typeof message === 'string') return message;
-    }
-  }
-  return 'Something went wrong. Please try again.';
-}
-
 function initials(employee: Employee): string {
   return employee.lastName.slice(0, 1);
 }
 
-type EmployeeFieldErrors = Partial<Record<keyof EmployeeFormState, string>>;
-
-function validate(form: EmployeeFormState): EmployeeFieldErrors {
-  const errors: EmployeeFieldErrors = {};
+function validate(form: EmployeeFormState): FieldErrors<EmployeeFormState> {
+  const errors: FieldErrors<EmployeeFormState> = {};
   if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
   if (!form.firstName.trim()) errors.firstName = 'First name is required.';
   if (!form.title.trim()) errors.title = 'Title is required.';
@@ -90,64 +77,39 @@ export function EmployeesPage() {
   const [updateEmployee, updateState] = useUpdateEmployeeMutation();
   const [deactivateEmployee] = useDeactivateEmployeeMutation();
 
-  const [panel, setPanel] = useState<'create' | string | null>(null);
-  const [form, setForm] = useState<EmployeeFormState>(EMPTY_FORM);
-  const [baseline, setBaseline] = useState<EmployeeFormState>(EMPTY_FORM);
-  const [attemptedSave, setAttemptedSave] = useState(false);
-
-  const editingEmployee =
-    panel && panel !== 'create'
-      ? employees?.find((employee) => employee.sysId === panel)
-      : undefined;
-  const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
-  const saveError = panel === 'create' ? createState.error : updateState.error;
-  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
-  const fieldErrors = validate(form);
-  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
-
-  useEffect(() => {
-    if (panel === 'create') {
-      setForm(EMPTY_FORM);
-      setBaseline(EMPTY_FORM);
-      setAttemptedSave(false);
-    } else if (editingEmployee) {
-      const state = toFormState(editingEmployee);
-      setForm(state);
-      setBaseline(state);
-      setAttemptedSave(false);
-    }
-  }, [panel, editingEmployee]);
-
-  function openCreate() {
-    createState.reset();
-    setPanel('create');
-  }
-
-  function openEdit(employee: Employee) {
-    updateState.reset();
-    setPanel(employee.sysId);
-  }
-
-  function closePanel() {
-    setPanel(null);
-    setForm(EMPTY_FORM);
-    setBaseline(EMPTY_FORM);
-    setAttemptedSave(false);
-  }
-
-  function discardChanges() {
-    setForm(baseline);
-    setAttemptedSave(false);
-  }
+  const {
+    panel,
+    editingRow: editingEmployee,
+    isCreating,
+    form,
+    setForm,
+    attemptedSave,
+    isDirty,
+    fieldErrors,
+    saving,
+    saveError,
+    openCreate,
+    openEdit,
+    closePanel,
+    discardChanges,
+    beginSave,
+  } = useEditorPanel<Employee, EmployeeFormState>({
+    emptyForm: EMPTY_FORM,
+    resolveRow: (sysId) => employees?.find((employee) => employee.sysId === sysId),
+    toFormState,
+    validate,
+    createState,
+    updateState,
+  });
 
   async function handleSave() {
-    setAttemptedSave(true);
-    if (hasFieldErrors) return;
-    if (panel === 'create') {
-      const result = await createEmployee(form);
+    const values = beginSave();
+    if (!values) return;
+    if (isCreating) {
+      const result = await createEmployee(values);
       if (!('error' in result)) closePanel();
     } else if (panel) {
-      const result = await updateEmployee({ sysId: panel, body: form });
+      const result = await updateEmployee({ sysId: panel, body: values });
       if (!('error' in result)) closePanel();
     }
   }
@@ -218,7 +180,7 @@ export function EmployeesPage() {
       {panel && isDirty ? (
         <SaveBar
           message={
-            panel === 'create'
+            isCreating
               ? 'Adding a new employee — unsaved changes'
               : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} — unsaved changes`
           }
@@ -229,7 +191,13 @@ export function EmployeesPage() {
       ) : null}
       <div className={PAGE_HEAD}>
         <div>
-          <div className="breadcrumb">Home · Maintenance</div>
+          <Breadcrumb
+            items={[
+              { label: 'Home', to: '/' },
+              { label: 'Maintenance', to: '/admin' },
+              { label: 'Employees' },
+            ]}
+          />
           <h1 className={PAGE_TITLE}>Employees</h1>
         </div>
         <div className={PH_ACTIONS}>
@@ -254,9 +222,9 @@ export function EmployeesPage() {
             columns={columns}
             rows={employees ?? []}
             rowKey={(employee) => employee.sysId}
-            highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
+            highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(employee) => (
-              <Button variant="plain" size="sm" onClick={() => openEdit(employee)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(employee.sysId)}>
                 Edit
               </Button>
             )}
@@ -270,7 +238,7 @@ export function EmployeesPage() {
       {panel ? (
         <Card>
           <Card.Header
-            title={panel === 'create' ? 'Add employee' : 'Edit employee'}
+            title={isCreating ? 'Add employee' : 'Edit employee'}
             actions={editingEmployee ? <Badge plain>{editingEmployee.userId}</Badge> : undefined}
           />
           <Card.Section>

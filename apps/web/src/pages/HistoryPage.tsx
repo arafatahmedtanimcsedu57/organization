@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import {
   Badge,
+  Breadcrumb,
   Button,
   Card,
   EmptyState,
@@ -250,7 +251,7 @@ export function HistoryPage() {
     <div className={PAGE}>
       <div className={PAGE_HEAD}>
         <div>
-          <div className="breadcrumb">Home · Change history</div>
+          <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Change history' }]} />
           <h1 className={PAGE_TITLE}>Change history</h1>
         </div>
       </div>

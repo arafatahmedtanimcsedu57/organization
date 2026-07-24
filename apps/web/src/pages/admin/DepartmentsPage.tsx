@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import {
   Badge,
+  Breadcrumb,
   Button,
   Card,
   EmptyState,
@@ -29,6 +29,8 @@ import {
   useUpdateDepartmentMutation,
   type Department,
 } from '../../store/api/departmentsApi';
+import { errorMessage } from '../../store/api/errorMessage';
+import { useEditorPanel, type FieldErrors } from './useEditorPanel';
 
 interface DepartmentFormState {
   name: string;
@@ -42,23 +44,8 @@ function toFormState(department: Department): DepartmentFormState {
   return { name: department.name, parentName: department.parentName, head: department.head };
 }
 
-/** Extracts a Nest `ValidationPipe`/`BadRequestException` message out of an RTK Query error. */
-function errorMessage(error: unknown): string {
-  if (error && typeof error === 'object' && 'data' in error) {
-    const data = (error as { data?: unknown }).data;
-    if (data && typeof data === 'object' && 'message' in data) {
-      const message = (data as { message?: unknown }).message;
-      if (Array.isArray(message)) return message.join(', ');
-      if (typeof message === 'string') return message;
-    }
-  }
-  return 'Something went wrong. Please try again.';
-}
-
-type DepartmentFieldErrors = Partial<Record<keyof DepartmentFormState, string>>;
-
-function validate(form: DepartmentFormState): DepartmentFieldErrors {
-  const errors: DepartmentFieldErrors = {};
+function validate(form: DepartmentFormState): FieldErrors<DepartmentFormState> {
+  const errors: FieldErrors<DepartmentFormState> = {};
   if (!form.name.trim()) errors.name = 'Name is required.';
   return errors;
 }
@@ -83,61 +70,36 @@ export function DepartmentsPage() {
   const [updateDepartment, updateState] = useUpdateDepartmentMutation();
   const [deactivateDepartment] = useDeactivateDepartmentMutation();
 
-  const [panel, setPanel] = useState<'create' | string | null>(null);
-  const [form, setForm] = useState<DepartmentFormState>(EMPTY_FORM);
-  const [baseline, setBaseline] = useState<DepartmentFormState>(EMPTY_FORM);
-  const [attemptedSave, setAttemptedSave] = useState(false);
-
-  const editingDepartment =
-    panel && panel !== 'create'
-      ? departments?.find((department) => department.id === panel)
-      : undefined;
-  const saving = panel === 'create' ? createState.isLoading : updateState.isLoading;
-  const saveError = panel === 'create' ? createState.error : updateState.error;
-  const isDirty = JSON.stringify(form) !== JSON.stringify(baseline);
-  const fieldErrors = validate(form);
-  const hasFieldErrors = Object.keys(fieldErrors).length > 0;
-
-  useEffect(() => {
-    if (panel === 'create') {
-      setForm(EMPTY_FORM);
-      setBaseline(EMPTY_FORM);
-      setAttemptedSave(false);
-    } else if (editingDepartment) {
-      const state = toFormState(editingDepartment);
-      setForm(state);
-      setBaseline(state);
-      setAttemptedSave(false);
-    }
-  }, [panel, editingDepartment]);
-
-  function openCreate() {
-    createState.reset();
-    setPanel('create');
-  }
-
-  function openEdit(department: Department) {
-    updateState.reset();
-    setPanel(department.id);
-  }
-
-  function closePanel() {
-    setPanel(null);
-    setForm(EMPTY_FORM);
-    setBaseline(EMPTY_FORM);
-    setAttemptedSave(false);
-  }
-
-  function discardChanges() {
-    setForm(baseline);
-    setAttemptedSave(false);
-  }
+  const {
+    panel,
+    editingRow: editingDepartment,
+    isCreating,
+    form,
+    setForm,
+    attemptedSave,
+    isDirty,
+    fieldErrors,
+    saving,
+    saveError,
+    openCreate,
+    openEdit,
+    closePanel,
+    discardChanges,
+    beginSave,
+  } = useEditorPanel<Department, DepartmentFormState>({
+    emptyForm: EMPTY_FORM,
+    resolveRow: (id) => departments?.find((department) => department.id === id),
+    toFormState,
+    validate,
+    createState,
+    updateState,
+  });
 
   async function handleSave() {
-    setAttemptedSave(true);
-    if (hasFieldErrors) return;
-    const body = { name: form.name, parentName: form.parentName, head: form.head };
-    if (panel === 'create') {
+    const values = beginSave();
+    if (!values) return;
+    const body = { name: values.name, parentName: values.parentName, head: values.head };
+    if (isCreating) {
       const result = await createDepartment(body);
       if (!('error' in result)) closePanel();
     } else if (panel) {
@@ -212,7 +174,7 @@ export function DepartmentsPage() {
       {panel && isDirty ? (
         <SaveBar
           message={
-            panel === 'create'
+            isCreating
               ? 'Adding a new department — unsaved changes'
               : `Editing ${editingDepartment?.name ?? ''} — unsaved changes`
           }
@@ -223,7 +185,13 @@ export function DepartmentsPage() {
       ) : null}
       <div className={PAGE_HEAD}>
         <div>
-          <div className="breadcrumb">Home · Maintenance</div>
+          <Breadcrumb
+            items={[
+              { label: 'Home', to: '/' },
+              { label: 'Maintenance', to: '/admin' },
+              { label: 'Departments' },
+            ]}
+          />
           <h1 className={PAGE_TITLE}>Departments</h1>
         </div>
         <div className={PH_ACTIONS}>
@@ -248,9 +216,9 @@ export function DepartmentsPage() {
             columns={columns}
             rows={departments ?? []}
             rowKey={(department) => department.id}
-            highlightedKeys={panel && panel !== 'create' ? new Set([panel]) : undefined}
+            highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(department) => (
-              <Button variant="plain" size="sm" onClick={() => openEdit(department)}>
+              <Button variant="plain" size="sm" onClick={() => openEdit(department.id)}>
                 Edit
               </Button>
             )}
@@ -267,7 +235,7 @@ export function DepartmentsPage() {
       {panel ? (
         <Card>
           <Card.Header
-            title={panel === 'create' ? 'Add department' : 'Edit department'}
+            title={isCreating ? 'Add department' : 'Edit department'}
             actions={editingDepartment ? <Badge plain>{editingDepartment.id}</Badge> : undefined}
           />
           <Card.Section>

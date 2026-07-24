@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
+import { Breadcrumb, Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
 import { PAGE, PAGE_HEAD, PAGE_TITLE, PH_ACTIONS } from '../design/formStyles';
 import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
 import { useUiStore } from '../store/uiStore';
@@ -32,7 +32,7 @@ export function ChartPage() {
     <div className={PAGE}>
       <div className={PAGE_HEAD}>
         <div>
-          <div className="breadcrumb">Home · Organization chart</div>
+          <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Organization chart' }]} />
           <h1 className={PAGE_TITLE}>Organization chart</h1>
         </div>
         {!printMode ? (
