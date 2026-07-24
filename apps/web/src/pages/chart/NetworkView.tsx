@@ -57,7 +57,7 @@ export function NetworkView({ roots }: { roots: ChartNode[] }) {
               key={edge.id}
               className="fill-none stroke-2 opacity-85"
               d={`M${x1},${y1} C${midX},${y1} ${midX},${y2} ${x2},${y2}`}
-              stroke={rail}
+              style={{ stroke: rail }}
             />
           );
         })}

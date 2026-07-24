@@ -88,3 +88,24 @@ export function BellIcon() {
     </Icon>
   );
 }
+
+export function SunIcon() {
+  return (
+    <Icon>
+      <circle cx="12" cy="12" r="4" strokeWidth={1.6} />
+      <path
+        d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+        strokeWidth={1.6}
+        strokeLinecap="round"
+      />
+    </Icon>
+  );
+}
+
+export function MoonIcon() {
+  return (
+    <Icon>
+      <path d="M20 14.5A8 8 0 019.5 4 7 7 0 1020 14.5z" strokeWidth={1.6} strokeLinejoin="round" />
+    </Icon>
+  );
+}

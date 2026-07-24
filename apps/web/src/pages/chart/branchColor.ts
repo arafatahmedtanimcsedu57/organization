@@ -6,14 +6,20 @@ export interface BranchColor {
 
 /** Polaris-adjacent hues, distinct from the brand green (reserved for 兼務/links). Order doesn't
  * matter — `branchColorFor` picks a stable entry per branch id, so this only needs to cover
- * however many top-level divisions exist without repeating for the known four. */
+ * however many top-level divisions exist without repeating for the known four.
+ *
+ * Each entry is a pair of CSS custom-property references (not literal hex) so the palette follows
+ * the light/dark theme: the actual rail/tint values are defined per theme in design/tailwind.css
+ * (`--branch-*`). Consumers must apply these as CSS *values* (inline `style`, `--rail`/`--tint`
+ * custom props, or `bg-[var(--rail)]`), never as a raw SVG presentation attribute — `var()` only
+ * resolves in the CSS cascade. */
 const BRANCH_PALETTE: BranchColor[] = [
-  { rail: '#2c6ecb', tint: '#eef4fc' }, // blue
-  { rail: '#b98900', tint: '#fbf4e4' }, // gold
-  { rail: '#2a845a', tint: '#e9f4ee' }, // green
-  { rail: '#8a5cc4', tint: '#f3edfb' }, // purple
-  { rail: '#c2410c', tint: '#fdf1ea' }, // burnt orange
-  { rail: '#be185d', tint: '#fce9f1' }, // magenta
+  { rail: 'var(--branch-blue-rail)', tint: 'var(--branch-blue-tint)' },
+  { rail: 'var(--branch-gold-rail)', tint: 'var(--branch-gold-tint)' },
+  { rail: 'var(--branch-green-rail)', tint: 'var(--branch-green-tint)' },
+  { rail: 'var(--branch-purple-rail)', tint: 'var(--branch-purple-tint)' },
+  { rail: 'var(--branch-orange-rail)', tint: 'var(--branch-orange-tint)' },
+  { rail: 'var(--branch-magenta-rail)', tint: 'var(--branch-magenta-tint)' },
 ];
 
 function hashString(value: string): number {

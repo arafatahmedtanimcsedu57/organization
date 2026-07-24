@@ -30,7 +30,7 @@ const NAV_ITEMS: NavItem[] = [
 const NAV_BASE =
   'flex items-center gap-[9px] px-2.5 py-1.5 rounded-sm text-[13px] font-medium transition-[background] duration-[120ms] ease-brand [&_svg]:w-[18px] [&_svg]:h-[18px] [&_svg]:shrink-0';
 const NAV_INACTIVE = 'text-ink hover:bg-surface-hover [&_svg]:text-sub';
-const NAV_ACTIVE = 'bg-surface shadow-1 font-semibold text-strong [&_svg]:text-action';
+const NAV_ACTIVE = 'bg-surface shadow-1 font-semibold text-strong [&_svg]:text-strong';
 
 /** `.sidebar` is kept as a hook so the print stylesheet can hide it. */
 export function Sidebar() {

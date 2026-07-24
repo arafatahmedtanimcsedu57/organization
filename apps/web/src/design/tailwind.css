@@ -92,10 +92,105 @@
 }
 
 /* Layout dimensions — referenced via arbitrary utilities
-   (grid-cols-[var(--sidebar-w)_1fr], h-[var(--topbar-h)], w-[var(--sidebar-w)]). */
+   (grid-cols-[var(--sidebar-w)_1fr], h-[var(--topbar-h)], w-[var(--sidebar-w)]).
+   Also the light-mode branch palette + native `color-scheme` (drives form
+   controls, scrollbars). Branch rail/tint are plain CSS vars — not `@theme`
+   tokens — because `branchColorFor` returns `var(--branch-*)` refs so the chart
+   recolors with the theme; see pages/chart/branchColor.ts. */
 :root {
   --sidebar-w: 232px;
   --topbar-h: 56px;
+  color-scheme: light;
+
+  --branch-blue-rail: #2c6ecb;
+  --branch-blue-tint: #eef4fc;
+  --branch-gold-rail: #b98900;
+  --branch-gold-tint: #fbf4e4;
+  --branch-green-rail: #2a845a;
+  --branch-green-tint: #e9f4ee;
+  --branch-purple-rail: #8a5cc4;
+  --branch-purple-tint: #f3edfb;
+  --branch-orange-rail: #c2410c;
+  --branch-orange-tint: #fdf1ea;
+  --branch-magenta-rail: #be185d;
+  --branch-magenta-tint: #fce9f1;
+}
+
+/* =====================================================================
+   Dark theme — overrides the `@theme` color/shadow tokens (and the branch
+   palette) under `[data-theme="dark"]` on <html>. Because every component
+   styles with the semantic tokens (bg-surface, text-ink, border-line,
+   shadow-1…) which compile to `var(--color-…)`, swapping the variables here
+   re-themes the whole app with no per-component `dark:` variants. The flag is
+   set pre-paint by the inline script in index.html (no FOUC) and toggled by
+   the Topbar switch (store/themeStore.ts).
+   ===================================================================== */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* surfaces — darkest page, lifting to elevated cards/topbar */
+  --color-bg: #16181d;
+  --color-surface: #1f2229;
+  --color-surface-sub: #1a1d23;
+  --color-surface-hover: #272b33;
+  --color-surface-press: #30353e;
+
+  /* text — soft off-white (not pure #fff) for comfort */
+  --color-ink: #d6d8dc;
+  --color-strong: #f3f4f6;
+  --color-sub: #9aa0a8;
+  --color-muted: #6d747d;
+
+  /* borders — low-contrast hairlines that still read on dark */
+  --color-line: #2c3037;
+  --color-line-2: #24282e;
+  --color-line-strong: #3b414a;
+
+  /* brand + action — brand brightened for dark; brand-dark flips to a LIGHT
+     green so `text-brand-dark` on the dark brand-tint stays legible (and the
+     brand button simply brightens on hover). action stays a dark, lifted
+     neutral so `text-white` on it holds up in both themes. */
+  --color-brand: #12946f;
+  --color-brand-dark: #46c99b;
+  --color-brand-tint: #10261f;
+  --color-action: #30343b;
+  --color-action-hover: #3a3f47;
+
+  /* status tones — deep tints + light ink (mirrors the light ramps) */
+  --color-success: #10281c;
+  --color-success-ink: #63d69b;
+  --color-success-line: #1f5b3d;
+  --color-info: #10243a;
+  --color-info-ink: #6bbef5;
+  --color-info-line: #1f4a72;
+  --color-warn: #2e2510;
+  --color-warn-ink: #eec06a;
+  --color-warn-line: #5f4a1e;
+  --color-crit: #331717;
+  --color-crit-ink: #f19a9a;
+  --color-crit-line: #6a2b2b;
+  --color-neutral: #2a2e35;
+  --color-neutral-ink: #c3c7cd;
+
+  /* elevation — stronger black + a faint light ring (the light shadows vanish
+     on dark, and the hairline ring gives cards a visible edge) */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --shadow-2: 0 6px 18px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --shadow-pop: 0 16px 40px rgba(0, 0, 0, 0.7);
+
+  /* branch palette — rails brightened, tints deepened */
+  --branch-blue-rail: #5b9bff;
+  --branch-blue-tint: #15243c;
+  --branch-gold-rail: #d4a12b;
+  --branch-gold-tint: #2b2410;
+  --branch-green-rail: #46b483;
+  --branch-green-tint: #12271e;
+  --branch-purple-rail: #ab86e2;
+  --branch-purple-tint: #221b33;
+  --branch-orange-rail: #e07b45;
+  --branch-orange-tint: #2f1c12;
+  --branch-magenta-rail: #ec5e94;
+  --branch-magenta-tint: #2f1522;
 }
 
 /* =====================================================================
@@ -126,6 +221,9 @@
   ::selection {
     background: #cdeee0;
   }
+  :root[data-theme='dark'] ::selection {
+    background: #17513c;
+  }
 }
 
 /* Motion-safe: honor prefers-reduced-motion by neutralizing animation. */
@@ -147,6 +245,40 @@
    chart's full-roster expansion) layer on top via `print:` utilities.
    ===================================================================== */
 @media print {
+  /* Always print on white paper — force the light palette even if the viewer
+     has dark mode on, so a Ctrl+P (and the Puppeteer A3 export) stays legible. */
+  :root,
+  :root[data-theme='dark'] {
+    color-scheme: light;
+    --color-bg: #f1f2f4;
+    --color-surface: #ffffff;
+    --color-surface-sub: #fafbfb;
+    --color-surface-hover: #f6f6f7;
+    --color-surface-press: #f1f2f4;
+    --color-ink: #303030;
+    --color-strong: #1a1a1a;
+    --color-sub: #616161;
+    --color-muted: #8a8a8a;
+    --color-line: #e3e3e3;
+    --color-line-2: #ebebeb;
+    --color-line-strong: #cbcccd;
+    --color-brand: #008060;
+    --color-brand-dark: #004c3f;
+    --color-brand-tint: #f0faf6;
+    --branch-blue-rail: #2c6ecb;
+    --branch-blue-tint: #eef4fc;
+    --branch-gold-rail: #b98900;
+    --branch-gold-tint: #fbf4e4;
+    --branch-green-rail: #2a845a;
+    --branch-green-tint: #e9f4ee;
+    --branch-purple-rail: #8a5cc4;
+    --branch-purple-tint: #f3edfb;
+    --branch-orange-rail: #c2410c;
+    --branch-orange-tint: #fdf1ea;
+    --branch-magenta-rail: #be185d;
+    --branch-magenta-tint: #fce9f1;
+  }
+
   .sidebar,
   .topbar,
   .savebar,
