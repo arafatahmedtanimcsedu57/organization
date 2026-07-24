@@ -30,6 +30,7 @@ export default defineConfig({
   server: {
     port: webPort,
     host: true,
+    allowedHosts: previewAllowedHosts,
     proxy: apiProxy,
   },
   preview: {

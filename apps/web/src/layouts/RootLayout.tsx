@@ -10,7 +10,7 @@ export function RootLayout() {
       <Sidebar />
       <div className="main flex flex-col min-w-0">
         <Topbar />
-        <main className="page px-7 pt-6 pb-[60px] max-w-[1180px] mx-auto w-full max-[640px]:p-4">
+        <main className="">
           <Outlet />
         </main>
       </div>

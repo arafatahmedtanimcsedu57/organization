@@ -30,8 +30,8 @@ export class ChartPdfService {
       await page.goto(printUrl, { waitUntil: 'networkidle0' });
 
       const pdf = await page.pdf({
-        format: 'A3',
-        landscape: true,
+        format: 'A4',
+        landscape: false,
         printBackground: true,
       });
 

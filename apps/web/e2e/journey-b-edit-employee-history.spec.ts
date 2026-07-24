@@ -38,8 +38,9 @@ test('edit an employee, see the chart and change history update', async ({ page 
   await expect(page.getByRole('heading', { name: 'Edit employee' })).toHaveCount(0);
   await expect(row.locator('td').nth(2)).toHaveText(afterTitle);
 
-  // --- Org chart re-renders with the edit ---
+  // --- Org chart re-renders with the edit (Horizontal view keeps the roster-line DOM) ---
   await page.goto('/chart');
+  await page.getByRole('button', { name: 'Horizontal', exact: true }).click();
   const deptName = page
     .locator('.dn')
     .filter({ hasText: new RegExp(`^${escapeRegExp(departmentName)}$`) });

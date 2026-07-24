@@ -1,19 +1,31 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Breadcrumb, Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
-import { PAGE, PAGE_HEAD, PAGE_TITLE, PH_ACTIONS } from '../design/formStyles';
+import { PAGE__BIG, PAGE_HEAD, PAGE_TITLE, PH_ACTIONS } from '../design/formStyles';
 import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
+import type { ChartNode } from '../store/api/chartNode';
 import { useUiStore } from '../store/uiStore';
 import { DataIssuesStrip } from './chart/DataIssuesStrip';
 import { Legend } from './chart/Legend';
-import { NetworkView } from './chart/NetworkView';
 import { OrgTree } from './chart/OrgTree';
+import { ChartCanvas } from './chart/topdown/ChartCanvas';
+import { CanvasEditor } from './chart/topdown/CanvasEditor';
+import { TopdownPrint } from './chart/topdown/TopdownPrint';
 
-/** `?print=1` is the route the PDF endpoint (6.2) navigates to: it forces every roster to
- * render in full (no truncation affordance) so Puppeteer's print-media PDF omits no one; the
- * A3/chrome-hiding rules themselves come from the existing `@media print` stylesheet (8.7),
- * which Puppeteer's `page.pdf()` applies automatically. Print always renders the Tree (the
- * PDF layout this app ships), regardless of which view the maintainer had open interactively. */
+/** Depth-first lookup so the selected node tracks refetched chart data, never a stale object. */
+function findNode(roots: ChartNode[], id: string): ChartNode | null {
+  for (const root of roots) {
+    if (root.id === id) return root;
+    const found = findNode(root.children, id);
+    if (found) return found;
+  }
+  return null;
+}
+
+/** `?print=1` is the route the PDF endpoint navigates to: it always renders the **Top-down**
+ * layout fit-to-width for A4 portrait with every roster expanded (no truncation), regardless
+ * of which view the maintainer had open interactively. The A4/chrome-hiding rules come from
+ * the `@media print` stylesheet, which Puppeteer's `page.pdf()` applies automatically. */
 export function ChartPage() {
   const { data, error, isLoading, refetch } = useGetChartQuery();
   const { data: warningsData } = useGetChartWarningsQuery();
@@ -22,14 +34,17 @@ export function ChartPage() {
   const setPrintMode = useUiStore((state) => state.setPrintMode);
   const viewMode = useUiStore((state) => state.viewMode);
   const setViewMode = useUiStore((state) => state.setViewMode);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     setPrintMode(printMode);
     return () => setPrintMode(false);
   }, [printMode, setPrintMode]);
 
+  const selectedNode = data && selectedId ? findNode(data.roots, selectedId) : null;
+
   return (
-    <div className={PAGE}>
+    <div className={PAGE__BIG}>
       <div className={PAGE_HEAD}>
         <div>
           <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Organization chart' }]} />
@@ -38,18 +53,18 @@ export function ChartPage() {
         {!printMode ? (
           <div className={`${PH_ACTIONS} no-print`} role="group" aria-label="Chart view">
             <Button
-              variant={viewMode === 'tree' ? 'primary' : 'secondary'}
+              variant={viewMode === 'topdown' ? 'primary' : 'secondary'}
               size="sm"
-              onClick={() => setViewMode('tree')}
+              onClick={() => setViewMode('topdown')}
             >
-              Tree
+              Top-down
             </Button>
             <Button
-              variant={viewMode === 'network' ? 'primary' : 'secondary'}
+              variant={viewMode === 'horizontal' ? 'primary' : 'secondary'}
               size="sm"
-              onClick={() => setViewMode('network')}
+              onClick={() => setViewMode('horizontal')}
             >
-              Network
+              Horizontal
             </Button>
             <a
               className="inline-flex items-center gap-1.5 h-[28px] px-[10px] rounded-md text-[12px] font-semibold border bg-brand text-white border-brand hover:bg-brand-dark transition-[background,box-shadow,transform] duration-[120ms] ease-brand"
@@ -86,12 +101,22 @@ export function ChartPage() {
               description="Import the masters to populate the chart."
             />
           </Card.Body>
-        ) : !printMode && viewMode === 'network' ? (
-          <NetworkView roots={data.roots} />
+        ) : printMode ? (
+          <TopdownPrint roots={data.roots} />
+        ) : viewMode === 'horizontal' ? (
+          <OrgTree roots={data.roots} printMode={false} />
         ) : (
-          <OrgTree roots={data.roots} printMode={printMode} />
+          <ChartCanvas
+            roots={data.roots}
+            selectedId={selectedId}
+            onSelectNode={(node) => setSelectedId(node?.id ?? null)}
+          />
         )}
       </Card>
+
+      {!printMode && viewMode === 'topdown' && selectedNode ? (
+        <CanvasEditor node={selectedNode} onClose={() => setSelectedId(null)} />
+      ) : null}
     </div>
   );
 }

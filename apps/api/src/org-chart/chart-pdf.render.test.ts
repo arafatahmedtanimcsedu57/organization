@@ -12,7 +12,7 @@ import { SEED_ASSIGNMENTS } from '../import/seed-assignments.data.ts';
 
 /**
  * `org-chart` capability, task 6.3: verifies the Puppeteer/Chromium PDF pipeline (task 6.1's
- * `fonts-noto-cjk` + task 6.2's renderer) actually produces a correct A3 PDF from the *real*
+ * `fonts-noto-cjk` + task 6.2's renderer) actually produces a correct A4-portrait PDF from the *real*
  * masters — full Japanese names, every roster expanded (no truncation), 兼務 marked distinctly —
  * rather than trusting the wiring alone. It renders a minimal print-mode fixture built from the
  * real domain output (the same `@org-chart/domain` pipeline `OrgChartService` uses) instead of
@@ -57,7 +57,7 @@ function renderPrintHtml(roots: OrgNode[]): string {
     return `<section>${node.name}${managers}${staff}${node.children.map(renderNode).join('')}</section>`;
   };
   return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
-    @page { size: A3 landscape; margin: 10mm; }
+    @page { size: A4 portrait; margin: 8mm; }
     body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; }
     .member.concurrent, .staff-name.concurrent { color: #c00; }
   </style></head><body>${roots.map(renderNode).join('')}</body></html>`;
@@ -70,7 +70,7 @@ function resolveChromiumPath(): string | undefined {
   return candidates.find((p) => fs.existsSync(p));
 }
 
-test('the real chart data renders to a valid A3 PDF with full rosters and distinct 兼務 marking', async (t) => {
+test('the real chart data renders to a valid A4 PDF with full rosters and distinct 兼務 marking', async (t) => {
   const executablePath = resolveChromiumPath();
   if (!executablePath) {
     t.skip('no Chromium binary found (set PUPPETEER_EXECUTABLE_PATH); this pipeline is verified inside the api Docker image');
@@ -106,7 +106,7 @@ test('the real chart data renders to a valid A3 PDF with full rosters and distin
     const page = await browser.newPage();
     await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle0' });
 
-    const pdf = await page.pdf({ format: 'A3', landscape: true, printBackground: true });
+    const pdf = await page.pdf({ format: 'A4', landscape: false, printBackground: true });
     assert.equal(Buffer.from(pdf.subarray(0, 5)).toString(), '%PDF-');
     assert.ok(pdf.length > 10_000, 'expected a substantial multi-department PDF, not a near-empty page');
 

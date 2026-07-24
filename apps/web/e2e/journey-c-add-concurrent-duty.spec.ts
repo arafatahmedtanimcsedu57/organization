@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { removeAssignmentsFor } from './assignment-helpers';
 
 /**
  * Journey C (task 13.10, `quality-assurance` spec): add a concurrent (兼務) posting for a
@@ -27,10 +28,9 @@ test('add a concurrent posting and see the sourced 兼 chip on the chart', async
   await page.goto('/admin/assignments');
   await expect(page.getByRole('heading', { name: 'Concurrent duties (兼務)' })).toBeVisible();
 
+  // Determine the target department first, then pre-clean any postings left in the shared
+  // seeded database by earlier runs, so "exactly one row" below stays a valid assertion.
   await page.getByRole('button', { name: 'Add posting' }).click();
-
-  await page.locator('#asn-person').selectOption({ label: `${fullName} (${userId})` });
-
   const departmentOptions = await page
     .locator('#asn-department option:not([disabled])')
     .allTextContents();
@@ -39,6 +39,11 @@ test('add a concurrent posting and see the sourced 兼 chip on the chart', async
     .find((text) => text !== homeDepartment);
   if (!targetDepartment)
     throw new Error('no other department available to post the concurrent duty into');
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await removeAssignmentsFor(page, userId, targetDepartment);
+
+  await page.getByRole('button', { name: 'Add posting' }).click();
+  await page.locator('#asn-person').selectOption({ label: `${fullName} (${userId})` });
   await page.locator('#asn-department').selectOption({ label: targetDepartment });
 
   const postingTitle = '部長';
@@ -59,8 +64,9 @@ test('add a concurrent posting and see the sourced 兼 chip on the chart', async
   await expect(newRow).toHaveCount(1);
   await expect(newRow).toContainText('兼務');
 
-  // --- Org chart shows the sourced 兼 chip in the target department ---
+  // --- Org chart shows the sourced 兼 chip in the target department (Horizontal view) ---
   await page.goto('/chart');
+  await page.getByRole('button', { name: 'Horizontal', exact: true }).click();
   const deptName = page
     .locator('.dn')
     .filter({ hasText: new RegExp(`^${escapeRegExp(targetDepartment)}$`) });

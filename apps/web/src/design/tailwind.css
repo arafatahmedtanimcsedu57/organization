@@ -306,16 +306,22 @@
   }
 
   .card,
-  .dept {
+  .dept,
+  .topdown-node {
     box-shadow: none;
     border: 1px solid #ddd;
     opacity: 1;
-    transform: none;
     animation: none;
   }
 
+  /* Fit-to-width A4: `.topdown-print` pre-scales the whole diagram to the page width
+     (see TopdownPrint.tsx); height flows onto additional pages. */
+  .topdown-print {
+    overflow: visible;
+  }
+
   @page {
-    size: A3 landscape;
-    margin: 12mm;
+    size: A4 portrait;
+    margin: 8mm;
   }
 }
