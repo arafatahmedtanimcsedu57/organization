@@ -1,6 +1,5 @@
 import { FIELD, FIELD_ERR, INPUT, LABEL, TWO } from '../../../design/formStyles';
 import { optionList } from '../../../design/optionList';
-import type { AssignmentType } from '../../../store/api/assignmentsApi';
 import type { Department } from '../../../store/api/departmentsApi';
 import type { Employee } from '../../../store/api/employeesApi';
 import { errorMessage } from '../../../store/api/errorMessage';
@@ -20,7 +19,7 @@ export interface AssignmentFieldsProps {
   saveError: unknown;
 }
 
-/** The posting editor's fields: who, where, what title, primary vs. 兼務, and validity dates. */
+/** The posting editor's fields: who, where, what title, and validity dates - always a 兼務 posting. */
 export function AssignmentFields({
   form,
   setForm,
@@ -71,7 +70,9 @@ export function AssignmentFields({
             className={INPUT}
             value={form.departmentId}
             disabled={!isCreating}
-            onChange={(event) => setForm({ ...form, departmentId: event.target.value, titleId: '' })}
+            onChange={(event) =>
+              setForm({ ...form, departmentId: event.target.value, titleId: '' })
+            }
           >
             <option value="" disabled>
               Select a department…
@@ -105,44 +106,6 @@ export function AssignmentFields({
         {attemptedSave && fieldErrors.titleId ? (
           <div className={FIELD_ERR}>{fieldErrors.titleId}</div>
         ) : null}
-      </div>
-
-      <div className={TWO}>
-        <div className={FIELD}>
-          <label className={LABEL} htmlFor="asn-type">
-            Posting type
-          </label>
-          <select
-            id="asn-type"
-            className={INPUT}
-            value={form.assignmentType}
-            onChange={(event) => {
-              const assignmentType = event.target.value as AssignmentType;
-              setForm({
-                ...form,
-                assignmentType,
-                // "Home department" is meaningless on a concurrent posting.
-                isPrimary: assignmentType === 'primary' ? form.isPrimary : false,
-              });
-            }}
-          >
-            <option value="concurrent">Concurrent (兼務)</option>
-            <option value="primary">Primary</option>
-          </select>
-        </div>
-        <div className={FIELD}>
-          <label className={LABEL} htmlFor="asn-is-primary">
-            <input
-              id="asn-is-primary"
-              type="checkbox"
-              checked={form.isPrimary}
-              disabled={form.assignmentType !== 'primary'}
-              onChange={(event) => setForm({ ...form, isPrimary: event.target.checked })}
-              className="mr-1.5"
-            />
-            Primary posting (home department)
-          </label>
-        </div>
       </div>
 
       <div className={TWO}>

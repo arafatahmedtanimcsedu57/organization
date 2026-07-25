@@ -1,13 +1,12 @@
-import type { Assignment, AssignmentType } from '../../../store/api/assignmentsApi';
+import type { Assignment } from '../../../store/api/assignmentsApi';
 import type { Employee } from '../../../store/api/employeesApi';
 import type { FieldErrors } from '../useEditorPanel';
 
+/** This page manages only 兼務 postings, so `assignmentType`/`isPrimary` aren't editable here - always sent as `concurrent`/`false`. */
 export interface AssignmentFormState {
   employeeSysId: string;
   departmentId: string;
   titleId: string;
-  assignmentType: AssignmentType;
-  isPrimary: boolean;
   validFrom: string;
   validTo: string;
 }
@@ -16,8 +15,6 @@ export const EMPTY_FORM: AssignmentFormState = {
   employeeSysId: '',
   departmentId: '',
   titleId: '',
-  assignmentType: 'concurrent',
-  isPrimary: false,
   validFrom: '',
   validTo: '',
 };
@@ -27,8 +24,6 @@ export function toFormState(assignment: Assignment): AssignmentFormState {
     employeeSysId: assignment.employeeSysId,
     departmentId: assignment.departmentId,
     titleId: assignment.titleId ?? '',
-    assignmentType: assignment.assignmentType,
-    isPrimary: assignment.isPrimary,
     validFrom: assignment.validFrom ?? '',
     validTo: assignment.validTo ?? '',
   };

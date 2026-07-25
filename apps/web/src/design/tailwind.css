@@ -6,7 +6,7 @@
      3. @theme - the design tokens, exposed as Tailwind utilities
         (bg-surface, text-sub, border-line, rounded-lg, shadow-1, font-jp…)
      4. @layer base - body defaults, focus ring, selection, reduced motion
-     5. the A3-landscape print rules (chrome hidden, surfaces flattened)
+     5. the A4-portrait print rules (chrome hidden, surfaces flattened)
    All component/screen styling is authored as Tailwind utilities in the
    JSX; there are no per-screen stylesheets. Ported from the former
    tokens.css / shell.css / components.css / chart.css / print.css.
@@ -305,14 +305,14 @@
 }
 
 /* =====================================================================
-   Print - A3 landscape. Hide app chrome (structural hook classes are
+   Print - A4 portrait. Hide app chrome (structural hook classes are
    kept in the markup for exactly this), flatten surfaces, and let the
    page expand to fill the sheet. View-specific print rules (e.g. the
    chart's full-roster expansion) layer on top via `print:` utilities.
    ===================================================================== */
 @media print {
   /* Always print on white paper - force the light palette even if the viewer
-     has dark mode on, so a Ctrl+P (and the Puppeteer A3 export) stays legible. */
+     has dark mode on, so a Ctrl+P (and the Puppeteer A4 export) stays legible. */
   :root,
   :root[data-theme='dark'] {
     color-scheme: light;

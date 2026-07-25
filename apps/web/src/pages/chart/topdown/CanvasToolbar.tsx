@@ -1,3 +1,5 @@
+import { Maximize, Maximize2, Minimize, ZoomIn, ZoomOut } from 'lucide-react';
+
 import { ToolbarButton } from './ToolbarButton';
 
 export interface CanvasToolbarProps {
@@ -61,10 +63,10 @@ export function CanvasToolbar({
       </span>
       <span className="w-px h-5 bg-line mx-1 shrink-0" aria-hidden="true" />
       <ToolbarButton label="Fit to screen" onClick={onFit}>
-        ⤢
+        <Maximize2 aria-hidden="true" />
       </ToolbarButton>
       <ToolbarButton label="Zoom out" onClick={onZoomOut}>
-        −
+        <ZoomOut aria-hidden="true" />
       </ToolbarButton>
       {/* The zoom readout is the least-essential element on a phone (the +/- buttons and the
           visible scale carry the intent); drop it below sm so search gets the width. */}
@@ -75,7 +77,7 @@ export function CanvasToolbar({
         {zoomPct}%
       </span>
       <ToolbarButton label="Zoom in" onClick={onZoomIn}>
-        ＋
+        <ZoomIn aria-hidden="true" />
       </ToolbarButton>
       {/* Fullscreen is a low-value control on phones and the first thing to drop when space is
           tight; hide it (and its divider) below sm so the essentials always fit. */}
@@ -85,7 +87,7 @@ export function CanvasToolbar({
           label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
           onClick={onToggleFullscreen}
         >
-          {isFullscreen ? '⤡' : '⛶'}
+          {isFullscreen ? <Minimize aria-hidden="true" /> : <Maximize aria-hidden="true" />}
         </ToolbarButton>
       </span>
     </div>

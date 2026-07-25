@@ -90,7 +90,6 @@ export function ChartPage() {
       <DataIssuesStrip warnings={warningsData?.warnings ?? []} />
 
       <Card>
-        <Card.Header title="Chart" />
         {data && data.roots.length > 0 ? (
           <Card.Section>
             <Legend roots={data.roots} />

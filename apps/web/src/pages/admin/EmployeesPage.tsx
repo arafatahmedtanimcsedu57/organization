@@ -1,4 +1,5 @@
-import {Pen, Plus} from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Pen, Plus } from 'lucide-react';
 
 import { TitleSelect } from '../chart/topdown/editor/TitleSelect';
 import {
@@ -52,7 +53,12 @@ interface EmployeeFormState {
   departmentId: string;
 }
 
-const EMPTY_FORM: EmployeeFormState = { lastName: '', firstName: '', titleId: '', departmentId: '' };
+const EMPTY_FORM: EmployeeFormState = {
+  lastName: '',
+  firstName: '',
+  titleId: '',
+  departmentId: '',
+};
 
 function toFormState(employee: Employee): EmployeeFormState {
   return {
@@ -107,6 +113,33 @@ export function EmployeesPage() {
     toFormState,
     resolveRow: (sysId) => employees?.find((employee) => employee.sysId === sysId),
   });
+
+  const [search, setSearch] = useState('');
+  const [departmentFilter, setDepartmentFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'' | 'active' | 'inactive'>('');
+
+  const filteredEmployees = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return (employees ?? []).filter((employee) => {
+      if (departmentFilter && employee.departmentId !== departmentFilter) return false;
+      if (statusFilter === 'active' && !employee.active) return false;
+      if (statusFilter === 'inactive' && employee.active) return false;
+      if (query) {
+        const haystack =
+          `${employee.lastName}${employee.firstName}${employee.userId}`.toLowerCase();
+        if (!haystack.includes(query)) return false;
+      }
+      return true;
+    });
+  }, [employees, search, departmentFilter, statusFilter]);
+
+  const hasFilters = Boolean(search || departmentFilter || statusFilter);
+
+  function clearFilters() {
+    setSearch('');
+    setDepartmentFilter('');
+    setStatusFilter('');
+  }
 
   async function handleSave() {
     const values = beginSave();
@@ -196,13 +229,82 @@ export function EmployeesPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            <Plus/> Add employee
+            <Plus /> Add employee
           </Button>
         </div>
       </div>
 
       <Card>
-        <Card.Header title={employees ? `${employees.length} employees in the Organizational Structure` : 'Employees'} />
+        <Card.Header title="Filters" />
+        <Card.Section>
+          <div className="grid grid-cols-3 gap-3">
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="emp-search">
+                Search
+              </label>
+              <input
+                id="emp-search"
+                type="search"
+                className={INPUT}
+                placeholder="Name or UID…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="emp-filter-department">
+                Department
+              </label>
+              <select
+                id="emp-filter-department"
+                className={INPUT}
+                value={departmentFilter}
+                onChange={(event) => setDepartmentFilter(event.target.value)}
+              >
+                <option value="">All departments</option>
+                {(departments ?? []).map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="emp-filter-status">
+                Status
+              </label>
+              <select
+                id="emp-filter-status"
+                className={INPUT}
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as '' | 'active' | 'inactive')
+                }
+              >
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          {hasFilters ? (
+            <Button variant="plain" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          ) : null}
+        </Card.Section>
+      </Card>
+
+      <Card>
+        <Card.Header
+          title={
+            employees
+              ? filteredEmployees.length === employees.length
+                ? `${employees.length} employees in the Organizational Structure`
+                : `${filteredEmployees.length} of ${employees.length} employees`
+              : 'Employees'
+          }
+        />
         {isLoading ? (
           <Card.Body>
             <LoadingState message="Loading employees…" />
@@ -215,16 +317,26 @@ export function EmployeesPage() {
           <div className="overflow-x-auto">
             <IndexTable
               columns={columns}
-              rows={employees ?? []}
+              rows={filteredEmployees}
               rowKey={(employee) => employee.sysId}
               highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
               rowActions={(employee) => (
                 <Button variant="plain" size="sm" onClick={() => openEdit(employee.sysId)}>
-                  <Pen/> Edit
+                  <Pen /> Edit
                 </Button>
               )}
               emptyState={
-                <EmptyState title="No employees yet" description="Add an employee to get started." />
+                hasFilters ? (
+                  <EmptyState
+                    title="No matches"
+                    description="Try a different search, or clear filters."
+                  />
+                ) : (
+                  <EmptyState
+                    title="No employees yet"
+                    description="Add an employee to get started."
+                  />
+                )
               }
             />
           </div>
@@ -304,7 +416,9 @@ export function EmployeesPage() {
                 id="emp-department"
                 className={INPUT}
                 value={form.departmentId}
-                onChange={(event) => setForm({ ...form, departmentId: event.target.value, titleId: '' })}
+                onChange={(event) =>
+                  setForm({ ...form, departmentId: event.target.value, titleId: '' })
+                }
               >
                 <option value="" disabled>
                   Select a department…

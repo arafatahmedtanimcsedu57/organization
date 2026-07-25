@@ -10,20 +10,12 @@ import type { AsnForm } from './forms';
 export interface AssignmentFormProps {
   panel: EditorPanel<never, AsnForm>;
   employees: Employee[];
-  /** The department the new posting lands in (the selected card). */
-  nodeName: string;
   onCancel: () => void;
   onSave: () => void;
 }
 
 /** Create a 兼務 posting: an active person gains a second title in the selected department. */
-export function AssignmentForm({
-  panel,
-  employees,
-  nodeName,
-  onCancel,
-  onSave,
-}: AssignmentFormProps) {
+export function AssignmentForm({ panel, employees, onCancel, onSave }: AssignmentFormProps) {
   const { form, setForm, fieldErrors, attemptedSave } = panel;
 
   // Only active people can take a new posting.
@@ -39,9 +31,6 @@ export function AssignmentForm({
 
   return (
     <>
-      <h3 className="text-[13px] font-semibold mb-3">
-        Add posting in <span className="font-jp">{nodeName}</span>
-      </h3>
       <div className={TWO}>
         <div className={FIELD}>
           <label className={LABEL} htmlFor="cv-asn-person">

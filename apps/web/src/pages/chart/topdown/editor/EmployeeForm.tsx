@@ -1,4 +1,3 @@
-import { Badge } from '../../../../design/components';
 import { FIELD, FIELD_ERR, INPUT, LABEL, TWO } from '../../../../design/formStyles';
 import { optionList } from '../../../../design/optionList';
 import type { Department } from '../../../../store/api/departmentsApi';
@@ -12,20 +11,12 @@ import type { EmpForm } from './forms';
 export interface EmployeeFormProps {
   panel: EditorPanel<Employee, EmpForm>;
   departments: Department[];
-  /** Always set - the shell renders this form only once the row has resolved. */
-  employee: Employee;
   onCancel: () => void;
   onSave: () => void;
 }
 
 /** Edit one roster member in place (name, title, home department). */
-export function EmployeeForm({
-  panel,
-  departments,
-  employee,
-  onCancel,
-  onSave,
-}: EmployeeFormProps) {
+export function EmployeeForm({ panel, departments, onCancel, onSave }: EmployeeFormProps) {
   const { form, setForm, fieldErrors, attemptedSave } = panel;
 
   // An inactive department stays listed only while it is this person's own.
@@ -41,9 +32,6 @@ export function EmployeeForm({
 
   return (
     <>
-      <h3 className="text-[13px] font-semibold mb-3">
-        Edit employee <Badge plain>{employee.userId}</Badge>
-      </h3>
       <div className={TWO}>
         <div className={FIELD}>
           <label className={LABEL} htmlFor="cv-emp-last">

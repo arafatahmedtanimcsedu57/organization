@@ -1,7 +1,7 @@
 # Organization Chart Auto-Output App
 
 A full-stack app that automatically generates a **printable organization chart** (interactive
-React view → A3 PDF) from the two Syslabo masters - `sys_user` (employees) and `cmn_department`
+React view → A4 PDF) from the two Syslabo masters - `sys_user` (employees) and `cmn_department`
 (departments) - reproducing the hand-made `組織図(Current Organizational Chart).xlsx`, and adds a
 maintenance UI with change history and a working concurrent-duties (兼務) model.
 
@@ -88,7 +88,7 @@ Use the **admin UI** at `/admin` (Employees, Departments, Assignments tabs):
 
 | Controller              | Base path      | Purpose                                            |
 | ----------------------- | -------------- | -------------------------------------------------- |
-| `OrgChartController`    | `/chart`       | Chart JSON + PDF export (Puppeteer, A3)            |
+| `OrgChartController`    | `/chart`       | Chart JSON + PDF export (Puppeteer, A4)            |
 | `EmployeesController`   | `/employees`   | CRUD                                               |
 | `DepartmentsController` | `/departments` | CRUD                                               |
 | `AssignmentsController` | `/assignments` | Primary/concurrent posting CRUD                    |

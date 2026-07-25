@@ -19,10 +19,12 @@ import {
   type EmpForm,
 } from './editor/forms';
 
-import { 
-  Button, 
-  ConfirmDialog, 
-  Drawer 
+import {
+  Badge,
+  Button,
+  ConfirmDialog,
+  Drawer,
+  Modal,
 } from '../../../design/components';
 
 import { useAppDispatch } from '../../../store/store';
@@ -275,42 +277,61 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
       </Drawer.Section>
 
       {/* For edits, render only once the department row resolved, so the form can never be
-          shown (or saved) unpopulated while /departments is still loading. */}
+          shown (or saved) unpopulated while /departments is still loading. Each editor opens
+          in its own Modal, layered above the Drawer, rather than inline in the panel body. */}
       {active === 'dept' && dept.panel && (dept.isCreating || dept.editingRow) ? (
-        <Drawer.Section>
-          <DepartmentForm
-            panel={dept}
-            departments={departmentRows}
-            nodeId={node.id}
-            nodeName={node.name}
-            onCancel={closeAll}
-            onSave={saveDept}
+        <Modal
+          aria-label={dept.isCreating ? `Add sub-department under ${node.name}` : 'Edit department'}
+          onClose={closeAll}
+        >
+          <Modal.Header
+            title={dept.isCreating ? `Add sub-department under ${node.name}` : 'Edit department'}
           />
-        </Drawer.Section>
+          <Modal.Section>
+            <DepartmentForm
+              panel={dept}
+              departments={departmentRows}
+              nodeId={node.id}
+              onCancel={closeAll}
+              onSave={saveDept}
+            />
+          </Modal.Section>
+        </Modal>
       ) : null}
 
       {active === 'emp' && emp.panel && emp.editingRow ? (
-        <Drawer.Section>
-          <EmployeeForm
-            panel={emp}
-            departments={departmentRows}
-            employee={emp.editingRow}
-            onCancel={closeAll}
-            onSave={saveEmp}
+        <Modal aria-label="Edit employee" onClose={closeAll}>
+          <Modal.Header
+            title={
+              <>
+                Edit employee <Badge plain>{emp.editingRow.userId}</Badge>
+              </>
+            }
           />
-        </Drawer.Section>
+          <Modal.Section>
+            <EmployeeForm
+              panel={emp}
+              departments={departmentRows}
+              onCancel={closeAll}
+              onSave={saveEmp}
+            />
+          </Modal.Section>
+        </Modal>
       ) : null}
 
       {active === 'asn' && asn.panel ? (
-        <Drawer.Section>
-          <AssignmentForm
-            panel={asn}
-            employees={employeeRows}
-            nodeName={node.name}
-            onCancel={closeAll}
-            onSave={saveAsn}
+        <Modal aria-label={`Add posting in ${node.name}`} onClose={closeAll}>
+          <Modal.Header
+            title={
+              <>
+                Add posting in <span className="font-jp">{node.name}</span>
+              </>
+            }
           />
-        </Drawer.Section>
+          <Modal.Section>
+            <AssignmentForm panel={asn} employees={employeeRows} onCancel={closeAll} onSave={saveAsn} />
+          </Modal.Section>
+        </Modal>
       ) : null}
 
       {confirming ? (

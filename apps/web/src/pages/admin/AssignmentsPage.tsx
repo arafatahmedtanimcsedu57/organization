@@ -32,9 +32,9 @@ import {
 import { Pen, Plus } from 'lucide-react';
 
 /**
- * `/admin/assignments` - the 兼務 master: every user ↔ department ↔ title posting, with the
- * primary/concurrent flag and validity dates. The page owns the panel state machine and the
- * mutations; the table columns and the form fields live beside it.
+ * `/admin/assignments` - the 兼務 master: every user ↔ department ↔ title concurrent posting,
+ * with its validity dates. The page owns the panel state machine and the mutations; the table
+ * columns and the form fields live beside it.
  */
 export function AssignmentsPage() {
   const { data: assignments, error, isLoading, refetch } = useGetAssignmentsQuery();
@@ -73,12 +73,12 @@ export function AssignmentsPage() {
     const values = beginSave();
     if (!values) return;
     if (isCreating) {
+      // This page manages only 兼務 postings - always concurrent, never someone's primary posting.
       const result = await createAssignment({
         employeeSysId: values.employeeSysId,
         departmentId: values.departmentId,
         titleId: values.titleId,
-        assignmentType: values.assignmentType,
-        isPrimary: values.isPrimary,
+        assignmentType: 'concurrent',
         validFrom: values.validFrom || undefined,
         validTo: values.validTo || undefined,
       });
@@ -88,8 +88,6 @@ export function AssignmentsPage() {
         id: panel,
         body: {
           titleId: values.titleId,
-          assignmentType: values.assignmentType,
-          isPrimary: values.isPrimary,
           validFrom: values.validFrom || null,
           validTo: values.validTo || null,
         },
@@ -128,7 +126,7 @@ export function AssignmentsPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            <Plus/> Add posting
+            <Plus /> Add posting
           </Button>
         </div>
       </div>
@@ -151,7 +149,7 @@ export function AssignmentsPage() {
             highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(assignment) => (
               <Button variant="plain" size="sm" onClick={() => openEdit(assignment.id)}>
-                <Pen/>
+                <Pen />
               </Button>
             )}
             emptyState={

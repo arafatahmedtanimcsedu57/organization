@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { Pen, Plus } from 'lucide-react';
 import {
   Badge,
@@ -101,6 +102,35 @@ export function DepartmentsPage() {
     resolveRow: (id) => departments?.find((department) => department.id === id),
   });
 
+  const [search, setSearch] = useState('');
+  const [parentFilter, setParentFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'' | 'active' | 'inactive'>('');
+
+  const filteredDepartments = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return (departments ?? []).filter((department) => {
+      if (parentFilter === '__root__' && department.parentName) return false;
+      if (parentFilter && parentFilter !== '__root__' && department.parentName !== parentFilter) {
+        return false;
+      }
+      if (statusFilter === 'active' && !department.active) return false;
+      if (statusFilter === 'inactive' && department.active) return false;
+      if (query) {
+        const haystack = `${department.name}${department.head}`.toLowerCase();
+        if (!haystack.includes(query)) return false;
+      }
+      return true;
+    });
+  }, [departments, search, parentFilter, statusFilter]);
+
+  const hasFilters = Boolean(search || parentFilter || statusFilter);
+
+  function clearFilters() {
+    setSearch('');
+    setParentFilter('');
+    setStatusFilter('');
+  }
+
   async function handleSave() {
     const values = beginSave();
     if (!values) return;
@@ -190,13 +220,83 @@ export function DepartmentsPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            <Plus/> Add department
+            <Plus /> Add department
           </Button>
         </div>
       </div>
 
       <Card>
-        <Card.Header title={departments ? `${departments.length} departments` : 'Departments'} />
+        <Card.Header title="Filters" />
+        <Card.Section>
+          <div className="grid grid-cols-3 gap-3">
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-search">
+                Search
+              </label>
+              <input
+                id="dept-search"
+                type="search"
+                className={INPUT}
+                placeholder="Name or head…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </div>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-filter-parent">
+                Parent
+              </label>
+              <select
+                id="dept-filter-parent"
+                className={INPUT}
+                value={parentFilter}
+                onChange={(event) => setParentFilter(event.target.value)}
+              >
+                <option value="">All departments</option>
+                <option value="__root__">Root (no parent)</option>
+                {(departments ?? []).map((department) => (
+                  <option key={department.id} value={department.name}>
+                    {department.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={FIELD}>
+              <label className={LABEL} htmlFor="dept-filter-status">
+                Status
+              </label>
+              <select
+                id="dept-filter-status"
+                className={INPUT}
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value as '' | 'active' | 'inactive')
+                }
+              >
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+          {hasFilters ? (
+            <Button variant="plain" size="sm" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          ) : null}
+        </Card.Section>
+      </Card>
+
+      <Card>
+        <Card.Header
+          title={
+            departments
+              ? filteredDepartments.length === departments.length
+                ? `${departments.length} departments`
+                : `${filteredDepartments.length} of ${departments.length} departments`
+              : 'Departments'
+          }
+        />
         {isLoading ? (
           <Card.Body>
             <LoadingState message="Loading departments…" />
@@ -208,19 +308,26 @@ export function DepartmentsPage() {
         ) : (
           <IndexTable
             columns={columns}
-            rows={departments ?? []}
+            rows={filteredDepartments}
             rowKey={(department) => department.id}
             highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(department) => (
               <Button variant="plain" size="sm" onClick={() => openEdit(department.id)}>
-                <Pen/>
+                <Pen />
               </Button>
             )}
             emptyState={
-              <EmptyState
-                title="No departments yet"
-                description="Add a department to get started."
-              />
+              hasFilters ? (
+                <EmptyState
+                  title="No matches"
+                  description="Try a different search, or clear filters."
+                />
+              ) : (
+                <EmptyState
+                  title="No departments yet"
+                  description="Add a department to get started."
+                />
+              )
             }
           />
         )}

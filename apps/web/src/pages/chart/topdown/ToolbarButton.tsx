@@ -17,7 +17,7 @@ export function ToolbarButton({ label, onClick, children, className }: ToolbarBu
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`w-[30px] h-[30px] shrink-0 pointer-coarse:w-11 pointer-coarse:h-11 grid place-items-center rounded-md text-[14px] text-ink hover:bg-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand${
+      className={`w-[30px] h-[30px] shrink-0 pointer-coarse:w-11 pointer-coarse:h-11 grid place-items-center rounded-md text-ink hover:bg-surface-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand [&_svg]:w-[17px] [&_svg]:h-[17px]${
         className ? ` ${className}` : ''
       }`}
     >

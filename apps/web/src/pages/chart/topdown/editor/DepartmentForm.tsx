@@ -11,20 +11,12 @@ export interface DepartmentFormProps {
   departments: Department[];
   /** The selected node - excluded from the parent list so a department cannot parent itself. */
   nodeId: string;
-  nodeName: string;
   onCancel: () => void;
   onSave: () => void;
 }
 
 /** Edit the selected department, or add a sub-department beneath it. */
-export function DepartmentForm({
-  panel,
-  departments,
-  nodeId,
-  nodeName,
-  onCancel,
-  onSave,
-}: DepartmentFormProps) {
+export function DepartmentForm({ panel, departments, nodeId, onCancel, onSave }: DepartmentFormProps) {
   const { form, setForm, fieldErrors, attemptedSave } = panel;
 
   // An inactive department stays listed only while it is the current parent; the selected
@@ -42,9 +34,6 @@ export function DepartmentForm({
 
   return (
     <>
-      <h3 className="text-[13px] font-semibold mb-3">
-        {panel.isCreating ? `Add sub-department under ${nodeName}` : 'Edit department'}
-      </h3>
       <div className={TWO}>
         <div className={FIELD}>
           <label className={LABEL} htmlFor="cv-dept-name">
