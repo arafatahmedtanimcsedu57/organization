@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type ButtonVariant = 'secondary' | 'primary' | 'brand' | 'plain' | 'critical' | 'ghostdark';
-export type ButtonSize = 'md' | 'sm';
+export type ButtonSize = 'md' | 'sm' | 'icon-sm' | 'icon-md';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -27,6 +27,8 @@ const VARIANTS: Record<ButtonVariant, string> = {
 const SIZES: Record<ButtonSize, string> = {
   md: '',
   sm: 'h-[28px] px-[10px] text-[12px]',
+  'icon-sm': 'h-6 w-6 p-0 rounded-full',
+  'icon-md': 'h-8 w-8 p-0 rounded-full',
 };
 
 /** Button - secondary/primary/brand/plain/critical/ghostdark (for dark surfaces like the save

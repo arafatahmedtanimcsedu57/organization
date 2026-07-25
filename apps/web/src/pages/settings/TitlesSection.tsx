@@ -1,3 +1,5 @@
+import { Pen, Plus } from 'lucide-react';
+
 import {
   Badge,
   Button,
@@ -10,7 +12,13 @@ import {
   SaveBar,
 } from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
-import { FIELD, FIELD_ERR, INPUT, LABEL, TWO } from '../../design/formStyles';
+import { 
+  FIELD, 
+  FIELD_ERR, 
+  INPUT, 
+  LABEL, 
+  TWO 
+} from '../../design/formStyles';
 import {
   useCreateTitleMutation,
   useDeactivateTitleMutation,
@@ -53,12 +61,12 @@ export function TitlesSection() {
     editingRow: editingTitle,
     isCreating,
     form,
-    setForm,
     attemptedSave,
     isDirty,
     fieldErrors,
     saving,
     saveError,
+    setForm,
     openCreate,
     openEdit,
     closePanel,
@@ -66,11 +74,11 @@ export function TitlesSection() {
     beginSave,
   } = useEditorPanel<Title, TitleFormState>({
     emptyForm: EMPTY_FORM,
-    resolveRow: (id) => titles?.find((title) => title.id === id),
-    toFormState,
-    validate,
     createState,
     updateState,
+    validate,
+    toFormState,
+    resolveRow: (id) => titles?.find((title) => title.id === id),
   });
 
   async function handleSave() {
@@ -128,7 +136,7 @@ export function TitlesSection() {
           title={titles ? `${titles.length} titles` : 'Titles'}
           actions={
             <Button variant="primary" size="sm" onClick={openCreate}>
-              Add title
+              <Plus/> Add title
             </Button>
           }
         />
@@ -148,7 +156,7 @@ export function TitlesSection() {
             highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(title) => (
               <Button variant="plain" size="sm" onClick={() => openEdit(title.id)}>
-                Edit
+                <Pen/>
               </Button>
             )}
             emptyState={<EmptyState title="No titles yet" description="Add a title to get started." />}

@@ -1,4 +1,7 @@
+import { Pen, X } from 'lucide-react';
+
 import type { Member } from '@org-chart/domain';
+
 import { Button } from '../../../../design/components';
 
 export interface EditorRosterProps {
@@ -19,7 +22,7 @@ export function EditorRoster({ members, onEdit, onDeactivate }: EditorRosterProp
       {members.map((member) => (
         <span
           key={`${member.sysId}-${member.concurrent ? 'k' : 'p'}`}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12.5px] font-jp ${
+          className={`inline-flex items-center gap-1.5 rounded-full border ps-4 pe-2 py-1 text-[12.5px] font-jp ${
             member.concurrent
               ? 'border-dashed border-brand bg-brand-tint text-brand-dark'
               : 'border-line bg-surface-sub text-ink'
@@ -34,17 +37,20 @@ export function EditorRoster({ members, onEdit, onDeactivate }: EditorRosterProp
             className="!h-auto !px-1 py-0"
             onClick={() => onEdit(member)}
           >
-            Edit
+            <Pen />
           </Button>
           {!member.concurrent ? (
-            <Button
-              variant="critical"
-              size="sm"
-              className="!h-auto !px-1 py-0"
-              onClick={() => onDeactivate(member)}
-            >
-              Deactivate
-            </Button>
+              <button
+                className="
+                flex h-4 w-4 items-center justify-center
+                rounded-full
+                bg-red-500
+                text-white
+                "
+                onClick={() => onDeactivate(member)}
+              >
+                <X className="h-3 w-3"  />
+              </button>
           ) : null}
         </span>
       ))}

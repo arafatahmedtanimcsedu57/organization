@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
+import { CircleX, Pen, Plus, X } from 'lucide-react';
 
-import { Button, ConfirmDialog, Drawer } from '../../../design/components';
 import { useEditorPanel } from '../../admin/useEditorPanel';
 import { AssignmentForm } from './editor/AssignmentForm';
 import { DepartmentForm } from './editor/DepartmentForm';
@@ -18,6 +18,12 @@ import {
   type DeptForm,
   type EmpForm,
 } from './editor/forms';
+
+import { 
+  Button, 
+  ConfirmDialog, 
+  Drawer 
+} from '../../../design/components';
 
 import { useAppDispatch } from '../../../store/store';
 import {
@@ -233,20 +239,30 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
           separated to the far end so it is never a misclick neighbour of "Edit department". */}
       <Drawer.Section>
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <Button variant="secondary" size="sm" onClick={openDeptEdit}>
-              Edit department
-            </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            
             <Button variant="secondary" size="sm" onClick={openDeptCreate}>
-              Add sub-department
+              <Plus/> Add sub-department
             </Button>
             <Button variant="secondary" size="sm" onClick={openAsnCreate}>
-              Add posting (兼務)
+              <Plus/> Add posting (兼務)
             </Button>
           </div>
-          <Button variant="critical" size="sm" onClick={() => setConfirming({ kind: 'dept' })}>
-            Deactivate
-          </Button>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="plain" size="sm" onClick={openDeptEdit}>
+              <Pen />
+            </Button>
+            <button
+              className="flex h-6 w-6 items-center justify-center
+                rounded-full
+                bg-red-500
+                text-white"
+              onClick={() => setConfirming({ kind: 'dept' })}
+            >
+              <X className="h-4 w-4"  />
+            </button>
+          </div>
         </div>
       </Drawer.Section>
 

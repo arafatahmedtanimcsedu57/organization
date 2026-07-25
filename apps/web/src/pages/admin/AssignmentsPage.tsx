@@ -29,6 +29,7 @@ import {
   validate,
   type AssignmentFormState,
 } from './assignments/assignmentForm';
+import { Pen, Plus } from 'lucide-react';
 
 /**
  * `/admin/assignments` - the 兼務 master: every user ↔ department ↔ title posting, with the
@@ -127,7 +128,7 @@ export function AssignmentsPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            Add posting
+            <Plus/> Add posting
           </Button>
         </div>
       </div>
@@ -150,7 +151,7 @@ export function AssignmentsPage() {
             highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(assignment) => (
               <Button variant="plain" size="sm" onClick={() => openEdit(assignment.id)}>
-                Edit
+                <Pen/>
               </Button>
             )}
             emptyState={

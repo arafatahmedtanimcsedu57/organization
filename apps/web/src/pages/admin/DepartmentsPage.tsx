@@ -1,3 +1,4 @@
+import { Pen, Plus } from 'lucide-react';
 import {
   Badge,
   Breadcrumb,
@@ -80,12 +81,12 @@ export function DepartmentsPage() {
     editingRow: editingDepartment,
     isCreating,
     form,
-    setForm,
     attemptedSave,
     isDirty,
     fieldErrors,
     saving,
     saveError,
+    setForm,
     openCreate,
     openEdit,
     closePanel,
@@ -93,11 +94,11 @@ export function DepartmentsPage() {
     beginSave,
   } = useEditorPanel<Department, DepartmentFormState>({
     emptyForm: EMPTY_FORM,
-    resolveRow: (id) => departments?.find((department) => department.id === id),
-    toFormState,
-    validate,
     createState,
     updateState,
+    validate,
+    toFormState,
+    resolveRow: (id) => departments?.find((department) => department.id === id),
   });
 
   async function handleSave() {
@@ -189,7 +190,7 @@ export function DepartmentsPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            Add department
+            <Plus/> Add department
           </Button>
         </div>
       </div>
@@ -212,7 +213,7 @@ export function DepartmentsPage() {
             highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
             rowActions={(department) => (
               <Button variant="plain" size="sm" onClick={() => openEdit(department.id)}>
-                Edit
+                <Pen/>
               </Button>
             )}
             emptyState={
