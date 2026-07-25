@@ -29,9 +29,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       >
         <Menu />
       </button>
-      <div className="flex-1 max-w-[480px] mx-auto relative max-[640px]:hidden [&_svg]:absolute [&_svg]:left-2.5 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-sub">
+      <div className="opacity-50  flex-1 max-w-[480px] mx-auto relative max-[640px]:hidden [&_svg]:absolute [&_svg]:left-2.5 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-sub">
         <Search />
         <input
+          disabled
           type="search"
           placeholder="Search employees, departments…"
           aria-label="Search"
