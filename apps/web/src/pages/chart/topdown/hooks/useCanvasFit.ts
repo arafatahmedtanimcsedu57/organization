@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type RefObject } from 'react';
 import { zoomIdentity } from 'd3-zoom';
 import { FIT_INSET, MIN_SCALE, NODE_FOCUS_MIN_SCALE } from '../../../../constants/canvasZoom';
 import type { LayoutNode, TopdownLayout } from '../topdownLayout';
@@ -14,12 +14,19 @@ export interface CanvasFit {
 export interface UseCanvasFitOptions {
   layout: TopdownLayout;
   nodeById: ReadonlyMap<string, LayoutNode>;
+  /** The element whose client box defines "the screen" being fitted to. */
+  viewportRef: RefObject<HTMLDivElement | null>;
   zoom: CanvasZoom;
 }
 
 /** Framing helpers — the seam where the zoom behavior meets the current layout. */
-export function useCanvasFit({ layout, nodeById, zoom }: UseCanvasFitOptions): CanvasFit {
-  const { viewportRef, transformRef, transformTo, takeControl, releaseControl } = zoom;
+export function useCanvasFit({
+  layout,
+  nodeById,
+  viewportRef,
+  zoom,
+}: UseCanvasFitOptions): CanvasFit {
+  const { transformRef, transformTo, takeControl, releaseControl } = zoom;
   const { width: layoutWidth, height: layoutHeight } = layout;
 
   const fitToScreen = useCallback(

@@ -126,6 +126,16 @@ export function useAdaptiveLayout({
     [roots, budgetWidth, expandedIds],
   );
 
+  // The budget is a hysteresis state machine whose next value depends on the width of the
+  // layout the *current* value produced — a genuine feedback loop, so it cannot be derived
+  // in a single pass. Reconciling after commit is the least-bad of the three options: doing
+  // it during render needs a render-phase setState or a ref written during render (both
+  // impure), and pushing it into the resize/gesture callbacks would spread the layout logic
+  // across the zoom and resize hooks and re-introduce refs mirroring layout state.
+  //
+  // The loop is provably finite: `nextBudgetWidth` returns its own `current` input inside
+  // the dead-band, so it reaches a fixpoint after at most one extra pass, and the identity
+  // bail-out below means the steady state costs no re-render at all.
   useEffect(() => {
     const next = nextBudgetWidth({
       viewportWidth: viewport.width,
@@ -135,6 +145,7 @@ export function useAdaptiveLayout({
       current: budgetWidth,
       currentLayoutWidth: layout.width,
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- documented fixpoint, see above
     setBudgetWidth((prev) => (prev === next ? prev : next));
   }, [viewport.width, overviewBudget, userControlled, settledScale, budgetWidth, layout.width]);
 

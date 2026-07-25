@@ -33,11 +33,15 @@ export interface ChartCanvasProps {
  */
 export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+  /** The three layers of the zoom surface, owned here and driven by `useCanvasZoom`. */
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const zoomLayerRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const zoom = useCanvasZoom();
+  const zoom = useCanvasZoom({ viewportRef, stageRef, zoomLayerRef });
   const reducedMotion = useReducedMotion();
-  const viewport = useViewportSize(zoom.viewportRef);
+  const viewport = useViewportSize(viewportRef);
   const { isFullscreen, toggleFullscreen } = useFullscreen(wrapperRef);
   const { expandedIds, toggleExpand } = useExpandedNodes(zoom.takeControl);
 
@@ -50,8 +54,8 @@ export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCan
   });
   const nodeById = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
 
-  const { fitToScreen, fitToNode } = useCanvasFit({ layout, nodeById, zoom });
-  useAutoFit({ roots, layout, viewport, nodeById, zoom, fitToScreen });
+  const { fitToScreen, fitToNode } = useCanvasFit({ layout, nodeById, viewportRef, zoom });
+  useAutoFit({ roots, layout, viewport, nodeById, viewportRef, zoom, fitToScreen });
 
   const search = useCanvasSearch({ layout, fitToNode });
   const handleKeyDown = useCanvasKeyboard({
@@ -85,7 +89,7 @@ export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCan
       />
 
       <div
-        ref={zoom.viewportRef}
+        ref={viewportRef}
         role="application"
         aria-label="Organization chart canvas"
         tabIndex={0}
@@ -99,8 +103,8 @@ export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCan
         {/* Outer: fast `transform` during gestures. Inner: the settled scale baked as CSS
             `zoom` (see useCanvasZoom) so text re-lays-out natively sharp at any zoom. No
             `will-change-transform`: permanent compositing would freeze rasterization. */}
-        <div ref={zoom.stageRef} className="absolute top-0 left-0 origin-top-left">
-          <div ref={zoom.zoomLayerRef}>
+        <div ref={stageRef} className="absolute top-0 left-0 origin-top-left">
+          <div ref={zoomLayerRef}>
             <CanvasStage
               layout={layout}
               matchSet={search.matchSet}

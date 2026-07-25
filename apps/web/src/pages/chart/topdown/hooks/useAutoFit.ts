@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { zoomIdentity } from 'd3-zoom';
 import type { ChartNode } from '../../../../store/api/chartNode';
 import type { LayoutNode, TopdownLayout } from '../topdownLayout';
@@ -10,6 +10,8 @@ export interface UseAutoFitOptions {
   layout: TopdownLayout;
   viewport: ViewportSize;
   nodeById: ReadonlyMap<string, LayoutNode>;
+  /** The element whose client box the anchoring math is done against. */
+  viewportRef: RefObject<HTMLDivElement | null>;
   zoom: CanvasZoom;
   fitToScreen: (animate?: boolean) => void;
 }
@@ -28,10 +30,11 @@ export function useAutoFit({
   layout,
   viewport,
   nodeById,
+  viewportRef,
   zoom,
   fitToScreen,
 }: UseAutoFitOptions): void {
-  const { viewportRef, transformRef, userControlledRef, transformTo } = zoom;
+  const { transformRef, userControlledRef, transformTo } = zoom;
   const fittedRef = useRef(false);
 
   // Read through a ref so refitting is driven by the data and the viewport, not by the

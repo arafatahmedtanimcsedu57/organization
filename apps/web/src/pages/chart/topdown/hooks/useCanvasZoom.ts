@@ -12,13 +12,16 @@ import {
 } from '../../../../constants/canvasZoom';
 import { useReducedMotion } from './useReducedMotion';
 
-export interface CanvasZoom {
+export interface CanvasZoomElements {
   /** The gesture surface: d3-zoom is bound here and it defines the visible box. */
   viewportRef: RefObject<HTMLDivElement | null>;
   /** Outer layer that carries the live `transform` during a gesture. */
   stageRef: RefObject<HTMLDivElement | null>;
   /** Inner layer that receives the settled scale as CSS `zoom`. */
   zoomLayerRef: RefObject<HTMLDivElement | null>;
+}
+
+export interface CanvasZoom {
   /** Live transform, readable from callbacks without re-rendering on every zoom frame. */
   transformRef: RefObject<ZoomTransform>;
   /** Mirrors `userControlled` for cheap checks in hot paths (60Hz zoom events). */
@@ -54,12 +57,14 @@ export interface CanvasZoom {
  * is unsupported.
  *
  * Deliberately knows nothing about the layout: `useCanvasFit` composes the two, which keeps
- * the layout free to depend on `settledScale` without a cycle.
+ * the layout free to depend on `settledScale` without a cycle. The three DOM refs are owned
+ * by the component that renders those elements and handed in here.
  */
-export function useCanvasZoom(): CanvasZoom {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const zoomLayerRef = useRef<HTMLDivElement>(null);
+export function useCanvasZoom({
+  viewportRef,
+  stageRef,
+  zoomLayerRef,
+}: CanvasZoomElements): CanvasZoom {
   const behaviorRef = useRef<ZoomBehavior<HTMLDivElement, unknown> | null>(null);
   const transformRef = useRef<ZoomTransform>(zoomIdentity);
   const zoomPctRef = useRef(100);
@@ -114,7 +119,7 @@ export function useCanvasZoom(): CanvasZoom {
       zoomPctRef.current = pct;
       setZoomPct(pct);
     }
-  }, []);
+  }, [stageRef, zoomLayerRef]);
 
   // Wire d3-zoom once; the toolbar and node clicks are excluded from drag-panning.
   useEffect(() => {
@@ -148,7 +153,7 @@ export function useCanvasZoom(): CanvasZoom {
         bakeTimerRef.current = null;
       }
     };
-  }, [applyTransform, takeControl]);
+  }, [applyTransform, takeControl, viewportRef]);
 
   const transformTo = useCallback(
     (transform: ZoomTransform, animate: boolean) => {
@@ -162,7 +167,7 @@ export function useCanvasZoom(): CanvasZoom {
         selection.call(behavior.transform, transform);
       }
     },
-    [reducedMotion],
+    [reducedMotion, viewportRef],
   );
 
   const zoomBy = useCallback(
@@ -173,7 +178,7 @@ export function useCanvasZoom(): CanvasZoom {
       takeControl();
       behavior.scaleBy(select(viewportEl), factor);
     },
-    [takeControl],
+    [takeControl, viewportRef],
   );
 
   const panBy = useCallback(
@@ -184,13 +189,10 @@ export function useCanvasZoom(): CanvasZoom {
       takeControl();
       behavior.translateBy(select(viewportEl), dx, dy);
     },
-    [takeControl],
+    [takeControl, viewportRef],
   );
 
   return {
-    viewportRef,
-    stageRef,
-    zoomLayerRef,
     transformRef,
     userControlledRef,
     zoomPct,

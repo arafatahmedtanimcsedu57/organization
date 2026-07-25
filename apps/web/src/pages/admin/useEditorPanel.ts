@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 /** Field-level validation errors keyed by form field. */
 export type FieldErrors<Form> = Partial<Record<keyof Form, string>>;
@@ -94,23 +94,39 @@ export function useEditorPanel<Row, Form>({
   const fieldErrors = validate(form);
   const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
-  // Seeding the draft from the record the panel points at. `useLayoutEffect`, not
-  // `useEffect`: a passive effect runs after paint, so opening an editor would show one
-  // frame of the *previous* record's values before the seed lands.
+  // `toFormState` is a pure row→form mapping that callers declare inline, so its identity
+  // changes every render. Holding the latest one here keeps it out of the seeding effect's
+  // dependencies — listing it would re-seed on every render and wipe whatever the user is
+  // typing. Declared first so this layout effect runs before the seeding one below.
+  const toFormStateRef = useRef(toFormState);
+  useLayoutEffect(() => {
+    toFormStateRef.current = toFormState;
+  });
+
+  // Seeding the draft from the record the panel points at: opening a panel, and the row
+  // arriving later if the list was still loading. `useLayoutEffect`, not `useEffect`: a
+  // passive effect runs after paint, so opening an editor would show one frame of the
+  // *previous* record's values before the seed lands.
+  //
+  // The draft is an editable copy of server data, so it cannot be derived during render,
+  // and the row it comes from can resolve after the panel opens. React's alternative is
+  // remounting the form via a `key` per record; that means splitting this hook's panel
+  // identity from its form state across all five screens that use it, which is a bigger
+  // change than this warning is worth right now.
+  /* eslint-disable react-hooks/set-state-in-effect -- seeding a draft from server data, see above */
   useLayoutEffect(() => {
     if (isCreating) {
       setForm(emptyForm);
       setBaseline(emptyForm);
       setAttemptedSave(false);
     } else if (editingRow) {
-      const state = toFormState(editingRow);
+      const state = toFormStateRef.current(editingRow);
       setForm(state);
       setBaseline(state);
       setAttemptedSave(false);
     }
-    // `emptyForm`/`toFormState` are stable module-level values; re-syncing is deliberately
-    // driven only by which record the panel points at.
-  }, [panel, editingRow]);
+  }, [isCreating, editingRow, emptyForm]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   function openCreate() {
     createState.reset();
