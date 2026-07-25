@@ -20,6 +20,21 @@ import { Assignment } from '../assignments/assignment.entity.ts';
 import { Title } from '../titles/title.entity.ts';
 
 /**
+ * True when `today` (an ISO `YYYY-MM-DD` string) falls within a posting's
+ * `[validFrom, validTo]` window; a null bound is open-ended. A posting whose
+ * `validTo` has passed is "ended" and excluded from the generated chart, per
+ * `concurrent-duties` ("Editing a posting's valid-to date into the past ends it").
+ */
+export function isAssignmentActive(
+  posting: { validFrom: string | null; validTo: string | null },
+  today: string,
+): boolean {
+  if (posting.validFrom && posting.validFrom > today) return false;
+  if (posting.validTo && posting.validTo < today) return false;
+  return true;
+}
+
+/**
  * `org-chart` capability: loads active departments/employees/assignments from
  * Postgres and delegates tree-building, rank ordering, disambiguation, and
  * 兼務 placement to the framework-free `@org-chart/domain` package.
@@ -72,7 +87,13 @@ export class OrgChartService {
       ];
     });
 
-    const assignmentRows: AssignmentRow[] = assignments.map((a) => ({
+    // A posting whose valid-to date has passed no longer holds - it stays in
+    // `assignments` (and the admin table) for record-keeping, but it drops out of
+    // the chart just like a deleted posting would.
+    const today = new Date().toISOString().slice(0, 10);
+    const activeAssignments = assignments.filter((a) => isAssignmentActive(a, today));
+
+    const assignmentRows: AssignmentRow[] = activeAssignments.map((a) => ({
       employeeSysId: a.employeeSysId,
       departmentId: a.departmentId,
       title: a.title,
@@ -94,7 +115,13 @@ export class OrgChartService {
     const lang = this.config.get('import.lang', { infer: true });
     const tree = buildDepartmentTree(departmentRows);
     const memberWarnings = placeEmployees(tree, employeeRows, titleRows, lang);
-    const assignmentWarnings = placeAssignments(tree, employeeRows, assignmentRows, titleRows, lang);
+    const assignmentWarnings = placeAssignments(
+      tree,
+      employeeRows,
+      assignmentRows,
+      titleRows,
+      lang,
+    );
     // After rosters are placed/ranked, resolve each head from its Sys ID
     // (falling back to the top-ranked member) - see resolveDepartmentHeads.
     const headWarnings = resolveDepartmentHeads(tree, employeeRows);

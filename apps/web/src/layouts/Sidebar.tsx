@@ -1,15 +1,16 @@
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  ChartIcon,
-  CloseIcon,
-  ConcurrentIcon,
-  DepartmentsIcon,
-  EmployeesIcon,
-  HistoryIcon,
-  HomeIcon,
-  SettingsIcon,
-} from './icons';
+  X, 
+  Home, 
+  Building2, 
+  TrendingUpDown, 
+  IdCardLanyard,
+  RotateCcw,
+  Bookmark,
+  SquareRoundCorner
+} from 'lucide-react';
+
 
 interface NavItem {
   to: string;
@@ -20,17 +21,17 @@ interface NavItem {
 
 /** General navigation. */
 const MAIN_NAV: NavItem[] = [
-  { to: '/', label: 'Home', icon: HomeIcon, end: true },
-  { to: '/chart', label: 'Organization chart', icon: ChartIcon },
+  { to: '/', label: 'Home', icon: Home, end: true },
+  { to: '/chart', label: 'Organization chart', icon: Building2 },
 ];
 
 /** Master-data administration - grouped separately under `/admin`. */
 const ADMIN_NAV: NavItem[] = [
-  { to: '/admin/employees', label: 'Employees', icon: EmployeesIcon },
-  { to: '/admin/departments', label: 'Departments', icon: DepartmentsIcon },
-  { to: '/admin/assignments', label: 'Concurrent duties', icon: ConcurrentIcon },
-  { to: '/admin/history', label: 'Change history', icon: HistoryIcon },
-  { to: '/admin/titles', label: 'Title', icon: SettingsIcon },
+  { to: '/admin/employees', label: 'Employees', icon: IdCardLanyard },
+  { to: '/admin/departments', label: 'Departments', icon: SquareRoundCorner },
+  { to: '/admin/assignments', label: 'Concurrent duties', icon: TrendingUpDown },
+  { to: '/admin/history', label: 'Change history', icon: RotateCcw },
+  { to: '/admin/titles', label: 'Title', icon: Bookmark },
 ];
 
 const NAV_BASE =
@@ -90,7 +91,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           aria-label="Close menu"
           className="ml-auto w-8 h-8 rounded-md grid place-items-center text-sub hover:bg-surface-hover min-[1081px]:hidden [&_svg]:w-[18px] [&_svg]:h-[18px]"
         >
-          <CloseIcon />
+          <X />
         </button>
       </div>
       <nav className="p-2 flex flex-col gap-px overflow-y-auto flex-1" aria-label="Main">

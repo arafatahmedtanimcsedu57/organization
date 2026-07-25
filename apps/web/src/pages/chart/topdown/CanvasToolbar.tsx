@@ -37,7 +37,9 @@ export function CanvasToolbar({
   const hits = matchCount === 0 ? '0 hits' : `${activeMatch + 1}/${matchCount}`;
 
   return (
-    <div className="canvas-toolbar no-print absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 rounded-lg border border-line bg-surface px-2 py-1.5 shadow-2">
+    // Mobile-first: the bar spans the viewport (`left-2 right-2`) with a flex-shrinking search
+    // field so nothing bleeds off a narrow screen; at `sm` it becomes the centered floating bar.
+    <div className="canvas-toolbar no-print absolute top-3 left-2 right-2 z-10 flex items-center gap-1 rounded-lg border border-line bg-surface px-2 py-1.5 shadow-2 sm:left-1/2 sm:right-auto sm:-translate-x-1/2">
       <input
         type="search"
         value={query}
@@ -47,36 +49,45 @@ export function CanvasToolbar({
         }}
         placeholder="Search employee / department…"
         aria-label="Search the chart"
-        className="w-56 h-[30px] rounded-md border border-line-strong bg-surface px-2.5 font-jp text-[12.5px] text-ink focus:outline-none focus:border-brand"
+        className="min-w-0 flex-1 h-[30px] pointer-coarse:h-11 rounded-md border border-line-strong bg-surface px-2.5 font-jp text-[12.5px] pointer-coarse:text-[16px] text-ink focus:outline-none focus:border-brand sm:w-56 sm:flex-none"
       />
       <span
-        className={`w-14 text-center font-mono text-[11px] ${
+        className={`w-14 shrink-0 text-center font-mono text-[11px] ${
           query && matchCount === 0 ? 'text-crit-ink' : 'text-sub'
         }`}
         role="status"
       >
         {query ? hits : ''}
       </span>
-      <span className="w-px h-5 bg-line mx-1" aria-hidden="true" />
+      <span className="w-px h-5 bg-line mx-1 shrink-0" aria-hidden="true" />
       <ToolbarButton label="Fit to screen" onClick={onFit}>
         ⤢
       </ToolbarButton>
       <ToolbarButton label="Zoom out" onClick={onZoomOut}>
         −
       </ToolbarButton>
-      <span className="w-12 text-center font-mono text-[11.5px] text-ink" aria-live="polite">
+      {/* The zoom readout is the least-essential element on a phone (the +/- buttons and the
+          visible scale carry the intent); drop it below sm so search gets the width. */}
+      <span
+        className="hidden w-12 shrink-0 text-center font-mono text-[11.5px] text-ink sm:block"
+        aria-live="polite"
+      >
         {zoomPct}%
       </span>
       <ToolbarButton label="Zoom in" onClick={onZoomIn}>
         ＋
       </ToolbarButton>
-      <span className="w-px h-5 bg-line mx-1" aria-hidden="true" />
-      <ToolbarButton
-        label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-        onClick={onToggleFullscreen}
-      >
-        {isFullscreen ? '⤡' : '⛶'}
-      </ToolbarButton>
+      {/* Fullscreen is a low-value control on phones and the first thing to drop when space is
+          tight; hide it (and its divider) below sm so the essentials always fit. */}
+      <span className="hidden sm:contents">
+        <span className="w-px h-5 bg-line mx-1 shrink-0" aria-hidden="true" />
+        <ToolbarButton
+          label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          onClick={onToggleFullscreen}
+        >
+          {isFullscreen ? '⤡' : '⛶'}
+        </ToolbarButton>
+      </span>
     </div>
   );
 }

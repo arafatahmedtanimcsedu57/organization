@@ -23,6 +23,7 @@ import { useViewportSize } from './hooks/useViewportSize';
 import type { ChartNode } from '../../../store/api/chartNode';
 
 import { ZOOM_STEP } from '../../../constants/canvasZoom';
+import { BranchColorProvider, createBranchColorResolver } from '../branchColor';
 
 export interface ChartCanvasProps {
   roots: ChartNode[];
@@ -62,6 +63,10 @@ export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCan
     expandedIds,
   });
   const nodeById = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
+  const resolveBranchColor = useMemo(
+    () => createBranchColorResolver(roots.map((root) => root.branchId)),
+    [roots],
+  );
 
   const { fitToScreen, fitToNode } = useCanvasFit({ layout, nodeById, viewportRef, zoom });
   useAutoFit({ roots, layout, viewport, nodeById, viewportRef, zoom, fitToScreen });
@@ -114,17 +119,19 @@ export function ChartCanvas({ roots, selectedId = null, onSelectNode }: ChartCan
             `will-change-transform`: permanent compositing would freeze rasterization. */}
         <div ref={stageRef} className="absolute top-0 left-0 origin-top-left">
           <div ref={zoomLayerRef}>
-            <CanvasStage
-              layout={layout}
-              matchSet={search.matchSet}
-              activeMatchId={search.activeMatchId}
-              selectedId={selectedId}
-              hoveredId={hoveredId}
-              onHover={setHoveredId}
-              animateLayout={!reducedMotion}
-              onSelect={handleSelect}
-              onToggleExpand={toggleExpand}
-            />
+            <BranchColorProvider value={resolveBranchColor}>
+              <CanvasStage
+                layout={layout}
+                matchSet={search.matchSet}
+                activeMatchId={search.activeMatchId}
+                selectedId={selectedId}
+                hoveredId={hoveredId}
+                onHover={setHoveredId}
+                animateLayout={!reducedMotion}
+                onSelect={handleSelect}
+                onToggleExpand={toggleExpand}
+              />
+            </BranchColorProvider>
           </div>
         </div>
       </div>

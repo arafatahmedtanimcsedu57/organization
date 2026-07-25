@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { Button, Card } from '../../../design/components';
+import { Button, ConfirmDialog, Drawer } from '../../../design/components';
 import { useEditorPanel } from '../../admin/useEditorPanel';
 import { AssignmentForm } from './editor/AssignmentForm';
 import { DepartmentForm } from './editor/DepartmentForm';
@@ -48,7 +48,8 @@ export interface CanvasEditorProps {
 }
 
 /**
- * `.canvas-editor` - inline CRUD for the selected canvas node (`chart-canvas` capability):
+ * `Drawer` CRUD for the selected canvas node (`chart-canvas` capability): a slide-over that
+ * comes in from the right on wide screens and up from the bottom on small ones. Lets you
  * edit / deactivate the department, add a sub-department, add a 兼務 posting, and edit /
  * deactivate roster people - all through the same `useEditorPanel` + RTK Query mutations the
  * admin pages use.
@@ -65,16 +66,20 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
 
   const [createDepartment, deptCreateState] = useCreateDepartmentMutation();
   const [updateDepartment, deptUpdateState] = useUpdateDepartmentMutation();
-  const [deactivateDepartment] = useDeactivateDepartmentMutation();
-  
+  const [deactivateDepartment, deptDeactivateState] = useDeactivateDepartmentMutation();
+
   const [updateEmployee, empUpdateState] = useUpdateEmployeeMutation();
-  const [deactivateEmployee] = useDeactivateEmployeeMutation();
+  const [deactivateEmployee, empDeactivateState] = useDeactivateEmployeeMutation();
   const [createAssignment, asnCreateState] = useCreateAssignmentMutation();
 
   const [active, setActive] = useState<ActiveEditor>(null);
   // Dynamic empty forms so "Add sub-department" / "Add posting" open prefilled.
   const [deptEmpty, setDeptEmpty] = useState<DeptForm>(DEPT_EMPTY);
   const [asnEmpty, setAsnEmpty] = useState<AsnForm>(ASN_EMPTY);
+  /** The pending destructive confirmation, if any - drives the ConfirmDialog. */
+  const [confirming, setConfirming] = useState<
+    { kind: 'dept' } | { kind: 'person'; member: Member } | null
+  >(null);
 
   const refreshChart = useCallback(
     () => dispatch(chartApi.util.invalidateTags(['Chart'])),
@@ -188,20 +193,20 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
     }
   }
 
-  async function deactivateDept() {
-    if (!window.confirm(`Deactivate ${node.name}? It will no longer appear on the chart.`)) return;
-    await deactivateDepartment(node.id);
-    refreshChart();
-    onClose();
-  }
-
-  async function deactivatePerson(member: Member) {
-    const confirmed = window.confirm(
-      `Deactivate ${member.displayName}? They will no longer appear on the chart.`,
-    );
-    if (!confirmed) return;
-    await deactivateEmployee(member.sysId);
-    refreshChart();
+  async function runDeactivate() {
+    if (!confirming) return;
+    if (confirming.kind === 'dept') {
+      const result = await deactivateDepartment(node.id);
+      setConfirming(null);
+      if (!('error' in result)) {
+        refreshChart();
+        onClose();
+      }
+    } else {
+      const result = await deactivateEmployee(confirming.member.sysId);
+      setConfirming(null);
+      if (!('error' in result)) refreshChart();
+    }
   }
 
   const roster: Member[] = [...node.managers, ...node.staff];
@@ -209,8 +214,8 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
   const employeeRows = employees ?? NO_EMPLOYEES;
 
   return (
-    <Card className="canvas-editor no-print">
-      <Card.Header
+    <Drawer aria-label={`Edit ${node.name}`} onClose={onClose}>
+      <Drawer.Header
         title={
           <span className="font-jp">
             {node.name}
@@ -218,7 +223,17 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
           </span>
         }
         actions={
-          <>
+          <Button variant="plain" size="sm" onClick={onClose} aria-label="Close panel">
+            ✕
+          </Button>
+        }
+      />
+
+      {/* Action toolbar: the constructive edits grouped together, the destructive Deactivate
+          separated to the far end so it is never a misclick neighbour of "Edit department". */}
+      <Drawer.Section>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Button variant="secondary" size="sm" onClick={openDeptEdit}>
               Edit department
             </Button>
@@ -228,24 +243,25 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
             <Button variant="secondary" size="sm" onClick={openAsnCreate}>
               Add posting (兼務)
             </Button>
-            <Button variant="plain" size="sm" onClick={deactivateDept}>
-              Deactivate
-            </Button>
-            <Button variant="plain" size="sm" onClick={onClose} aria-label="Close panel">
-              ✕
-            </Button>
-          </>
-        }
-      />
+          </div>
+          <Button variant="critical" size="sm" onClick={() => setConfirming({ kind: 'dept' })}>
+            Deactivate
+          </Button>
+        </div>
+      </Drawer.Section>
 
-      <Card.Section>
-        <EditorRoster members={roster} onEdit={openEmpEdit} onDeactivate={deactivatePerson} />
-      </Card.Section>
+      <Drawer.Section>
+        <EditorRoster
+          members={roster}
+          onEdit={openEmpEdit}
+          onDeactivate={(member) => setConfirming({ kind: 'person', member })}
+        />
+      </Drawer.Section>
 
       {/* For edits, render only once the department row resolved, so the form can never be
           shown (or saved) unpopulated while /departments is still loading. */}
       {active === 'dept' && dept.panel && (dept.isCreating || dept.editingRow) ? (
-        <Card.Section>
+        <Drawer.Section>
           <DepartmentForm
             panel={dept}
             departments={departmentRows}
@@ -254,11 +270,11 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
             onCancel={closeAll}
             onSave={saveDept}
           />
-        </Card.Section>
+        </Drawer.Section>
       ) : null}
 
       {active === 'emp' && emp.panel && emp.editingRow ? (
-        <Card.Section>
+        <Drawer.Section>
           <EmployeeForm
             panel={emp}
             departments={departmentRows}
@@ -266,11 +282,11 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
             onCancel={closeAll}
             onSave={saveEmp}
           />
-        </Card.Section>
+        </Drawer.Section>
       ) : null}
 
       {active === 'asn' && asn.panel ? (
-        <Card.Section>
+        <Drawer.Section>
           <AssignmentForm
             panel={asn}
             employees={employeeRows}
@@ -278,8 +294,37 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
             onCancel={closeAll}
             onSave={saveAsn}
           />
-        </Card.Section>
+        </Drawer.Section>
       ) : null}
-    </Card>
+
+      {confirming ? (
+        <ConfirmDialog
+          title={confirming.kind === 'dept' ? 'Deactivate department' : 'Deactivate person'}
+          confirmLabel="Deactivate"
+          tone="critical"
+          loading={
+            confirming.kind === 'dept'
+              ? deptDeactivateState.isLoading
+              : empDeactivateState.isLoading
+          }
+          onConfirm={runDeactivate}
+          onCancel={() => setConfirming(null)}
+        >
+          {confirming.kind === 'dept' ? (
+            <>
+              <span className="font-jp font-semibold text-ink">{node.name}</span> will be
+              deactivated and will no longer appear on the organization chart.
+            </>
+          ) : (
+            <>
+              <span className="font-jp font-semibold text-ink">
+                {confirming.member.displayName}
+              </span>{' '}
+              will be deactivated and will no longer appear on the organization chart.
+            </>
+          )}
+        </ConfirmDialog>
+      ) : null}
+    </Drawer>
   );
 }

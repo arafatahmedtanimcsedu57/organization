@@ -252,6 +252,46 @@
   animation: edges-fade-in 0.35s ease 0.5s backwards;
 }
 
+/* Drawer / slide-over (`Drawer` component). The panel slides up from the bottom on
+   small screens and in from the right at md+; the backdrop fades in. All three are
+   neutralized by the reduced-motion rule below. The md breakpoint (768px) here is
+   kept in step with the `md:` utilities that flip the panel's anchor in the JSX. */
+@keyframes drawer-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes drawer-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes drawer-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.drawer-backdrop {
+  animation: drawer-backdrop-in 0.2s ease both;
+}
+.drawer-panel {
+  animation: drawer-in-bottom 0.28s var(--ease-brand) both;
+}
+@media (min-width: 768px) {
+  .drawer-panel {
+    animation: drawer-in-right 0.28s var(--ease-brand) both;
+  }
+}
+
 /* Motion-safe: honor prefers-reduced-motion by neutralizing animation. */
 @media (prefers-reduced-motion: reduce) {
   *,

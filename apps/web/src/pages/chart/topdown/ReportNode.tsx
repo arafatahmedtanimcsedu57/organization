@@ -1,6 +1,6 @@
 import type { Member } from '@org-chart/domain';
 import type { ChartNode } from '../../../store/api/chartNode';
-import { branchColorFor } from '../branchColor';
+import { branchTextInk, useBranchColor } from '../branchColor';
 import { groupByTitle } from './reportUtils';
 
 export interface ReportNodeProps {
@@ -13,7 +13,7 @@ export interface ReportNodeProps {
 export function RoleRow({ title, members, rail }: { title: string; members: Member[]; rail: string }) {
   return (
     <div className="report-row">
-      <span className="report-role" style={{ color: rail }}>
+      <span className="report-role" style={{ color: branchTextInk(rail) }}>
         {title}
       </span>
       <div className="report-chips">
@@ -78,7 +78,8 @@ function NodeHeadAndBody({
   ancestry,
   heading: Heading,
 }: ReportNodeProps & { heading: 'h3' | 'h4' }) {
-  const { rail, tint } = branchColorFor(node.branchId);
+  const resolveBranchColor = useBranchColor();
+  const { rail, tint } = resolveBranchColor(node.branchId);
   const badgeBg = `color-mix(in srgb, ${rail} 78%, black)`;
 
   const concurrentOwn = [...node.managers, ...node.staff].filter((m) => m.concurrent);
@@ -108,7 +109,7 @@ function NodeHeadAndBody({
         <span className="report-bullet" style={{ background: rail }} aria-hidden="true" />
         <Heading>{node.name}</Heading>
         {pillMember ? (
-          <span className="report-pill" style={{ borderColor: rail, background: tint, color: rail }}>
+          <span className="report-pill" style={{ borderColor: rail, background: tint, color: branchTextInk(rail) }}>
             <span className="lbl">{pillMember.title}</span> <b>{pillMember.displayName}</b>
           </span>
         ) : null}
@@ -159,7 +160,8 @@ export function DepartmentCard({ node, ancestry }: ReportNodeProps) {
 /** A group (depth ≥ 2): an inset tinted panel nested inside its parent's card, recursing for
  * any further nesting rather than breaking out into its own top-level card. */
 export function GroupPanel({ node, ancestry }: ReportNodeProps) {
-  const { tint } = branchColorFor(node.branchId);
+  const resolveBranchColor = useBranchColor();
+  const { tint } = resolveBranchColor(node.branchId);
   return (
     <div className="report-panel" style={{ background: tint }}>
       <NodeHeadAndBody node={node} ancestry={ancestry} heading="h4" />

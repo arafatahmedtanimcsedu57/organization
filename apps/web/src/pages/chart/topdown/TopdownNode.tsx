@@ -1,6 +1,6 @@
 import { memo, type CSSProperties, type MouseEvent } from 'react';
 import type { ChartTier } from '../../../store/api/chartNode';
-import { branchColorFor } from '../branchColor';
+import { useBranchColor } from '../branchColor';
 import { NodeRoster } from './NodeRoster';
 import type { LayoutNode } from './topdownLayout';
 
@@ -8,6 +8,13 @@ const NAME_TIER: Record<ChartTier, string> = {
   division: 'text-[15px] font-bold',
   department: 'text-[13.5px] font-bold',
   group: 'text-[12.5px] font-semibold',
+};
+
+/** Spoken tier word, so a screen reader announces a card's level, not just its name + count. */
+const TIER_ARIA: Record<ChartTier, string> = {
+  division: 'Division',
+  department: 'Department',
+  group: 'Group',
 };
 
 export interface TopdownNodeProps {
@@ -45,7 +52,8 @@ function TopdownNodeComponent({
   onHover,
 }: TopdownNodeProps) {
   const { node, fullRoster } = item;
-  const { rail, tint } = branchColorFor(item.branchId);
+  const resolveBranchColor = useBranchColor();
+  const { rail, tint } = resolveBranchColor(item.branchId);
   const memberCount = node.managers.length + node.staff.length;
   // Ring the card when the hovered person appears in it - so "every other place" pops even
   // when the specific name is collapsed behind a ＋N / ×N roster row.
@@ -70,7 +78,7 @@ function TopdownNodeComponent({
       role="group"
       tabIndex={0}
       data-node-id={node.id}
-      aria-label={`${node.name} — ${memberCount}名`}
+      aria-label={`${node.name}, ${TIER_ARIA[node.tier]}, ${memberCount}名`}
       onClick={() => onSelect?.(item)}
       onMouseEnter={() => onHover?.(node.id)}
       onMouseLeave={() => onHover?.(null)}
@@ -100,10 +108,16 @@ function TopdownNodeComponent({
           className="w-2 h-2 rounded-full shrink-0 bg-[var(--rail,var(--color-line-strong))]"
         />
         <span className="min-w-0 flex-1 leading-tight">
-          <span className={`dn block truncate font-jp text-strong ${NAME_TIER[node.tier]}`}>
-            {node.name}
+          <span
+            className={`dn block truncate font-jp text-strong ${NAME_TIER[node.tier]}`}
+            title={node.name}
+          >
+            {item.label}
           </span>
-          <span className="block truncate text-[10.5px] text-sub">
+          <span
+            className="block truncate text-[10.5px] text-sub"
+            title={node.nameEn || node.head || undefined}
+          >
             {node.nameEn || node.head || ' '}
           </span>
         </span>
@@ -111,7 +125,7 @@ function TopdownNodeComponent({
           type="button"
           onClick={handleExpand}
           title={fullRoster ? 'Collapse roster' : 'Expand roster'}
-          className="shadow-2 shrink-0 rounded-full bg-surface px-1.5 py-0.5 font-mono text-[10.5px] text-[var(--rail,var(--color-line-strong))] hover:text-ink "
+          className="shadow-2 shrink-0 rounded-full bg-surface px-1.5 py-0.5 font-mono text-[10.5px] text-sub hover:text-ink "
         >
           {memberCount} 名
         </button>

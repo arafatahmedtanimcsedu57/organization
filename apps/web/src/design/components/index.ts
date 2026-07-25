@@ -16,6 +16,12 @@ export type { CardProps, CardHeaderProps } from './Card';
 export { Modal } from './Modal';
 export type { ModalProps } from './Modal';
 
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
+
+export { Drawer } from './Drawer';
+export type { DrawerProps } from './Drawer';
+
 export { IndexTable, IndexTableFooter } from './IndexTable';
 export type { IndexTableProps, IndexTableColumn, IndexTableFooterProps } from './IndexTable';
 

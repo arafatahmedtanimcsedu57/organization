@@ -16,6 +16,7 @@ import {
   TIER_GAP,
 } from '../../../constants/chartLayout';
 import type { ChartNode } from '../../../store/api/chartNode';
+import { buildDepartmentLabels } from './nodeLabel';
 
 /**
  * Top-down layout for the interactive canvas (`chart-canvas` capability).
@@ -64,6 +65,8 @@ export interface LayoutNode {
   /** True when this node was placed by the vertical-stack rule (indented list). */
   stacked: boolean;
   branchId: string;
+  /** Card label: `node.name` with the parent's name prefix stripped (see `departmentLabel`). */
+  label: string;
 }
 
 export interface LayoutEdge {
@@ -154,6 +157,7 @@ export function computeTopdownLayout(
   const { viewportWidth, fullRosters = false, expandedIds } = options;
   const stackBudget = viewportWidth ? viewportWidth * STACK_VIEWPORT_FRACTION : Infinity;
   const isFull = (node: ChartNode) => fullRosters || (expandedIds?.has(node.id) ?? false);
+  const labelById = buildDepartmentLabels(roots);
 
   /** DFS-places a subtree as an indented vertical list; returns its bounding box. */
   function buildStack(node: ChartNode): { placements: StackPlacement[]; width: number; height: number } {
@@ -273,6 +277,7 @@ export function computeTopdownLayout(
             fullRoster: isFull(stackedNode),
             stacked: placement.relX > 0,
             branchId: stackedNode.branchId,
+            label: labelById.get(stackedId) ?? stackedNode.name,
           });
           const parentId = placement.parentId ?? parentChart?.id ?? null;
           if (parentId) {
@@ -298,6 +303,7 @@ export function computeTopdownLayout(
         fullRoster: isFull(chart),
         stacked: false,
         branchId: chart.branchId,
+        label: labelById.get(chart.id) ?? chart.name,
       });
       if (parentChart) {
         edges.push({ id: `${parentChart.id}->${chart.id}`, fromId: parentChart.id, toId: chart.id, kind: 'fan' });

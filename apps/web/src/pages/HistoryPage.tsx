@@ -117,18 +117,26 @@ function entityDisplayName(
   lookups: NameLookups,
   assignments: Assignment[] | undefined,
 ): string {
-  if (entry.entity === 'employee') return lookups.employeeName(entry.entityId);
-  if (entry.entity === 'department') return lookups.departmentName(entry.entityId);
-
   const assignment = assignments?.find((row) => row.id === entry.entityId);
   if (assignment)
     return `${lookups.employeeName(assignment.employeeSysId)} @ ${lookups.departmentName(assignment.departmentId)}`;
 
   const snapshot = entry.after ?? entry.before;
+  const parentDepartmentId = snapshot?.parentName as string | undefined;
+  const childDepartmentId = snapshot?.id as string | undefined;
   const employeeSysId = snapshot?.employeeSysId as string | undefined;
   const departmentId = snapshot?.departmentId as string | undefined;
+
+  
   if (employeeSysId && departmentId)
     return `${lookups.employeeName(employeeSysId)} @ ${lookups.departmentName(departmentId)}`;
+  
+  else if (parentDepartmentId || childDepartmentId){
+    if (!parentDepartmentId && childDepartmentId)
+      return `${lookups.departmentName(childDepartmentId)} (root)`;
+    else if (parentDepartmentId && childDepartmentId)
+      return `${lookups.departmentName(childDepartmentId)} (child of ${parentDepartmentId})`;
+  }
   return entry.entityId;
 }
 

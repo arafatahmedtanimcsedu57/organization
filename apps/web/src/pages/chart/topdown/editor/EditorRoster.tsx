@@ -38,7 +38,7 @@ export function EditorRoster({ members, onEdit, onDeactivate }: EditorRosterProp
           </Button>
           {!member.concurrent ? (
             <Button
-              variant="plain"
+              variant="critical"
               size="sm"
               className="!h-auto !px-1 py-0"
               onClick={() => onDeactivate(member)}

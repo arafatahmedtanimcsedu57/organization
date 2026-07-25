@@ -1,17 +1,22 @@
+import { useMemo } from 'react';
 import type { ChartNode } from '../../store/api/chartNode';
-import { branchColorFor } from './branchColor';
+import { createBranchColorResolver } from './branchColor';
 
 /** `.legend` - explains the chart's visual conventions (branch color per top-level division,
  * the dashed 兼務 chip/arrow) so a printed or exported chart is self-explanatory without the
  * interactive UI around it. Renders in both interactive and print mode. */
 export function Legend({ roots }: { roots: ChartNode[] }) {
+  const resolveBranchColor = useMemo(
+    () => createBranchColorResolver(roots.map((root) => root.branchId)),
+    [roots],
+  );
   if (roots.length === 0) return null;
 
   return (
     <div className="flex flex-wrap gap-x-[22px] gap-y-2" aria-label="Chart legend">
       <div className="flex flex-wrap items-center gap-x-[14px] gap-y-1.5">
         {roots.map((root) => {
-          const { rail } = branchColorFor(root.branchId);
+          const { rail } = resolveBranchColor(root.branchId);
           return (
             <span
               className="inline-flex items-center gap-1.5 text-[12px] text-sub font-jp"

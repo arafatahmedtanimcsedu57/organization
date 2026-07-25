@@ -85,6 +85,7 @@ export function AssignmentForm({
           <input
             id="cv-asn-from"
             type="date"
+            lang="ja"
             className={INPUT}
             value={form.validFrom}
             onChange={(event) => setForm({ ...form, validFrom: event.target.value })}
@@ -97,6 +98,7 @@ export function AssignmentForm({
           <input
             id="cv-asn-to"
             type="date"
+            lang="ja"
             className={INPUT}
             value={form.validTo}
             onChange={(event) => setForm({ ...form, validTo: event.target.value })}

@@ -1,7 +1,12 @@
 import { useMemo } from 'react';
 import type { Member } from '@org-chart/domain';
 import type { ChartNode } from '../../../store/api/chartNode';
-import { branchColorFor } from '../branchColor';
+import {
+  BranchColorProvider,
+  branchTextInk,
+  createBranchColorResolver,
+  useBranchColor,
+} from '../branchColor';
 import { ConcurrentCallout, DepartmentCard, RoleRow } from './ReportNode';
 import {
   buildAncestryIndex,
@@ -45,7 +50,8 @@ function ReportCover({ roots }: { roots: ChartNode[] }) {
 /** The division's own directly-assigned people: its top rank as large colored badges (the
  * division's "leadership line"), any remaining own members as ordinary rows below. */
 function DivisionSelf({ node, ancestry }: { node: ChartNode; ancestry: ReadonlyMap<string, string> }) {
-  const { rail, tint } = branchColorFor(node.branchId);
+  const resolveBranchColor = useBranchColor();
+  const { rail, tint } = resolveBranchColor(node.branchId);
   const badgeBg = `color-mix(in srgb, ${rail} 78%, black)`;
 
   if (node.managers.length === 0 && node.staff.length === 0) return null;
@@ -101,14 +107,15 @@ interface DivisionPageProps {
 
 /** One division: its own page, starting with the cover block if this is the first. */
 function DivisionPage({ root, index, roots, ancestry }: DivisionPageProps) {
-  const { rail } = branchColorFor(root.branchId);
+  const resolveBranchColor = useBranchColor();
+  const { rail } = resolveBranchColor(root.branchId);
 
   return (
     <div className="topdown-print-page">
       {index === 0 ? <ReportCover roots={roots} /> : null}
 
       <header className="report-division-head">
-        <p className="report-eyebrow" style={{ color: rail }}>
+        <p className="report-eyebrow" style={{ color: branchTextInk(rail) }}>
           {divisionEyebrow(index)}
         </p>
         <div className="report-division-title-row">
@@ -133,12 +140,18 @@ function DivisionPage({ root, index, roots, ancestry }: DivisionPageProps) {
 
 export function TopdownPrint({ roots }: { roots: ChartNode[] }) {
   const ancestry = useMemo(() => buildAncestryIndex(roots), [roots]);
+  const resolveBranchColor = useMemo(
+    () => createBranchColorResolver(roots.map((root) => root.branchId)),
+    [roots],
+  );
   if (roots.length === 0) return null;
   return (
-    <div className="topdown-print report">
-      {roots.map((root, index) => (
-        <DivisionPage key={root.id} root={root} index={index} roots={roots} ancestry={ancestry} />
-      ))}
-    </div>
+    <BranchColorProvider value={resolveBranchColor}>
+      <div className="topdown-print report">
+        {roots.map((root, index) => (
+          <DivisionPage key={root.id} root={root} index={index} roots={roots} ancestry={ancestry} />
+        ))}
+      </div>
+    </BranchColorProvider>
   );
 }

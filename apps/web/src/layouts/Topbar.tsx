@@ -1,6 +1,12 @@
 import { NavLink } from 'react-router-dom';
+import { 
+  Menu, 
+  Sun, 
+  Moon, 
+  Bell, 
+  Search 
+} from 'lucide-react';
 import { useThemeStore } from '../store/themeStore';
-import { BellIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from './icons';
 
 export interface TopbarProps {
   /** Toggle the nav drawer (small screens only). */
@@ -21,10 +27,10 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         aria-label="Open navigation menu"
         className="min-[1081px]:hidden w-[34px] h-[34px] rounded-md grid place-items-center text-sub transition-[background] duration-[120ms] ease-brand hover:bg-surface-hover [&_svg]:w-[20px] [&_svg]:h-[20px]"
       >
-        <MenuIcon />
+        <Menu />
       </button>
       <div className="flex-1 max-w-[480px] mx-auto relative max-[640px]:hidden [&_svg]:absolute [&_svg]:left-2.5 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-sub">
-        <SearchIcon />
+        <Search />
         <input
           type="search"
           placeholder="Search employees, departments…"
@@ -41,7 +47,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-pressed={isDark}
           title={isDark ? 'Light theme' : 'Dark theme'}
         >
-          {isDark ? <SunIcon /> : <MoonIcon />}
+          {isDark ? <Sun /> : <Moon />}
         </button>
         <button
           className="w-[34px] h-[34px] rounded-md grid place-items-center text-sub relative transition-[background] duration-[120ms] ease-brand hover:bg-surface-hover [&_svg]:w-[18px] [&_svg]:h-[18px]"
@@ -49,7 +55,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           aria-label="Notifications"
         >
           <span className="absolute top-[7px] right-2 w-[7px] h-[7px] rounded-full bg-brand border-[1.5px] border-surface z-[1]" />
-          <BellIcon />
+          <Bell />
         </button>
         <NavLink
           to="/admin/titles"

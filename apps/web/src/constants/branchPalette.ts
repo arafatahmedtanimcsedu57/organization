@@ -4,9 +4,10 @@ export interface BranchColor {
   tint: string;
 }
 
-/** Polaris-adjacent hues, distinct from the brand green (reserved for 兼務/links). Order doesn't
- * matter - `branchColorFor` picks a stable entry per branch id, so this only needs to cover
- * however many top-level divisions exist without repeating for the known four.
+/** Polaris-adjacent hues, distinct from the brand green (reserved for 兼務/links). Order defines
+ * assignment: `createBranchColorResolver` gives each division the entry at its ordinal index, so
+ * the first N divisions (N = palette length) are guaranteed distinct - keep the entries visually
+ * well-separated. Beyond N the index wraps (the division name beside each swatch disambiguates).
  *
  * Each entry is a pair of CSS custom-property references (not literal hex) so the palette follows
  * the light/dark theme: the actual rail/tint values are defined per theme in design/tailwind.css

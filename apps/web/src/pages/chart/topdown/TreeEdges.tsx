@@ -2,7 +2,7 @@ import {
   STACK_ENTRY_OFFSET,
   STACK_RAIL_OFFSET,
 } from '../../../constants/canvasConnectors';
-import { branchColorFor } from '../branchColor';
+import { useBranchColor } from '../branchColor';
 import { roundedFanPath, roundedStackPath } from './canvasGeometry';
 import type { LayoutNode, TopdownLayout } from './topdownLayout';
 
@@ -17,6 +17,7 @@ export interface TreeEdgesProps {
  * branch color.
  */
 export function TreeEdges({ layout, byId }: TreeEdgesProps) {
+  const resolveBranchColor = useBranchColor();
   return (
     <svg
       className="edges-morph absolute top-0 left-0 overflow-visible pointer-events-none"
@@ -28,7 +29,7 @@ export function TreeEdges({ layout, byId }: TreeEdgesProps) {
         const from = byId.get(edge.fromId);
         const to = byId.get(edge.toId);
         if (!from || !to) return null;
-        const { rail } = branchColorFor(to.branchId);
+        const { rail } = resolveBranchColor(to.branchId);
         const d =
           edge.kind === 'stack'
             ? roundedStackPath(

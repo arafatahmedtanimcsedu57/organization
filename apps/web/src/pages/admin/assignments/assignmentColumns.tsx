@@ -11,6 +11,11 @@ export interface AssignmentColumnsOptions {
   departments: Department[] | undefined;
 }
 
+/** A posting whose valid-to date has passed - stays visible for record-keeping, but no longer holds. */
+function isEnded(assignment: Assignment, today: string): boolean {
+  return Boolean(assignment.validTo && assignment.validTo < today);
+}
+
 /**
  * The postings table's columns. The two name lookups are indexed once per render rather
  * than scanned per cell, so the table stays linear in the number of postings.
@@ -23,6 +28,7 @@ export function assignmentColumns({
   const departmentById = new Map(
     (departments ?? []).map((department) => [department.id, department]),
   );
+  const today = new Date().toISOString().slice(0, 10);
 
   return [
     {
@@ -62,10 +68,19 @@ export function assignmentColumns({
       key: 'valid',
       header: 'Valid from / to',
       render: (assignment) => (
-        <span className="font-jp text-ink text-[13px]">
+        <span
+          className="font-jp text-ink text-[13px]"
+          style={isEnded(assignment, today) ? { color: 'var(--color-sub)' } : undefined}
+        >
           {assignment.validFrom ?? '-'} → {assignment.validTo ?? '-'}
         </span>
       ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (assignment) =>
+        isEnded(assignment, today) ? <Badge>Ended</Badge> : <Badge tone="success">Active</Badge>,
     },
   ];
 }
