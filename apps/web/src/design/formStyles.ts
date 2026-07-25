@@ -9,7 +9,7 @@
 
 export const PAGE__BIG = 'page px-7 pt-6 pb-[60px] mx-auto w-full max-[640px]:p-4';
 export const PAGE = 'page px-7 pt-6 pb-[60px] max-w-[1180px] mx-auto w-full max-[640px]:p-4';
-export const PAGE_HEAD = 'page-head flex items-start justify-between gap-4 mb-5';
+export const PAGE_HEAD = 'page-head flex flex-wrap items-start justify-between gap-4 mb-5';
 export const PH_ACTIONS = 'ph-actions flex gap-2 shrink-0';
 export const PAGE_TITLE = 'text-[28px] font-bold leading-tight';
 

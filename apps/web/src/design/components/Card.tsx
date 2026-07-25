@@ -31,7 +31,7 @@ export interface CardHeaderProps {
 function CardHeader({ title, actions }: CardHeaderProps) {
   return (
     <div className="flex items-center gap-2.5 px-4 py-[14px] flex-wrap justify-between">
-      <h2 className="text-[14px] font-semibold text-strong">{title}</h2>
+      <h2 className="text-[14px]">{title}</h2>
       {actions ? <div className="ch-actions  flex gap-1.5">{actions}</div> : null}
     </div>
   );

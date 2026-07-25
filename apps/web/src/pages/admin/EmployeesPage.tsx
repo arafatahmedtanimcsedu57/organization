@@ -1,3 +1,6 @@
+import {Pen, Plus} from 'lucide-react';
+
+import { TitleSelect } from '../chart/topdown/editor/TitleSelect';
 import {
   Badge,
   Breadcrumb,
@@ -10,7 +13,6 @@ import {
   Modal,
   SaveBar,
 } from '../../design/components';
-import { TitleSelect } from '../chart/topdown/editor/TitleSelect';
 import type { IndexTableColumn } from '../../design/components';
 import {
   PAGE,
@@ -30,6 +32,7 @@ import {
   DEPT,
 } from '../../design/formStyles';
 import { optionList } from '../../design/optionList';
+
 import {
   useCreateEmployeeMutation,
   useDeactivateEmployeeMutation,
@@ -39,6 +42,7 @@ import {
 } from '../../store/api/employeesApi';
 import { useGetDepartmentsQuery } from '../../store/api/departmentsApi';
 import { errorMessage } from '../../store/api/errorMessage';
+
 import { useEditorPanel, type FieldErrors } from './useEditorPanel';
 
 interface EmployeeFormState {
@@ -84,12 +88,12 @@ export function EmployeesPage() {
     editingRow: editingEmployee,
     isCreating,
     form,
-    setForm,
     attemptedSave,
     isDirty,
     fieldErrors,
     saving,
     saveError,
+    setForm,
     openCreate,
     openEdit,
     closePanel,
@@ -97,11 +101,11 @@ export function EmployeesPage() {
     beginSave,
   } = useEditorPanel<Employee, EmployeeFormState>({
     emptyForm: EMPTY_FORM,
-    resolveRow: (sysId) => employees?.find((employee) => employee.sysId === sysId),
-    toFormState,
-    validate,
     createState,
     updateState,
+    validate,
+    toFormState,
+    resolveRow: (sysId) => employees?.find((employee) => employee.sysId === sysId),
   });
 
   async function handleSave() {
@@ -192,13 +196,13 @@ export function EmployeesPage() {
         </div>
         <div className={PH_ACTIONS}>
           <Button variant="primary" onClick={openCreate}>
-            Add employee
+            <Plus/> Add employee
           </Button>
         </div>
       </div>
 
       <Card>
-        <Card.Header title={employees ? `${employees.length} employees` : 'Employees'} />
+        <Card.Header title={employees ? `${employees.length} employees in the Organizational Structure` : 'Employees'} />
         {isLoading ? (
           <Card.Body>
             <LoadingState message="Loading employees…" />
@@ -208,20 +212,22 @@ export function EmployeesPage() {
             <ErrorState description="Could not load employees." onRetry={refetch} />
           </Card.Body>
         ) : (
-          <IndexTable
-            columns={columns}
-            rows={employees ?? []}
-            rowKey={(employee) => employee.sysId}
-            highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
-            rowActions={(employee) => (
-              <Button variant="plain" size="sm" onClick={() => openEdit(employee.sysId)}>
-                Edit
-              </Button>
-            )}
-            emptyState={
-              <EmptyState title="No employees yet" description="Add an employee to get started." />
-            }
-          />
+          <div className="overflow-x-auto">
+            <IndexTable
+              columns={columns}
+              rows={employees ?? []}
+              rowKey={(employee) => employee.sysId}
+              highlightedKeys={panel && !isCreating ? new Set([panel]) : undefined}
+              rowActions={(employee) => (
+                <Button variant="plain" size="sm" onClick={() => openEdit(employee.sysId)}>
+                  <Pen/> Edit
+                </Button>
+              )}
+              emptyState={
+                <EmptyState title="No employees yet" description="Add an employee to get started." />
+              }
+            />
+          </div>
         )}
       </Card>
 
