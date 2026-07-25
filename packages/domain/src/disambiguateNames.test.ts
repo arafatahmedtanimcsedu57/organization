@@ -5,7 +5,7 @@ import { computeDisplayNames } from "./disambiguateNames.ts";
 import type { Employee } from "./model.ts";
 
 function emp(sysId: string, lastName: string, firstName: string): Employee {
-  return { sysId, userId: sysId, lastName, firstName, title: "課員", departmentName: "本部" };
+  return { sysId, userId: sysId, lastName, firstName, title: "課員", titleId: "employee", departmentName: "本部" };
 }
 
 test("a unique last name is shown plainly", () => {

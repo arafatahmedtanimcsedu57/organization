@@ -10,7 +10,8 @@ import type { Assignment } from '@org-chart/domain';
  *   - 佐藤 曠弌 as 事業部長 (兼) of システム事業部 - redundant: he is already the
  *     primary member there (代表取締役) in sys_user.
  */
-export const SEED_ASSIGNMENTS: Assignment[] = [
+// `titleId` is resolved from `title` at seed time (see SeedAssignmentsService).
+export const SEED_ASSIGNMENTS: Omit<Assignment, 'titleId'>[] = [
   {
     employeeSysId: 'e9275f28c3e842109af532011501311b', // 照沼 邦義 (primary: 事業部長 of ITサポート事業部)
     departmentId: '24510', // ITサポート事業部 購買調達部

@@ -8,6 +8,7 @@ import type { AppConfig } from '../config/configuration.ts';
 import { ReadMastersService } from './read-masters.service.ts';
 import { UpsertMastersService } from './upsert-masters.service.ts';
 import { SeedAssignmentsService } from './seed-assignments.service.ts';
+import { SeedTitlesService } from './seed-titles.service.ts';
 import { findPhantomDepartmentHeadWarnings, type ImportWarning } from './import-warnings.ts';
 
 /**
@@ -26,6 +27,7 @@ async function run() {
     const readMasters = context.get(ReadMastersService);
     const upsertMasters = context.get(UpsertMastersService);
     const seedAssignments = context.get(SeedAssignmentsService);
+    const seedTitles = context.get(SeedTitlesService);
 
     const departments = readMasters.readDepartments(path.join(sourceDir, 'cmn_department.xlsx'));
     const employees = readMasters.readEmployees(path.join(sourceDir, 'sys_user.xlsx'));
@@ -36,16 +38,30 @@ async function run() {
       `Departments: ${departmentCounts.inserted} inserted, ${departmentCounts.updated} updated (${departments.length} total)`,
     );
 
+    // Seed the managed titles before employees, whose `title_id` FK references them.
+    const titleCounts = await seedTitles.seedCanonicalTitles();
+    logger.log(`Titles: ${titleCounts.inserted} inserted, ${titleCounts.updated} updated`);
+
     const departmentIdByName = new Map(departments.map((d) => [d.name, d.id]));
     const employeeResult = await upsertMasters.upsertEmployees(employees, departmentIdByName);
     logger.log(
       `Employees: ${employeeResult.inserted} inserted, ${employeeResult.updated} updated (${employees.length} total)`,
     );
 
+    // After employees exist, anchor each department's head to a Sys ID.
+    const headBackfill = await upsertMasters.backfillDepartmentHeads(departments, employees);
+    logger.log(
+      `Department heads: ${headBackfill.resolved} resolved to a Sys ID, ${headBackfill.unresolved} unresolved`,
+    );
+
     const assignmentCounts = await seedAssignments.seedConcurrentAssignments();
     logger.log(
       `Assignments (兼務): ${assignmentCounts.inserted} inserted, ${assignmentCounts.updated} updated`,
     );
+
+    // With every posting's title_id set, assign each department the titles it uses.
+    const deptTitleCounts = await seedTitles.seedDepartmentTitles();
+    logger.log(`Department-title links: ${deptTitleCounts.inserted} pairs ensured`);
 
     const warnings: ImportWarning[] = [
       ...employeeResult.warnings,

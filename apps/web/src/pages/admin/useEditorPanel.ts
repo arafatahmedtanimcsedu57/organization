@@ -73,10 +73,10 @@ export interface EditorPanel<Row, Form> {
  * and mutation wiring.
  */
 export function useEditorPanel<Row, Form>({
-  emptyForm,
   resolveRow,
   toFormState,
   validate,
+  emptyForm,
   createState,
   updateState,
 }: UseEditorPanelOptions<Row, Form>): EditorPanel<Row, Form> {
@@ -160,13 +160,13 @@ export function useEditorPanel<Row, Form>({
     editingRow,
     isCreating,
     form,
-    setForm,
     attemptedSave,
     isDirty,
     fieldErrors,
     hasFieldErrors,
     saving,
     saveError,
+    setForm,
     openCreate,
     openEdit,
     closePanel,

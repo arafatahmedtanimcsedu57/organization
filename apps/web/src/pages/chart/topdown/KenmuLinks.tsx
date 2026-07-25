@@ -72,8 +72,8 @@ export function KenmuLinks({
             <path
               className={`fill-none stroke-brand [stroke-linecap:round] ${
                 active
-                  ? '[stroke-width:2] [stroke-dasharray:1_6]'
-                  : '[stroke-width:1.5] [stroke-dasharray:0.1_7]'
+                  ? '[stroke-width:1.5] [stroke-dasharray:1_6]'
+                  : '[stroke-width:.5] [stroke-dasharray:0.1_7]'
               }`}
               d={geometry.d}
               markerEnd={active ? 'url(#kenmu-arrow)' : undefined}
@@ -93,7 +93,7 @@ export function KenmuLinks({
                     strokeLinejoin: 'round',
                   }}
                 >
-                  兼 {link.label}
+                  ( 兼 ) {link.label}
                 </text>
               </>
             ) : null}

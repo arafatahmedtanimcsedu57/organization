@@ -11,6 +11,7 @@
     "migration:run": "npm run typeorm -- migration:run",
     "migration:revert": "npm run typeorm -- migration:revert",
     "seed": "node --import @swc-node/register/esm-register src/import/import.command.ts",
+    "data:gen:en": "node --import @swc-node/register/esm-register scripts/generate-en-dataset.ts",
     "start": "node --import @swc-node/register/esm-register src/main.ts",
     "start:dev": "node --import @swc-node/register/esm-register --watch src/main.ts",
     "test": "vitest run",

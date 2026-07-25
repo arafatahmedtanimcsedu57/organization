@@ -1,4 +1,3 @@
-
 services:
   web:
     command: npm run dev
@@ -18,5 +17,6 @@ services:
     volumes:
       - ./apps/api:/app/apps/api
       - ./packages/domain:/app/packages/domain
+      - ./data:/app/data
       - /app/apps/api/node_modules
       - /app/packages/domain/node_modules

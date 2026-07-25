@@ -340,14 +340,326 @@
     animation: none;
   }
 
-  /* Fit-to-width A4: `.topdown-print` pre-scales the whole diagram to the page width
-     (see TopdownPrint.tsx); height flows onto additional pages. */
-  .topdown-print {
-    overflow: visible;
+  /* ---- Report document (`.report`, see TopdownPrint.tsx / ReportNode.tsx) ----
+     A readable A4-portrait document, NOT the scaled canvas: a cover block, then one division per
+     page as a colored-badge leadership line + bordered department cards on a branch-colored rail,
+     with any deeper groups nested as tinted panels inside their department's own card. */
+  .report {
+    font-family: 'Noto Sans JP', 'Noto Sans CJK JP', sans-serif;
+    color: var(--color-ink);
+    font-size: 11.5px;
+  }
+
+  /* Backgrounds carry meaning here (cover band, 兼務 highlights, branch tints) - force them
+     to print even when the browser's "background graphics" option is off. */
+  .report,
+  .report * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .topdown-print-page + .topdown-print-page {
+    break-before: page;
+  }
+
+  /* ---- Cover block (once, above the first division) ----
+     A tinted, banded masthead - not a repeating page header - so the document's opening reads
+     as a clear, weighty title section without costing page space on every subsequent page. */
+  .report-cover {
+    margin: 0 0 24px;
+  }
+  .report-cover-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .report-brand .jp {
+    margin: 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .report-brand .en {
+    margin: 1px 0 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .report-meta {
+    text-align: right;
+  }
+  .report-meta p {
+    margin: 0;
+    font-size: 11px;
+  }
+  .report-meta .date {
+    font-weight: 700;
+  }
+  .report-title {
+    margin: 14px 0 0;
+    font-size: 30px;
+    font-weight: 800;
+  }
+  .report-title-rule {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    margin: 10px 0 16px;
+  }
+  .report-legend {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+  }
+  .report-legend-badge {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #fff;
+    color: var(--color-brand-dark);
+    font-weight: 700;
+    font-size: 12px;
+    display: grid;
+    place-items: center;
+  }
+  .report-legend p {
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .report-legend b {
+  }
+
+  /* ---- Division header ---- */
+  .report-division-head {
+    break-after: avoid;
+  }
+  .report-eyebrow {
+    margin: 0;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+  .report-division-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .report-division-title-row h2 {
+    margin: 2px 0 0;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-strong);
+  }
+  .report-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-sub);
+    white-space: nowrap;
+  }
+  .report-division-rule {
+    height: 2px;
+    margin: 8px 0 14px;
+  }
+
+  /* ---- Division's own leadership badges ---- */
+  .report-division-self {
+    margin-bottom: 16px;
+  }
+  .report-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .report-badge {
+    border-radius: 10px;
+    padding: 8px 16px;
+    color:#fff;    
+    break-inside: avoid;
+  }
+  .report-badge .lbl {
+    display: block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    opacity: 0.85;
+  }
+  .report-badge .nm {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .report-division-extra {
+    margin-top: 12px;
+  }
+
+  /* ---- The rail connecting a division to its departments ---- */
+  .report-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-left: 4px;
+    padding-left: 16px;
+    border-left: 2px solid;
+  }
+
+  /* ---- Department card ---- */
+  .report-card {
+    break-inside: avoid;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: var(--color-surface);
+  }
+
+  /* ---- Nested group panels (inset, inside their parent's card) ---- */
+  .report-panels {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .report-panel {
+    break-inside: avoid;
+    border-radius: 8px;
+    padding: 8px 12px;
+  }
+  .report-panel .report-panels.nested {
+    margin-left: 8px;
+  }
+
+  /* ---- Shared node header (bullet + name + optional inline pill) ---- */
+  .report-node-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .report-node-head h3,
+  .report-node-head h4 {
+    margin: 0;
+    color: var(--color-strong);
+  }
+  .report-node-head h3 {
+    font-size: 13.5px;
+    font-weight: 700;
+  }
+  .report-node-head h4 {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .report-bullet {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+  .report-pill {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    border: 1px solid;
+    border-radius: 999px;
+    padding: 2px 10px;
+    font-size: 11px;
+  }
+  .report-pill .lbl {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  /* ---- Roster rows (role label + wrapped chips) ---- */
+  .report-body {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .report-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-top: 7px;
+    border-top: 1px solid var(--color-line-2);
+  }
+  .report-row:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+  .report-role {
+    flex: 0 0 96px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding-top: 3px;
+  }
+  .report-chips {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .report-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--color-surface-sub);
+    border: 1px solid var(--color-line);
+    font-size: 11px;
+    color: var(--color-ink);
+    break-inside: avoid;
+  }
+
+  /* ---- 兼務 callout ---- */
+  /* Border + background color come from the branch palette inline (ReportNode.tsx), so a
+     concurrent posting reads as a distinctly colored, highlighted card, not just an outline. */
+  .report-kenmu {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid;
+    break-inside: avoid;
+  }
+  .report-kenmu-badge {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+    display: grid;
+    place-items: center;
+  }
+  .report-kenmu-title {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-strong);
+  }
+  .report-kenmu-sub {
+    margin: 1px 0 0;
+    font-size: 10px;
+    color: var(--color-sub);
+  }
+
+  .report-empty {
+    margin: 6px 0 0;
+    font-size: 11px;
+    color: var(--color-muted);
+    font-style: italic;
   }
 
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 12mm 14mm;
   }
 }

@@ -7,7 +7,9 @@ export interface AppConfig {
     url: string;
   };
   import: {
-    /** Directory containing the provided `sys_user.xlsx` / `cmn_department.xlsx` masters. */
+    /** Which language dataset to seed, chosen at seed time via `DATA_LANG` (default `ja`). */
+    lang: 'ja' | 'en';
+    /** Directory containing the `sys_user.xlsx` / `cmn_department.xlsx` masters to seed. */
     sourceDir: string;
   };
   pdf: {
@@ -28,13 +30,18 @@ export default (): AppConfig => {
     throw new Error('DATABASE_URL is not set');
   }
 
+  // `DATA_LANG` picks which committed dataset (`data/ja` or `data/en`) the seed reads;
+  // an explicit `IMPORT_SOURCE_DIR` still overrides the resolved directory.
+  const lang = process.env.DATA_LANG === 'en' ? 'en' : 'ja';
+
   return {
     port: Number(process.env.API_PORT) || 3000,
     database: {
       url: databaseUrl,
     },
     import: {
-      sourceDir: process.env.IMPORT_SOURCE_DIR || path.join(repoRoot, 'TryOutProgram'),
+      lang,
+      sourceDir: process.env.IMPORT_SOURCE_DIR || path.join(repoRoot, 'data', lang),
     },
     pdf: {
       webBaseUrl: process.env.WEB_BASE_URL || `http://web:${process.env.WEB_PORT || 5173}`,

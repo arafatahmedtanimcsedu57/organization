@@ -51,7 +51,7 @@ test('edit an employee, see the chart and change history update', async ({ page 
   await expect(titleLine.locator('.p').filter({ hasText: lastName }).first()).toBeVisible();
 
   // --- Change history shows the new entry with before/after ---
-  await page.goto('/history');
+  await page.goto('/admin/history');
   await page.getByLabel('Entity type').selectOption('employee');
   const recordSelect = page.getByLabel('Specific record');
   await expect(recordSelect).toContainText(fullName);

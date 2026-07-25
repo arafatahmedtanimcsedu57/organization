@@ -2,14 +2,18 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 
 import type { ObjectLiteral, Repository } from 'typeorm';
+import { CANONICAL_TITLES, findTitleByLabel } from '@org-chart/domain';
 import { Department } from '../departments/department.entity.ts';
+import { DepartmentTitle } from '../departments/department-title.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import { AssignmentsService } from '../assignments/assignments.service.ts';
 import { OrgChartService } from './org-chart.service.ts';
 import { OrgChartController } from './org-chart.controller.ts';
 import type { ChartPdfService } from './chart-pdf.service.ts';
 import type { ChartNode } from './chart-node.ts';
+import { fakeConfigService } from '../test/fake-config.ts';
 
 /**
  * Minimal in-memory stand-in for the slice of `Repository<T>` the assignments/org-chart
@@ -30,7 +34,9 @@ function fakeMutableRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
     },
     findOne: async (options: { where: Partial<T> }) => {
       const entries = Object.entries(options.where);
-      return rows.find((row) => entries.every(([key, value]) => asRecord(row)[key] === value)) ?? null;
+      return (
+        rows.find((row) => entries.every(([key, value]) => asRecord(row)[key] === value)) ?? null
+      );
     },
     create: (partial: Partial<T>) => ({ ...partial }) as T,
     save: async (entity: T) => {
@@ -38,7 +44,8 @@ function fakeMutableRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
         (row) => asRecord(row).id !== undefined && asRecord(row).id === asRecord(entity).id,
       );
       if (index === -1 || asRecord(entity).id === undefined) {
-        const withId = asRecord(entity).id === undefined ? { ...entity, id: `a${rows.length + 1}` } : entity;
+        const withId =
+          asRecord(entity).id === undefined ? { ...entity, id: `a${rows.length + 1}` } : entity;
         rows.push(withId as T);
       } else {
         rows[index] = { ...rows[index], ...entity };
@@ -49,16 +56,23 @@ function fakeMutableRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
 }
 
 function dept(id: string, name: string, parentName: string): Department {
-  return { id, name, parentName, head: '', sysId: id, active: true };
+  return { id, name, parentName, head: '', headSysId: null, sysId: id, active: true };
 }
 
-function emp(sysId: string, lastName: string, firstName: string, title: string, departmentId: string): Employee {
+function emp(
+  sysId: string,
+  lastName: string,
+  firstName: string,
+  title: string,
+  departmentId: string,
+): Employee {
   return {
     sysId,
     userId: sysId,
     lastName,
     firstName,
     title,
+    titleId: findTitleByLabel(CANONICAL_TITLES, title)?.id ?? null,
     departmentId,
     department: undefined as unknown as Department,
     active: true,
@@ -79,12 +93,31 @@ function buildHarness() {
   const employees = [emp('s1', '佐藤', '悠', '本部長', '1')];
   const assignments: Assignment[] = [];
 
+  const titles = CANONICAL_TITLES as unknown as Title[];
+  const departmentTitles = ['1', '2'].flatMap((departmentId) =>
+    CANONICAL_TITLES.map((t) => ({ departmentId, titleId: t.id })),
+  ) as unknown as DepartmentTitle[];
+
   const departmentRepo = fakeMutableRepo(departments);
   const employeeRepo = fakeMutableRepo(employees);
   const assignmentRepo = fakeMutableRepo(assignments);
+  const titleRepo = fakeMutableRepo(titles);
+  const departmentTitleRepo = fakeMutableRepo(departmentTitles);
 
-  const assignmentsService = new AssignmentsService(assignmentRepo, employeeRepo, departmentRepo);
-  const orgChartService = new OrgChartService(departmentRepo, employeeRepo, assignmentRepo);
+  const assignmentsService = new AssignmentsService(
+    assignmentRepo,
+    employeeRepo,
+    departmentRepo,
+    titleRepo,
+    departmentTitleRepo,
+  );
+  const orgChartService = new OrgChartService(
+    departmentRepo,
+    employeeRepo,
+    assignmentRepo,
+    titleRepo,
+    fakeConfigService(),
+  );
   const orgChartController = new OrgChartController(orgChartService, {} as ChartPdfService);
 
   return { assignmentsService, orgChartController };
@@ -96,12 +129,15 @@ test('adding a concurrent posting makes the person appear in the target departme
   const before = await orgChartController.getChart();
   const solutionSalesBefore = findNode(before.roots, 'ソリューション営業部');
   assert.ok(solutionSalesBefore);
-  assert.equal(solutionSalesBefore.managers.find((m) => m.sysId === 's1'), undefined);
+  assert.equal(
+    solutionSalesBefore.managers.find((m) => m.sysId === 's1'),
+    undefined,
+  );
 
   await assignmentsService.create({
     employeeSysId: 's1',
     departmentId: '2',
-    title: '部長',
+    titleId: 'general-manager',
     assignmentType: 'concurrent',
   });
 

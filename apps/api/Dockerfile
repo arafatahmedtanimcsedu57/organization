@@ -17,6 +17,9 @@ RUN npm ci --workspace=@org-chart/domain --workspace=@org-chart/api --include-wo
 COPY packages/domain packages/domain
 COPY apps/api apps/api
 COPY TryOutProgram TryOutProgram
+# The committed seed datasets (data/ja, data/en) + the translation map. The seed reads
+# data/<DATA_LANG> at container start; TryOutProgram is kept only for the reference tests.
+COPY data data
 
 WORKDIR /app/apps/api
 RUN chmod +x docker-entrypoint.sh

@@ -9,8 +9,8 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-const BASE =
-  'inline-flex items-center gap-1.5 h-[34px] px-[13px] rounded-md text-[13px] font-semibold border transition-[background,box-shadow,transform] duration-[120ms] ease-brand active:translate-y-[0.5px] disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:w-[15px] [&_svg]:h-[15px]';
+const BASE = 
+  'inline-flex items-center gap-1.5 h-[34px] px-[13px] rounded-md font-semibold border transition-[background,box-shadow,transform] duration-[120ms] ease-brand active:translate-y-[0.5px] disabled:opacity-50 disabled:cursor-not-allowed [&_svg]:w-[15px] [&_svg]:h-[15px]';
 
 const VARIANTS: Record<ButtonVariant, string> = {
   secondary:

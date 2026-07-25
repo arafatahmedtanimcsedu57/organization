@@ -8,7 +8,9 @@ export interface Assignment {
   id: string;
   employeeSysId: string;
   departmentId: string;
+  /** Display cache of the title held in this department (see `titleId`). */
   title: string;
+  titleId: string | null;
   isPrimary: boolean;
   assignmentType: AssignmentType;
   validFrom: string | null;
@@ -18,7 +20,7 @@ export interface Assignment {
 export interface CreateAssignmentInput {
   employeeSysId: string;
   departmentId: string;
-  title: string;
+  titleId: string;
   assignmentType: AssignmentType;
   isPrimary?: boolean;
   validFrom?: string;
@@ -26,7 +28,7 @@ export interface CreateAssignmentInput {
 }
 
 export interface UpdateAssignmentInput {
-  title?: string;
+  titleId?: string;
   assignmentType?: AssignmentType;
   isPrimary?: boolean;
   validFrom?: string | null;

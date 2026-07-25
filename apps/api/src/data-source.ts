@@ -3,6 +3,8 @@ import { DataSource } from 'typeorm';
 import { Department } from './departments/department.entity.ts';
 import { Employee } from './employees/employee.entity.ts';
 import { Assignment } from './assignments/assignment.entity.ts';
+import { Title } from './titles/title.entity.ts';
+import { DepartmentTitle } from './departments/department-title.entity.ts';
 import { ChangeLog } from './history/change-log.entity.ts';
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -18,7 +20,7 @@ if (!databaseUrl) {
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  entities: [Department, Employee, Assignment, ChangeLog],
+  entities: [Department, Employee, Assignment, Title, DepartmentTitle, ChangeLog],
   migrations: ['src/migrations/*.ts'],
   synchronize: false,
 });

@@ -15,7 +15,7 @@ export class UpdateEmployeeDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  title?: string;
+  titleId?: string;
 
   @IsOptional()
   @IsString()

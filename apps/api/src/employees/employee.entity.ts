@@ -22,6 +22,14 @@ export class Employee {
   @Column({ name: 'title', type: 'varchar' })
   title!: string;
 
+  /**
+   * Authoritative title reference -> `titles.id`; drives rank/display. Must be a
+   * title assigned to this employee's department (enforced by `EmployeesService`).
+   * Nullable only so the column can be added and backfilled during import.
+   */
+  @Column({ name: 'title_id', type: 'varchar', nullable: true })
+  titleId!: string | null;
+
   @Column({ name: 'department_id', type: 'varchar' })
   departmentId!: string;
 

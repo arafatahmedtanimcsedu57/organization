@@ -6,7 +6,7 @@ export class UpdateAssignmentDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  title?: string;
+  titleId?: string;
 
   @IsOptional()
   @IsIn(['primary', 'concurrent'])

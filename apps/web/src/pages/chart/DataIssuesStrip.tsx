@@ -7,6 +7,7 @@ const KIND_LABEL: Record<BuildWarning['kind'], string> = {
   'orphan-department': 'Orphan department',
   'unknown-assignment-user': 'Unknown assignment user',
   'unknown-assignment-department': 'Unknown assignment department',
+  'unknown-head': 'Unknown head',
 };
 
 /** `.no-print` data-issues strip: surfaces the build's non-fatal `BuildWarning`s (unmatched

@@ -10,8 +10,24 @@ export interface Department {
   id: string; // "24500"
   name: string; // "ITサポート事業部" - the join key from Employee.departmentName
   parentName: string; // parent department *name* ("" = top level)
-  head: string; // "邦義 照沼"
+  head: string; // legacy free-text head name, e.g. "邦義 照沼" (kept as a display fallback)
+  /** Authoritative head reference: the `Employee.sysId` of the department's head. */
+  headSysId?: string;
   sysId: string;
+}
+
+/**
+ * A position/title, managed as its own record. `rank` orders the roster (lower =
+ * higher); `staffLevel` marks the rank-and-file (課員) shown in the wrapped grid.
+ * Which titles are usable in a given department is a separate Department↔Title link.
+ */
+export interface Title {
+  id: string;
+  name: string; // canonical Japanese, e.g. "課長"
+  nameEn: string; // English label, e.g. "Manager"
+  rank: number; // lower = higher in the hierarchy
+  staffLevel: boolean; // true -> wrapped staff grid rather than the manager line list
+  active: boolean;
 }
 
 /** An employee's home posting (their single `Department` in the source master). */
@@ -20,7 +36,9 @@ export interface Employee {
   userId: string; // "0002"
   lastName: string; // "佐藤"
   firstName: string; // "曠弌"
-  title: string; // position, e.g. "課長" - one of the known position ranks
+  title: string; // display cache of the resolved title (see `titleId`)
+  /** Authoritative title reference -> `Title.id`; drives rank and display. */
+  titleId: string;
   departmentName: string; // single department name, matches Department.name
 }
 
@@ -31,7 +49,8 @@ export type AssignmentType = "primary" | "concurrent";
 export interface Assignment {
   employeeSysId: string; // FK -> Employee.sysId
   departmentId: string; // FK -> Department.id
-  title: string; // position held *in that department*
+  title: string; // display cache of the title held *in that department* (see `titleId`)
+  titleId: string; // FK -> Title.id; drives rank and display for this posting
   type: AssignmentType;
 }
 
@@ -53,7 +72,10 @@ export interface OrgNode {
   id: string;
   name: string;
   nameEn?: string;
+  /** Head display name, resolved from `headSysId` when set (see `resolveDepartmentHeads`). */
   head: string;
+  /** Authoritative head reference carried through from the department master. */
+  headSysId?: string;
   /** Ranked members shown line-by-line (everything above 課員). */
   managers: Member[];
   /** 課員-level members, shown as a wrapped name grid. */
@@ -68,7 +90,8 @@ export interface BuildWarning {
     | "unknown-title"
     | "orphan-department"
     | "unknown-assignment-user"
-    | "unknown-assignment-department";
+    | "unknown-assignment-department"
+    | "unknown-head";
   message: string;
 }
 

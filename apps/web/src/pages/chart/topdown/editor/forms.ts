@@ -17,25 +17,25 @@ export const deptValidate = (form: DeptForm): FieldErrors<DeptForm> =>
 export interface EmpForm {
   lastName: string;
   firstName: string;
-  title: string;
+  titleId: string;
   departmentId: string;
 }
 
-export const EMP_EMPTY: EmpForm = { lastName: '', firstName: '', title: '', departmentId: '' };
+export const EMP_EMPTY: EmpForm = { lastName: '', firstName: '', titleId: '', departmentId: '' };
 
 export function empValidate(form: EmpForm): FieldErrors<EmpForm> {
   const errors: FieldErrors<EmpForm> = {};
   if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
   if (!form.firstName.trim()) errors.firstName = 'First name is required.';
-  if (!form.title.trim()) errors.title = 'Title is required.';
   if (!form.departmentId) errors.departmentId = 'Department is required.';
+  if (!form.titleId) errors.titleId = 'Title is required.';
   return errors;
 }
 
 export interface AsnForm {
   employeeSysId: string;
   departmentId: string;
-  title: string;
+  titleId: string;
   assignmentType: AssignmentType;
   isPrimary: boolean;
   validFrom: string;
@@ -45,7 +45,7 @@ export interface AsnForm {
 export const ASN_EMPTY: AsnForm = {
   employeeSysId: '',
   departmentId: '',
-  title: '',
+  titleId: '',
   assignmentType: 'concurrent',
   isPrimary: false,
   validFrom: '',
@@ -55,7 +55,8 @@ export const ASN_EMPTY: AsnForm = {
 export function asnValidate(form: AsnForm): FieldErrors<AsnForm> {
   const errors: FieldErrors<AsnForm> = {};
   if (!form.employeeSysId) errors.employeeSysId = 'Person is required.';
-  if (!form.title.trim()) errors.title = 'Title is required.';
+  if (!form.departmentId) errors.departmentId = 'Department is required.';
+  if (!form.titleId) errors.titleId = 'Title is required.';
   if (form.validFrom && form.validTo && form.validFrom > form.validTo) {
     errors.validTo = 'Valid-to must be on or after valid-from.';
   }

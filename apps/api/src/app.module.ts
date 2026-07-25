@@ -8,10 +8,13 @@ import { AppService } from './app.service.ts';
 import { Department } from './departments/department.entity.ts';
 import { Employee } from './employees/employee.entity.ts';
 import { Assignment } from './assignments/assignment.entity.ts';
+import { Title } from './titles/title.entity.ts';
+import { DepartmentTitle } from './departments/department-title.entity.ts';
 import { ChangeLog } from './history/change-log.entity.ts';
 import { DepartmentsModule } from './departments/departments.module.ts';
 import { EmployeesModule } from './employees/employees.module.ts';
 import { AssignmentsModule } from './assignments/assignments.module.ts';
+import { TitlesModule } from './titles/titles.module.ts';
 import { HistoryModule } from './history/history.module.ts';
 import { OrgChartModule } from './org-chart/org-chart.module.ts';
 import { AuditModule } from './common/audit.module.ts';
@@ -27,13 +30,14 @@ import { AuditModule } from './common/audit.module.ts';
       useFactory: (configService: ConfigService<AppConfig, true>) => ({
         type: 'postgres' as const,
         url: configService.get('database.url', { infer: true }),
-        entities: [Department, Employee, Assignment, ChangeLog],
+        entities: [Department, Employee, Assignment, Title, DepartmentTitle, ChangeLog],
         synchronize: false,
       }),
     }),
     DepartmentsModule,
     EmployeesModule,
     AssignmentsModule,
+    TitlesModule,
     HistoryModule,
     OrgChartModule,
     AuditModule,

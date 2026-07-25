@@ -1,15 +1,28 @@
 import { NavLink } from 'react-router-dom';
 import { useThemeStore } from '../store/themeStore';
-import { BellIcon, MoonIcon, SearchIcon, SunIcon } from './icons';
+import { BellIcon, MenuIcon, MoonIcon, SearchIcon, SunIcon } from './icons';
+
+export interface TopbarProps {
+  /** Toggle the nav drawer (small screens only). */
+  onMenuClick: () => void;
+}
 
 /** `.topbar` is kept as a hook so the print stylesheet can hide it. */
-export function Topbar() {
+export function Topbar({ onMenuClick }: TopbarProps) {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const isDark = theme === 'dark';
 
   return (
     <header className="topbar h-[var(--topbar-h)] bg-surface border-b border-line flex items-center gap-[14px] px-4 sticky top-0 z-20">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        aria-label="Open navigation menu"
+        className="min-[1081px]:hidden w-[34px] h-[34px] rounded-md grid place-items-center text-sub transition-[background] duration-[120ms] ease-brand hover:bg-surface-hover [&_svg]:w-[20px] [&_svg]:h-[20px]"
+      >
+        <MenuIcon />
+      </button>
       <div className="flex-1 max-w-[480px] mx-auto relative max-[640px]:hidden [&_svg]:absolute [&_svg]:left-2.5 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2 [&_svg]:w-4 [&_svg]:h-4 [&_svg]:text-sub">
         <SearchIcon />
         <input
@@ -39,7 +52,7 @@ export function Topbar() {
           <BellIcon />
         </button>
         <NavLink
-          to="/settings"
+          to="/admin/titles"
           className="w-[34px] h-[34px] rounded-md grid place-items-center text-sub relative transition-[background] duration-[120ms] ease-brand hover:bg-surface-hover"
           aria-label="Account"
         >

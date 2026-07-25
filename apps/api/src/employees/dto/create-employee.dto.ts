@@ -10,9 +10,10 @@ export class CreateEmployeeDto {
   @IsNotEmpty()
   firstName!: string;
 
+  /** Managed title id; must be a title assigned to `departmentId` (enforced in the service). */
   @IsString()
   @IsNotEmpty()
-  title!: string;
+  titleId!: string;
 
   @IsString()
   @IsNotEmpty()

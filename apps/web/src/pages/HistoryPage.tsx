@@ -251,7 +251,13 @@ export function HistoryPage() {
     <div className={PAGE}>
       <div className={PAGE_HEAD}>
         <div>
-          <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Change history' }]} />
+          <Breadcrumb
+            items={[
+              { label: 'Home', to: '/' },
+              { label: 'Maintenance', to: '/admin' },
+              { label: 'Change history' },
+            ]}
+          />
           <h1 className={PAGE_TITLE}>Change history</h1>
         </div>
       </div>

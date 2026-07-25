@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { DataIssuesStrip } from './chart/DataIssuesStrip';
 import { Legend } from './chart/Legend';
+import { PdfExportMenu } from './chart/PdfExportMenu';
 import { ChartCanvas } from './chart/topdown/ChartCanvas';
 import { CanvasEditor } from './chart/topdown/CanvasEditor';
 import { TopdownPrint } from './chart/topdown/TopdownPrint';
@@ -51,6 +52,27 @@ export function ChartPage() {
 
   const selectedNode = data && selectedId ? findNode(data.roots, selectedId) : null;
 
+  // Print mode may render a subset of divisions: `?divisions=id1,id2` (absent = all).
+  const printRoots = (() => {
+    if (!data) return [];
+    const sel = searchParams.get('divisions');
+    if (!sel) return data.roots;
+    const ids = new Set(sel.split(',').filter(Boolean));
+    const filtered = data.roots.filter((root) => ids.has(root.id));
+    return filtered.length > 0 ? filtered : data.roots;
+  })();
+
+  // Print/PDF: a standalone document with none of the interactive page's chrome (breadcrumb,
+  // title, the "Chart" card, the dot legend) - `TopdownPrint` renders its own complete cover,
+  // masthead legend, and per-division pages. Keeping this chrome out is what `ChartPdfService`
+  // (via Puppeteer) actually captures for the downloaded PDF.
+  if (printMode) {
+    if (!data) {
+      return <p className="p-6 text-[13px] text-sub">{error ? 'Could not load the organization chart.' : 'Loading…'}</p>;
+    }
+    return <TopdownPrint roots={printRoots} />;
+  }
+
   return (
     <div className={PAGE__BIG}>
       <div className={PAGE_HEAD}>
@@ -58,20 +80,14 @@ export function ChartPage() {
           <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Organization chart' }]} />
           <h1 className={PAGE_TITLE}>Organization chart</h1>
         </div>
-         {!printMode ? (
+        {data && data.roots.length > 0 ? (
           <div className={`${PH_ACTIONS} no-print`} role="group" aria-label="Chart view">
-            <a
-              className="inline-flex items-center gap-1.5 h-[28px] px-[10px] rounded-md text-[12px] font-semibold border bg-brand text-white border-brand hover:bg-brand-dark transition-[background,box-shadow,transform] duration-[120ms] ease-brand"
-              href="/api/chart/pdf"
-              download="organization-chart.pdf"
-            >
-              Download PDF
-            </a>
+            <PdfExportMenu roots={data.roots} />
           </div>
         ) : null}
       </div>
 
-      {!printMode ? <DataIssuesStrip warnings={warningsData?.warnings ?? []} /> : null}
+      <DataIssuesStrip warnings={warningsData?.warnings ?? []} />
 
       <Card>
         <Card.Header title="Chart" />
@@ -95,9 +111,7 @@ export function ChartPage() {
               description="Import the masters to populate the chart."
             />
           </Card.Body>
-        ) : printMode ? (
-          <TopdownPrint roots={data.roots} />
-        )  : (
+        ) : (
           <ChartCanvas
             roots={data.roots}
             selectedId={selectedId}
@@ -106,9 +120,7 @@ export function ChartPage() {
         )}
       </Card>
 
-      {!printMode && selectedNode ? (
-        <CanvasEditor node={selectedNode} onClose={() => setSelectedId(null)} />
-      ) : null}
+      {selectedNode ? <CanvasEditor node={selectedNode} onClose={() => setSelectedId(null)} /> : null}
     </div>
   );
 }

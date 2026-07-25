@@ -42,7 +42,7 @@ docker compose up --build
 
 This single command brings up **the database, the API, and the web app**, and the API's
 entrypoint automatically **waits for Postgres, runs migrations, and imports/seeds the masters**
-from `data/*.xlsx` before starting - no separate seed step.
+from `data/<DATA_LANG>/*.xlsx` before starting - no separate seed step.
 
 Once it's up:
 
@@ -51,6 +51,23 @@ Once it's up:
 
 Stop with `Ctrl+C`, or `docker compose down` (add `-v` to also drop the `db-data` volume and
 start from a clean database next time).
+
+### Chart language (Japanese / English)
+
+The seed loads one of two committed datasets, chosen by the **`DATA_LANG`** env var - `ja`
+(default) or `en`. English gives readable department names, position titles, and romaji person
+names for reviewers who don't read Japanese:
+
+```bash
+DATA_LANG=en docker compose up --build   # or set DATA_LANG in .env
+```
+
+Because the language is applied at **seed time**, switching it needs only a re-seed, not a
+rebuild: change the value and recreate the api container (`docker compose up -d --force-recreate api`).
+The English dataset (`data/en/*.xlsx`) is generated from the Japanese masters plus a single
+hand-editable translation map, `data/translations.en.json`; edit that file and regenerate with
+`npm run data:gen:en` (from `apps/api`). The web UI's own labels stay Japanese - only the chart
+data changes language.
 
 ## Maintainer guide
 
@@ -62,20 +79,20 @@ Use the **admin UI** at `/admin` (Employees, Departments, Assignments tabs):
   (new columns, never repurposed ones), per the assignment's precautions.
 - **Assignments** - a person's **primary** posting plus any **concurrent (兼務)** postings.
   Adding a concurrent assignment is what makes a person's `(兼)` chip appear in another
-  department on the chart; a second *primary* posting for the same person is rejected.
+  department on the chart; a second _primary_ posting for the same person is rejected.
 - Every create/update/deactivate across these three is recorded automatically; browse it at
   `/history` (reverse-chronological, before/after, no edit or delete path - the log is
   append-only by design).
 
 ### API surface (`apps/api`, NestJS)
 
-| Controller | Base path | Purpose |
-| --- | --- | --- |
-| `OrgChartController` | `/chart` | Chart JSON + PDF export (Puppeteer, A3) |
-| `EmployeesController` | `/employees` | CRUD |
-| `DepartmentsController` | `/departments` | CRUD |
-| `AssignmentsController` | `/assignments` | Primary/concurrent posting CRUD |
-| `HistoryController` | `/history` | Read-only change-log query (filter by entity/time) |
+| Controller              | Base path      | Purpose                                            |
+| ----------------------- | -------------- | -------------------------------------------------- |
+| `OrgChartController`    | `/chart`       | Chart JSON + PDF export (Puppeteer, A3)            |
+| `EmployeesController`   | `/employees`   | CRUD                                               |
+| `DepartmentsController` | `/departments` | CRUD                                               |
+| `AssignmentsController` | `/assignments` | Primary/concurrent posting CRUD                    |
+| `HistoryController`     | `/history`     | Read-only change-log query (filter by entity/time) |
 
 ### Domain core (`packages/domain`)
 
@@ -92,8 +109,10 @@ manually against a running stack:
 docker compose exec api npm run seed
 ```
 
-To change the source data, edit the working copies in `data/*.xlsx` (never the originals in
-`TryOutProgram/`) and re-run the seed.
+To change the source data, edit the working copies in `data/ja/*.xlsx` (never the originals in
+`TryOutProgram/`) and re-run the seed. For the English dataset, edit `data/translations.en.json`
+and regenerate with `npm run data:gen:en` (see **Chart language** above) rather than editing
+`data/en/*.xlsx` by hand.
 
 ### Database migrations
 

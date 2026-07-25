@@ -7,6 +7,7 @@ import {
   ErrorState,
   IndexTable,
   LoadingState,
+  Modal,
   SaveBar,
 } from '../../design/components';
 import type { IndexTableColumn } from '../../design/components';
@@ -175,18 +176,6 @@ export function DepartmentsPage() {
 
   return (
     <div className={PAGE}>
-      {panel && isDirty ? (
-        <SaveBar
-          message={
-            isCreating
-              ? 'Adding a new department - unsaved changes'
-              : `Editing ${editingDepartment?.name ?? ''} - unsaved changes`
-          }
-          saving={saving}
-          onSave={handleSave}
-          onDiscard={discardChanges}
-        />
-      ) : null}
       <div className={PAGE_HEAD}>
         <div>
           <Breadcrumb
@@ -237,12 +226,26 @@ export function DepartmentsPage() {
       </Card>
 
       {panel ? (
-        <Card>
-          <Card.Header
+        <Modal aria-label={isCreating ? 'Add department' : 'Edit department'} onClose={closePanel}>
+          {isDirty ? (
+            <div className="px-3 pt-3">
+              <SaveBar
+                message={
+                  isCreating
+                    ? 'Adding a new department - unsaved changes'
+                    : `Editing ${editingDepartment?.name ?? ''} - unsaved changes`
+                }
+                saving={saving}
+                onSave={handleSave}
+                onDiscard={discardChanges}
+              />
+            </div>
+          ) : null}
+          <Modal.Header
             title={isCreating ? 'Add department' : 'Edit department'}
             actions={editingDepartment ? <Badge plain>{editingDepartment.id}</Badge> : undefined}
           />
-          <Card.Section>
+          <Modal.Section>
             <div className={FIELD}>
               <label className={LABEL} htmlFor="dept-name">
                 Name 部門名
@@ -293,8 +296,8 @@ export function DepartmentsPage() {
               />
             </div>
             {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
-          </Card.Section>
-          <Card.Footer>
+          </Modal.Section>
+          <Modal.Footer>
             {editingDepartment?.active ? (
               <Button variant="plain" onClick={handleDeactivate}>
                 Deactivate
@@ -307,8 +310,8 @@ export function DepartmentsPage() {
             <Button variant="primary" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
-          </Card.Footer>
-        </Card>
+          </Modal.Footer>
+        </Modal>
       ) : null}
     </div>
   );

@@ -2,13 +2,16 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 
 import type { ObjectLiteral, Repository } from 'typeorm';
+import { CANONICAL_TITLES, findTitleByLabel } from '@org-chart/domain';
 import { Department } from '../departments/department.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import { OrgChartController } from './org-chart.controller.ts';
 import { OrgChartService } from './org-chart.service.ts';
 import type { ChartPdfService } from './chart-pdf.service.ts';
 import type { ChartNode } from './chart-node.ts';
+import { fakeConfigService } from '../test/fake-config.ts';
 
 /** Minimal in-memory stand-in for the slice of `Repository<T>` the service calls (`.find`). */
 function fakeRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
@@ -16,21 +19,31 @@ function fakeRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
 }
 
 function dept(id: string, name: string, parentName: string): Department {
-  return { id, name, parentName, head: '', sysId: id, active: true };
+  return { id, name, parentName, head: '', headSysId: null, sysId: id, active: true };
 }
 
-function emp(sysId: string, lastName: string, firstName: string, title: string, departmentId: string): Employee {
+function emp(
+  sysId: string,
+  lastName: string,
+  firstName: string,
+  title: string,
+  departmentId: string,
+): Employee {
   return {
     sysId,
     userId: sysId,
     lastName,
     firstName,
     title,
+    titleId: findTitleByLabel(CANONICAL_TITLES, title)?.id ?? null,
     departmentId,
     department: undefined as unknown as Department,
     active: true,
   };
 }
+
+/** The managed titles the fixtures reference, as the title repo would return them. */
+const fixtureTitleRows = CANONICAL_TITLES as unknown as Title[];
 
 /**
  * Wires `OrgChartService`/`OrgChartController` against in-memory fixtures (no DB) to exercise
@@ -54,13 +67,22 @@ function buildFixtureController(): OrgChartController {
   ];
 
   const assignments = [
-    { employeeSysId: 's1', departmentId: '2', title: '部長', isPrimary: false, assignmentType: 'concurrent' as const },
+    {
+      employeeSysId: 's1',
+      departmentId: '2',
+      title: '部長',
+      titleId: findTitleByLabel(CANONICAL_TITLES, '部長')?.id ?? null,
+      isPrimary: false,
+      assignmentType: 'concurrent' as const,
+    },
   ];
 
   const service = new OrgChartService(
     fakeRepo(departments),
     fakeRepo(employees),
     fakeRepo(assignments as unknown as Assignment[]),
+    fakeRepo(fixtureTitleRows),
+    fakeConfigService(),
   );
   const pdfService = {} as ChartPdfService; // unused by the JSON-only scenarios below
   return new OrgChartController(service, pdfService);

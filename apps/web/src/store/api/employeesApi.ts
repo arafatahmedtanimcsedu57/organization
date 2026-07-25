@@ -6,7 +6,9 @@ export interface Employee {
   userId: string;
   lastName: string;
   firstName: string;
+  /** Display cache of the resolved title (see `titleId`). */
   title: string;
+  titleId: string | null;
   departmentId: string;
   active: boolean;
 }
@@ -14,14 +16,14 @@ export interface Employee {
 export interface CreateEmployeeInput {
   lastName: string;
   firstName: string;
-  title: string;
+  titleId: string;
   departmentId: string;
 }
 
 export interface UpdateEmployeeInput {
   lastName?: string;
   firstName?: string;
-  title?: string;
+  titleId?: string;
   departmentId?: string;
 }
 

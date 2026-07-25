@@ -5,7 +5,7 @@ import type { FieldErrors } from '../useEditorPanel';
 export interface AssignmentFormState {
   employeeSysId: string;
   departmentId: string;
-  title: string;
+  titleId: string;
   assignmentType: AssignmentType;
   isPrimary: boolean;
   validFrom: string;
@@ -15,7 +15,7 @@ export interface AssignmentFormState {
 export const EMPTY_FORM: AssignmentFormState = {
   employeeSysId: '',
   departmentId: '',
-  title: '',
+  titleId: '',
   assignmentType: 'concurrent',
   isPrimary: false,
   validFrom: '',
@@ -26,7 +26,7 @@ export function toFormState(assignment: Assignment): AssignmentFormState {
   return {
     employeeSysId: assignment.employeeSysId,
     departmentId: assignment.departmentId,
-    title: assignment.title,
+    titleId: assignment.titleId ?? '',
     assignmentType: assignment.assignmentType,
     isPrimary: assignment.isPrimary,
     validFrom: assignment.validFrom ?? '',
@@ -43,7 +43,7 @@ export function validate(form: AssignmentFormState): FieldErrors<AssignmentFormS
   const errors: FieldErrors<AssignmentFormState> = {};
   if (!form.employeeSysId) errors.employeeSysId = 'Person is required.';
   if (!form.departmentId) errors.departmentId = 'Department is required.';
-  if (!form.title.trim()) errors.title = 'Title is required.';
+  if (!form.titleId) errors.titleId = 'Title is required.';
   if (form.validFrom && form.validTo && form.validFrom > form.validTo) {
     errors.validTo = 'Valid-to must be on or after valid-from.';
   }

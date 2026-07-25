@@ -5,6 +5,22 @@ function Icon(props: SVGProps<SVGSVGElement>) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" {...props} />;
 }
 
+export function MenuIcon() {
+  return (
+    <Icon>
+      <path d="M4 6h16M4 12h16M4 18h16" strokeWidth={1.7} strokeLinecap="round" />
+    </Icon>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <Icon>
+      <path d="M6 6l12 12M18 6L6 18" strokeWidth={1.7} strokeLinecap="round" />
+    </Icon>
+  );
+}
+
 export function HomeIcon() {
   return (
     <Icon>

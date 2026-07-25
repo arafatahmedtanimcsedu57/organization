@@ -2,15 +2,23 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { DataSource } from 'typeorm';
 import { Department } from '../departments/department.entity.ts';
+import { DepartmentTitle } from '../departments/department-title.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import { ChangeLog } from '../history/change-log.entity.ts';
-import { fixtureAssignments, fixtureDepartments, fixtureEmployees } from './fixtures.ts';
+import {
+  fixtureAssignments,
+  fixtureDepartments,
+  fixtureDepartmentTitles,
+  fixtureEmployees,
+  fixtureTitles,
+} from './fixtures.ts';
 
 const migrationsGlob = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'migrations', '*.ts');
 
-/** Tables in FK-safe delete order (children before the parents they reference). */
-const TABLES_IN_DELETE_ORDER = ['change_log', 'assignments', 'employees', 'departments'];
+/** Tables wiped before each run (TRUNCATE ... CASCADE resolves FK order). */
+const TABLES_IN_DELETE_ORDER = ['change_log', 'assignments', 'department_titles', 'employees', 'departments', 'titles'];
 
 function testDatabaseUrl(): string {
   const url = process.env.TEST_DATABASE_URL;
@@ -27,7 +35,7 @@ export function createDataSource(url: string): DataSource {
   return new DataSource({
     type: 'postgres',
     url,
-    entities: [Department, Employee, Assignment, ChangeLog],
+    entities: [Department, DepartmentTitle, Employee, Assignment, Title, ChangeLog],
     migrations: [migrationsGlob],
     synchronize: false,
   });
@@ -54,7 +62,11 @@ export async function resetTestDatabase(dataSource: DataSource): Promise<void> {
   const tables = TABLES_IN_DELETE_ORDER.map((table) => `"${table}"`).join(', ');
   await dataSource.query(`TRUNCATE TABLE ${tables} RESTART IDENTITY CASCADE`);
 
+  // FK-safe insert order: titles and departments first, then the join and the
+  // rows that reference titles (employees, assignments).
+  await dataSource.getRepository(Title).insert(fixtureTitles);
   await dataSource.getRepository(Department).insert(fixtureDepartments);
+  await dataSource.getRepository(DepartmentTitle).insert(fixtureDepartmentTitles);
   await dataSource.getRepository(Employee).insert(fixtureEmployees);
   await dataSource.getRepository(Assignment).insert(fixtureAssignments);
 }

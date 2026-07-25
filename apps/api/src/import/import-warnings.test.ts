@@ -11,6 +11,7 @@ function employee(overrides: Partial<Employee> = {}): Employee {
     lastName: '佐藤',
     firstName: '曠弌',
     title: '代表取締役',
+    titleId: 'representative-director',
     departmentName: 'システム事業部',
     ...overrides,
   };

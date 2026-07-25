@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './employee.entity.ts';
 import { Department } from '../departments/department.entity.ts';
+import { DepartmentTitle } from '../departments/department-title.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import type { CreateEmployeeDto } from './dto/create-employee.dto.ts';
 import type { UpdateEmployeeDto } from './dto/update-employee.dto.ts';
 
@@ -13,6 +15,8 @@ export class EmployeesService {
   constructor(
     @InjectRepository(Employee) private readonly employeeRepo: Repository<Employee>,
     @InjectRepository(Department) private readonly departmentRepo: Repository<Department>,
+    @InjectRepository(Title) private readonly titleRepo: Repository<Title>,
+    @InjectRepository(DepartmentTitle) private readonly departmentTitleRepo: Repository<DepartmentTitle>,
   ) {}
 
   findAll(): Promise<Employee[]> {
@@ -29,13 +33,15 @@ export class EmployeesService {
 
   async create(dto: CreateEmployeeDto): Promise<Employee> {
     await this.assertDepartmentExists(dto.departmentId);
+    const title = await this.resolveDepartmentTitle(dto.titleId, dto.departmentId);
 
     const employee = this.employeeRepo.create({
       sysId: randomBytes(16).toString('hex'),
       userId: dto.userId ?? (await this.nextUserId()),
       lastName: dto.lastName,
       firstName: dto.firstName,
-      title: dto.title,
+      title: title.name,
+      titleId: title.id,
       departmentId: dto.departmentId,
       active: true,
     });
@@ -48,7 +54,19 @@ export class EmployeesService {
       await this.assertDepartmentExists(dto.departmentId);
     }
 
-    Object.assign(employee, dto);
+    if (dto.lastName !== undefined) employee.lastName = dto.lastName;
+    if (dto.firstName !== undefined) employee.firstName = dto.firstName;
+    if (dto.departmentId !== undefined) employee.departmentId = dto.departmentId;
+
+    // Re-validate the title against the (possibly new) department whenever either changes.
+    if (dto.titleId !== undefined || dto.departmentId !== undefined) {
+      const titleId = dto.titleId ?? employee.titleId;
+      if (titleId) {
+        const title = await this.resolveDepartmentTitle(titleId, employee.departmentId);
+        employee.titleId = title.id;
+        employee.title = title.name;
+      }
+    }
     return this.employeeRepo.save(employee);
   }
 
@@ -63,6 +81,22 @@ export class EmployeesService {
     if (!department) {
       throw new BadRequestException(`Department ${departmentId} does not exist`);
     }
+  }
+
+  /**
+   * Resolves a title id to an active `Title` that is assigned to the department,
+   * enforcing "a person's title must be pre-defined and assigned to their department".
+   */
+  private async resolveDepartmentTitle(titleId: string, departmentId: string): Promise<Title> {
+    const title = await this.titleRepo.findOne({ where: { id: titleId } });
+    if (!title || !title.active) {
+      throw new BadRequestException(`Title "${titleId}" does not exist or is inactive`);
+    }
+    const link = await this.departmentTitleRepo.findOne({ where: { departmentId, titleId } });
+    if (!link) {
+      throw new BadRequestException(`Title "${title.name}" is not assigned to department ${departmentId}`);
+    }
+    return title;
   }
 
   /** Best-effort sequential `User ID` (mirrors the zero-padded `sys_user` style) for records added outside the import. */

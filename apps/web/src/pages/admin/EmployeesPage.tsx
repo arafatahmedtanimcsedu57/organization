@@ -1,4 +1,3 @@
-import { POSITION_RANK } from '@org-chart/domain';
 import {
   Badge,
   Breadcrumb,
@@ -8,8 +7,10 @@ import {
   ErrorState,
   IndexTable,
   LoadingState,
+  Modal,
   SaveBar,
 } from '../../design/components';
+import { TitleSelect } from '../chart/topdown/editor/TitleSelect';
 import type { IndexTableColumn } from '../../design/components';
 import {
   PAGE,
@@ -43,17 +44,17 @@ import { useEditorPanel, type FieldErrors } from './useEditorPanel';
 interface EmployeeFormState {
   lastName: string;
   firstName: string;
-  title: string;
+  titleId: string;
   departmentId: string;
 }
 
-const EMPTY_FORM: EmployeeFormState = { lastName: '', firstName: '', title: '', departmentId: '' };
+const EMPTY_FORM: EmployeeFormState = { lastName: '', firstName: '', titleId: '', departmentId: '' };
 
 function toFormState(employee: Employee): EmployeeFormState {
   return {
     lastName: employee.lastName,
     firstName: employee.firstName,
-    title: employee.title,
+    titleId: employee.titleId ?? '',
     departmentId: employee.departmentId,
   };
 }
@@ -66,8 +67,8 @@ function validate(form: EmployeeFormState): FieldErrors<EmployeeFormState> {
   const errors: FieldErrors<EmployeeFormState> = {};
   if (!form.lastName.trim()) errors.lastName = 'Last name is required.';
   if (!form.firstName.trim()) errors.firstName = 'First name is required.';
-  if (!form.title.trim()) errors.title = 'Title is required.';
   if (!form.departmentId) errors.departmentId = 'Department is required.';
+  if (!form.titleId) errors.titleId = 'Title is required.';
   return errors;
 }
 
@@ -178,18 +179,6 @@ export function EmployeesPage() {
 
   return (
     <div className={PAGE}>
-      {panel && isDirty ? (
-        <SaveBar
-          message={
-            isCreating
-              ? 'Adding a new employee - unsaved changes'
-              : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} - unsaved changes`
-          }
-          saving={saving}
-          onSave={handleSave}
-          onDiscard={discardChanges}
-        />
-      ) : null}
       <div className={PAGE_HEAD}>
         <div>
           <Breadcrumb
@@ -237,12 +226,26 @@ export function EmployeesPage() {
       </Card>
 
       {panel ? (
-        <Card>
-          <Card.Header
+        <Modal aria-label={isCreating ? 'Add employee' : 'Edit employee'} onClose={closePanel}>
+          {isDirty ? (
+            <div className="px-3 pt-3">
+              <SaveBar
+                message={
+                  isCreating
+                    ? 'Adding a new employee - unsaved changes'
+                    : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} - unsaved changes`
+                }
+                saving={saving}
+                onSave={handleSave}
+                onDiscard={discardChanges}
+              />
+            </div>
+          ) : null}
+          <Modal.Header
             title={isCreating ? 'Add employee' : 'Edit employee'}
             actions={editingEmployee ? <Badge plain>{editingEmployee.userId}</Badge> : undefined}
           />
-          <Card.Section>
+          <Modal.Section>
             <div className={TWO}>
               <div className={FIELD}>
                 <label className={LABEL} htmlFor="emp-last-name">
@@ -277,20 +280,14 @@ export function EmployeesPage() {
               <label className={LABEL} htmlFor="emp-title">
                 Title 役職
               </label>
-              <input
+              <TitleSelect
                 id="emp-title"
-                className={INPUT}
-                list="position-ranks"
-                value={form.title}
-                onChange={(event) => setForm({ ...form, title: event.target.value })}
+                departmentId={form.departmentId}
+                value={form.titleId}
+                onChange={(titleId) => setForm({ ...form, titleId })}
               />
-              <datalist id="position-ranks">
-                {POSITION_RANK.map((rank) => (
-                  <option key={rank} value={rank} />
-                ))}
-              </datalist>
-              {attemptedSave && fieldErrors.title ? (
-                <div className={FIELD_ERR}>{fieldErrors.title}</div>
+              {attemptedSave && fieldErrors.titleId ? (
+                <div className={FIELD_ERR}>{fieldErrors.titleId}</div>
               ) : null}
             </div>
             <div className={FIELD}>
@@ -301,7 +298,7 @@ export function EmployeesPage() {
                 id="emp-department"
                 className={INPUT}
                 value={form.departmentId}
-                onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
+                onChange={(event) => setForm({ ...form, departmentId: event.target.value, titleId: '' })}
               >
                 <option value="" disabled>
                   Select a department…
@@ -321,8 +318,8 @@ export function EmployeesPage() {
               ) : null}
             </div>
             {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
-          </Card.Section>
-          <Card.Footer>
+          </Modal.Section>
+          <Modal.Footer>
             {editingEmployee?.active ? (
               <Button variant="plain" onClick={handleDeactivate}>
                 Deactivate
@@ -335,8 +332,8 @@ export function EmployeesPage() {
             <Button variant="primary" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
-          </Card.Footer>
-        </Card>
+          </Modal.Footer>
+        </Modal>
       ) : null}
     </div>
   );

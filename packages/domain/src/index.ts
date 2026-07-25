@@ -4,3 +4,4 @@ export * from "./config.ts";
 export * from "./disambiguateNames.ts";
 export * from "./placeMembers.ts";
 export * from "./placeAssignments.ts";
+export * from "./resolveDepartmentHeads.ts";

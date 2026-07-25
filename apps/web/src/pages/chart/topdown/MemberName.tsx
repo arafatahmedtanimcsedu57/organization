@@ -54,7 +54,7 @@ export function MemberName({
       title={`兼務 ← ${member.sourceDepartmentName ?? ''} ${member.sourceTitle ?? ''}`}
       {...hoverProps}
     >
-      <span className="kenmu-mark font-bold">兼</span> {member.displayName}
+      <span className="kenmu-mark font-bold">( 兼 )</span> {member.displayName}
     </span>
   );
 }

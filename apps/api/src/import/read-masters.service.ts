@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import { Injectable } from '@nestjs/common';
 import * as XLSX from 'xlsx';
-import type { Department, Employee } from '@org-chart/domain';
+import { CANONICAL_TITLES, findTitleByLabel, type Department, type Employee } from '@org-chart/domain';
 import { normalizeText } from './normalize.ts';
 
 /** Read a sheet as an array of plain objects keyed by the header row. */
@@ -37,14 +37,20 @@ export class ReadMastersService {
 
   readEmployees(filePath: string): Employee[] {
     return readSheet(filePath)
-      .map((r) => ({
-        lastName: str(r['Last name']),
-        firstName: str(r['First name']),
-        title: str(r['Title']),
-        departmentName: str(r['Department']),
-        userId: str(r['User ID']),
-        sysId: str(r['Sys ID']),
-      }))
+      .map((r) => {
+        const title = str(r['Title']);
+        return {
+          lastName: str(r['Last name']),
+          firstName: str(r['First name']),
+          title,
+          // Resolve the free-text master title to a managed title id against the
+          // canonical seed (the DB is seeded with exactly these). '' when unrecognized.
+          titleId: findTitleByLabel(CANONICAL_TITLES, title)?.id ?? '',
+          departmentName: str(r['Department']),
+          userId: str(r['User ID']),
+          sysId: str(r['Sys ID']),
+        };
+      })
       .filter((u) => u.lastName !== '' || u.firstName !== '');
   }
 }

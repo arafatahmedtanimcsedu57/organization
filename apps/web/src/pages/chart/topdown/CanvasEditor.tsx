@@ -66,6 +66,7 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
   const [createDepartment, deptCreateState] = useCreateDepartmentMutation();
   const [updateDepartment, deptUpdateState] = useUpdateDepartmentMutation();
   const [deactivateDepartment] = useDeactivateDepartmentMutation();
+  
   const [updateEmployee, empUpdateState] = useUpdateEmployeeMutation();
   const [deactivateEmployee] = useDeactivateEmployeeMutation();
   const [createAssignment, asnCreateState] = useCreateAssignmentMutation();
@@ -95,7 +96,7 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
     toFormState: (row) => ({
       lastName: row.lastName,
       firstName: row.firstName,
-      title: row.title,
+      titleId: row.titleId ?? '',
       departmentId: row.departmentId,
     }),
     validate: empValidate,
@@ -175,7 +176,7 @@ export function CanvasEditor({ node, onClose }: CanvasEditorProps) {
     const result = await createAssignment({
       employeeSysId: values.employeeSysId,
       departmentId: node.id,
-      title: values.title,
+      titleId: values.titleId,
       assignmentType: values.assignmentType,
       isPrimary: values.isPrimary,
       validFrom: values.validFrom || undefined,

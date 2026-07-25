@@ -6,7 +6,15 @@ import path from 'node:path';
 import { test } from 'vitest';
 import { fileURLToPath } from 'node:url';
 
-import { buildDepartmentTree, placeAssignments, placeEmployees, type Member, type OrgNode } from '@org-chart/domain';
+import {
+  buildDepartmentTree,
+  CANONICAL_TITLES,
+  findTitleByLabel,
+  placeAssignments,
+  placeEmployees,
+  type Member,
+  type OrgNode,
+} from '@org-chart/domain';
 import { ReadMastersService } from '../import/read-masters.service.ts';
 import { SEED_ASSIGNMENTS } from '../import/seed-assignments.data.ts';
 
@@ -30,9 +38,15 @@ function buildRealOrgModel() {
   const departments = readMasters.readDepartments(path.join(sourceDir, 'cmn_department.xlsx'));
   const employees = readMasters.readEmployees(path.join(sourceDir, 'sys_user.xlsx'));
 
+  // Resolve each seed 兼務 title to a managed title id (as SeedAssignmentsService does).
+  const assignments = SEED_ASSIGNMENTS.map((a) => ({
+    ...a,
+    titleId: findTitleByLabel(CANONICAL_TITLES, a.title)?.id ?? '',
+  }));
+
   const tree = buildDepartmentTree(departments);
-  const memberWarnings = placeEmployees(tree, employees);
-  const assignmentWarnings = placeAssignments(tree, employees, SEED_ASSIGNMENTS);
+  const memberWarnings = placeEmployees(tree, employees, CANONICAL_TITLES);
+  const assignmentWarnings = placeAssignments(tree, employees, assignments, CANONICAL_TITLES);
 
   return {
     roots: tree.roots,
@@ -57,7 +71,7 @@ function renderPrintHtml(roots: OrgNode[]): string {
     return `<section>${node.name}${managers}${staff}${node.children.map(renderNode).join('')}</section>`;
   };
   return `<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>
-    @page { size: A4 portrait; margin: 8mm; }
+    @page { size: A4 landscape; margin: 8mm; }
     body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; }
     .member.concurrent, .staff-name.concurrent { color: #c00; }
   </style></head><body>${roots.map(renderNode).join('')}</body></html>`;
@@ -106,7 +120,7 @@ test('the real chart data renders to a valid A4 PDF with full rosters and distin
     const page = await browser.newPage();
     await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle0' });
 
-    const pdf = await page.pdf({ format: 'A4', landscape: false, printBackground: true });
+    const pdf = await page.pdf({ format: 'A4', landscape: true, printBackground: true });
     assert.equal(Buffer.from(pdf.subarray(0, 5)).toString(), '%PDF-');
     assert.ok(pdf.length > 10_000, 'expected a substantial multi-department PDF, not a near-empty page');
 

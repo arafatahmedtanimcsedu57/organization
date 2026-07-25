@@ -46,7 +46,7 @@ export function TreeEdges({ layout, byId }: TreeEdgesProps) {
         return (
           <path
             key={edge.id}
-            className="fill-none stroke-2 opacity-90 [stroke-linecap:round]"
+            className="fill-none [stroke-linecap:round]"
             d={d}
             style={{ stroke: rail }}
           />

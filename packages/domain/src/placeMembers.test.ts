@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from 'vitest';
 
 import { buildDepartmentTree } from "./buildTree.ts";
+import { CANONICAL_TITLES, findTitleByLabel } from "./config.ts";
 import type { Department, Employee } from "./model.ts";
 import { placeEmployees } from "./placeMembers.ts";
 
@@ -9,8 +10,13 @@ function dept(id: string, name: string, parentName: string): Department {
   return { id, name, parentName, head: "", sysId: id };
 }
 
+/** Resolve a title label to its managed id (or keep the raw label when unknown). */
+function tid(label: string): string {
+  return findTitleByLabel(CANONICAL_TITLES, label)?.id ?? label;
+}
+
 function emp(sysId: string, lastName: string, title: string, departmentName: string): Employee {
-  return { sysId, userId: sysId, lastName, firstName: "", title, departmentName };
+  return { sysId, userId: sysId, lastName, firstName: "", title, titleId: tid(title), departmentName };
 }
 
 test("orders people within a department from highest to lowest rank", () => {
@@ -21,7 +27,7 @@ test("orders people within a department from highest to lowest rank", () => {
     emp("3", "課長A", "課長", "営業本部"),
   ];
 
-  const warnings = placeEmployees(tree, employees);
+  const warnings = placeEmployees(tree, employees, CANONICAL_TITLES);
 
   assert.equal(warnings.length, 0);
   const node = tree.byName.get("営業本部");
@@ -43,7 +49,7 @@ test("splits managers from staff at 課員", () => {
     emp("2", "課員X", "課員", "管理部"),
   ];
 
-  placeEmployees(tree, employees);
+  placeEmployees(tree, employees, CANONICAL_TITLES);
 
   const node = tree.byName.get("管理部");
   assert.ok(node);
@@ -57,7 +63,7 @@ test("normalizes full-width digits so 主任２ ranks the same as 主任2", () =
   const tree = buildDepartmentTree([dept("1", "システム事業部", "")]);
   const employees = [emp("1", "田中", "主任２", "システム事業部")];
 
-  const warnings = placeEmployees(tree, employees);
+  const warnings = placeEmployees(tree, employees, CANONICAL_TITLES);
 
   assert.equal(warnings.length, 0);
   const node = tree.byName.get("システム事業部");
@@ -73,7 +79,7 @@ test("unknown title is placed last (in staff) and reported as a warning", () => 
     emp("2", "謎の役職", "宇宙飛行士", "ITサポート事業部"),
   ];
 
-  const warnings = placeEmployees(tree, employees);
+  const warnings = placeEmployees(tree, employees, CANONICAL_TITLES);
 
   assert.equal(warnings.length, 1);
   const warning = warnings[0];
@@ -92,10 +98,10 @@ test("unknown title is placed last (in staff) and reported as a warning", () => 
 test("unique last name is shown plainly", () => {
   const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
   const employees: Employee[] = [
-    { sysId: "1", userId: "1", lastName: "濱井", firstName: "太郎", title: "課員", departmentName: "営業本部" },
+    { sysId: "1", userId: "1", lastName: "濱井", firstName: "太郎", title: "課員", titleId: tid("課員"), departmentName: "営業本部" },
   ];
 
-  placeEmployees(tree, employees);
+  placeEmployees(tree, employees, CANONICAL_TITLES);
 
   const node = tree.byName.get("営業本部");
   assert.ok(node);
@@ -105,11 +111,11 @@ test("unique last name is shown plainly", () => {
 test("shared last name is disambiguated with the given-name initial", () => {
   const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
   const employees: Employee[] = [
-    { sysId: "1", userId: "1", lastName: "佐藤", firstName: "悠介", title: "課員", departmentName: "営業本部" },
-    { sysId: "2", userId: "2", lastName: "佐藤", firstName: "晃", title: "課員", departmentName: "営業本部" },
+    { sysId: "1", userId: "1", lastName: "佐藤", firstName: "悠介", title: "課員", titleId: tid("課員"), departmentName: "営業本部" },
+    { sysId: "2", userId: "2", lastName: "佐藤", firstName: "晃", title: "課員", titleId: tid("課員"), departmentName: "営業本部" },
   ];
 
-  placeEmployees(tree, employees);
+  placeEmployees(tree, employees, CANONICAL_TITLES);
 
   const node = tree.byName.get("営業本部");
   assert.ok(node);
@@ -128,11 +134,12 @@ test("a configured display override wins over the computed name", () => {
       lastName: "大西",
       firstName: "隆洋",
       title: "主任",
+      titleId: tid("主任"),
       departmentName: "SW開発課 2G",
     },
   ];
 
-  placeEmployees(tree, employees);
+  placeEmployees(tree, employees, CANONICAL_TITLES);
 
   const node = tree.byName.get("SW開発課 2G");
   assert.ok(node);
@@ -143,7 +150,7 @@ test("employee with an unmatched department is skipped and reported as a warning
   const tree = buildDepartmentTree([dept("1", "営業本部", "")]);
   const employees = [emp("1", "行方不明", "課長", "存在しない部")];
 
-  const warnings = placeEmployees(tree, employees);
+  const warnings = placeEmployees(tree, employees, CANONICAL_TITLES);
 
   assert.equal(warnings.length, 1);
   const warning = warnings[0];

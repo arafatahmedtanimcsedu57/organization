@@ -32,6 +32,14 @@ export class Assignment {
   @Column({ name: 'title', type: 'varchar' })
   title!: string;
 
+  /**
+   * Authoritative title reference -> `titles.id` for this posting. Must be a title
+   * assigned to `departmentId` (enforced by `AssignmentsService`). Nullable only so
+   * the column can be added and backfilled during import.
+   */
+  @Column({ name: 'title_id', type: 'varchar', nullable: true })
+  titleId!: string | null;
+
   @Column({ name: 'is_primary', type: 'boolean', default: false })
   isPrimary!: boolean;
 

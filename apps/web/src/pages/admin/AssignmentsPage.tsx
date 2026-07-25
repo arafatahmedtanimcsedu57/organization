@@ -6,6 +6,7 @@ import {
   ErrorState,
   IndexTable,
   LoadingState,
+  Modal,
   SaveBar,
 } from '../../design/components';
 import { PAGE, PAGE_HEAD, PH_ACTIONS, PAGE_TITLE } from '../../design/formStyles';
@@ -47,12 +48,12 @@ export function AssignmentsPage() {
     editingRow: editingAssignment,
     isCreating,
     form,
-    setForm,
     attemptedSave,
     isDirty,
     fieldErrors,
     saving,
     saveError,
+    setForm,
     openCreate,
     openEdit,
     closePanel,
@@ -74,7 +75,7 @@ export function AssignmentsPage() {
       const result = await createAssignment({
         employeeSysId: values.employeeSysId,
         departmentId: values.departmentId,
-        title: values.title,
+        titleId: values.titleId,
         assignmentType: values.assignmentType,
         isPrimary: values.isPrimary,
         validFrom: values.validFrom || undefined,
@@ -85,7 +86,7 @@ export function AssignmentsPage() {
       const result = await updateAssignment({
         id: panel,
         body: {
-          title: values.title,
+          titleId: values.titleId,
           assignmentType: values.assignmentType,
           isPrimary: values.isPrimary,
           validFrom: values.validFrom || null,
@@ -113,17 +114,6 @@ export function AssignmentsPage() {
 
   return (
     <div className={PAGE}>
-      {panel && isDirty ? (
-        <SaveBar
-          message={
-            isCreating ? 'Adding a new posting - unsaved changes' : 'Editing posting - unsaved changes'
-          }
-          saving={saving}
-          onSave={handleSave}
-          onDiscard={discardChanges}
-        />
-      ) : null}
-
       <div className={PAGE_HEAD}>
         <div>
           <Breadcrumb
@@ -174,9 +164,23 @@ export function AssignmentsPage() {
       </Card>
 
       {panel ? (
-        <Card>
-          <Card.Header title={isCreating ? 'Add posting' : 'Edit posting'} />
-          <Card.Section>
+        <Modal aria-label={isCreating ? 'Add posting' : 'Edit posting'} onClose={closePanel}>
+          {isDirty ? (
+            <div className="px-3 pt-3">
+              <SaveBar
+                message={
+                  isCreating
+                    ? 'Adding a new posting - unsaved changes'
+                    : 'Editing posting - unsaved changes'
+                }
+                saving={saving}
+                onSave={handleSave}
+                onDiscard={discardChanges}
+              />
+            </div>
+          ) : null}
+          <Modal.Header title={isCreating ? 'Add posting' : 'Edit posting'} />
+          <Modal.Section>
             <AssignmentFields
               form={form}
               setForm={setForm}
@@ -187,8 +191,8 @@ export function AssignmentsPage() {
               departments={departments}
               saveError={saveError}
             />
-          </Card.Section>
-          <Card.Footer>
+          </Modal.Section>
+          <Modal.Footer>
             {!isCreating ? (
               <Button variant="plain" onClick={handleRemove}>
                 Remove
@@ -201,8 +205,8 @@ export function AssignmentsPage() {
             <Button variant="primary" onClick={handleSave} disabled={saving}>
               {saving ? 'Saving…' : 'Save'}
             </Button>
-          </Card.Footer>
-        </Card>
+          </Modal.Footer>
+        </Modal>
       ) : null}
     </div>
   );

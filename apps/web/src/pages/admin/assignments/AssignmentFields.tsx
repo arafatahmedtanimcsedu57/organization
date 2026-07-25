@@ -1,10 +1,10 @@
-import { POSITION_RANK } from '@org-chart/domain';
 import { FIELD, FIELD_ERR, INPUT, LABEL, TWO } from '../../../design/formStyles';
 import { optionList } from '../../../design/optionList';
 import type { AssignmentType } from '../../../store/api/assignmentsApi';
 import type { Department } from '../../../store/api/departmentsApi';
 import type { Employee } from '../../../store/api/employeesApi';
 import { errorMessage } from '../../../store/api/errorMessage';
+import { TitleSelect } from '../../chart/topdown/editor/TitleSelect';
 import type { FieldErrors } from '../useEditorPanel';
 import type { AssignmentFormState } from './assignmentForm';
 
@@ -71,7 +71,7 @@ export function AssignmentFields({
             className={INPUT}
             value={form.departmentId}
             disabled={!isCreating}
-            onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
+            onChange={(event) => setForm({ ...form, departmentId: event.target.value, titleId: '' })}
           >
             <option value="" disabled>
               Select a department…
@@ -96,20 +96,14 @@ export function AssignmentFields({
         <label className={LABEL} htmlFor="asn-title">
           Title in this department 役職
         </label>
-        <input
+        <TitleSelect
           id="asn-title"
-          className={INPUT}
-          list="position-ranks"
-          value={form.title}
-          onChange={(event) => setForm({ ...form, title: event.target.value })}
+          departmentId={form.departmentId}
+          value={form.titleId}
+          onChange={(titleId) => setForm({ ...form, titleId })}
         />
-        <datalist id="position-ranks">
-          {POSITION_RANK.map((rank) => (
-            <option key={rank} value={rank} />
-          ))}
-        </datalist>
-        {attemptedSave && fieldErrors.title ? (
-          <div className={FIELD_ERR}>{fieldErrors.title}</div>
+        {attemptedSave && fieldErrors.titleId ? (
+          <div className={FIELD_ERR}>{fieldErrors.titleId}</div>
         ) : null}
       </div>
 

@@ -13,6 +13,9 @@ export type { BannerProps, BannerTone } from './Banner';
 export { Card } from './Card';
 export type { CardProps, CardHeaderProps } from './Card';
 
+export { Modal } from './Modal';
+export type { ModalProps } from './Modal';
+
 export { IndexTable, IndexTableFooter } from './IndexTable';
 export type { IndexTableProps, IndexTableColumn, IndexTableFooterProps } from './IndexTable';
 

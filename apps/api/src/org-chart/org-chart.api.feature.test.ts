@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Module } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import request from 'supertest';
 import { afterAll, beforeAll, test } from 'vitest';
@@ -18,6 +19,9 @@ import type { ChartNode } from './chart-node.ts';
 /** Minimal Nest app: real TypeORM against the ephemeral test Postgres + the real `org-chart` HTTP routes. */
 @Module({
   imports: [
+    // OrgChartService reads `import.lang`; supply it without the real configuration()
+    // (which mandates DATABASE_URL). The test fixtures are Japanese, so lang = 'ja'.
+    ConfigModule.forRoot({ isGlobal: true, load: [() => ({ import: { lang: 'ja' } })] }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.TEST_DATABASE_URL,

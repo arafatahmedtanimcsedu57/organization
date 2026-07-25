@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Assignment } from './assignment.entity.ts';
 import { Department } from '../departments/department.entity.ts';
+import { DepartmentTitle } from '../departments/department-title.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import type { CreateAssignmentDto } from './dto/create-assignment.dto.ts';
 import type { UpdateAssignmentDto } from './dto/update-assignment.dto.ts';
 
@@ -14,6 +16,8 @@ export class AssignmentsService {
     @InjectRepository(Assignment) private readonly assignmentRepo: Repository<Assignment>,
     @InjectRepository(Employee) private readonly employeeRepo: Repository<Employee>,
     @InjectRepository(Department) private readonly departmentRepo: Repository<Department>,
+    @InjectRepository(Title) private readonly titleRepo: Repository<Title>,
+    @InjectRepository(DepartmentTitle) private readonly departmentTitleRepo: Repository<DepartmentTitle>,
   ) {}
 
   findAll(): Promise<Assignment[]> {
@@ -31,6 +35,7 @@ export class AssignmentsService {
   async create(dto: CreateAssignmentDto): Promise<Assignment> {
     await this.assertEmployeeExists(dto.employeeSysId);
     await this.assertDepartmentExists(dto.departmentId);
+    const title = await this.resolveDepartmentTitle(dto.titleId, dto.departmentId);
     const isPrimary = dto.isPrimary ?? false;
     if (isPrimary) {
       await this.assertNoExistingPrimary(dto.employeeSysId);
@@ -39,7 +44,8 @@ export class AssignmentsService {
     const assignment = this.assignmentRepo.create({
       employeeSysId: dto.employeeSysId,
       departmentId: dto.departmentId,
-      title: dto.title,
+      title: title.name,
+      titleId: title.id,
       assignmentType: dto.assignmentType,
       isPrimary,
       validFrom: dto.validFrom ?? null,
@@ -53,7 +59,15 @@ export class AssignmentsService {
     if (dto.isPrimary && !assignment.isPrimary) {
       await this.assertNoExistingPrimary(assignment.employeeSysId, id);
     }
-    Object.assign(assignment, dto);
+    if (dto.titleId !== undefined) {
+      const title = await this.resolveDepartmentTitle(dto.titleId, assignment.departmentId);
+      assignment.titleId = title.id;
+      assignment.title = title.name;
+    }
+    if (dto.assignmentType !== undefined) assignment.assignmentType = dto.assignmentType;
+    if (dto.isPrimary !== undefined) assignment.isPrimary = dto.isPrimary;
+    if (dto.validFrom !== undefined) assignment.validFrom = dto.validFrom;
+    if (dto.validTo !== undefined) assignment.validTo = dto.validTo;
     return this.assignmentRepo.save(assignment);
   }
 
@@ -74,6 +88,19 @@ export class AssignmentsService {
     if (!department) {
       throw new BadRequestException(`Department ${departmentId} does not exist`);
     }
+  }
+
+  /** A 兼務 posting's title must be an active title assigned to the *target* department. */
+  private async resolveDepartmentTitle(titleId: string, departmentId: string): Promise<Title> {
+    const title = await this.titleRepo.findOne({ where: { id: titleId } });
+    if (!title || !title.active) {
+      throw new BadRequestException(`Title "${titleId}" does not exist or is inactive`);
+    }
+    const link = await this.departmentTitleRepo.findOne({ where: { departmentId, titleId } });
+    if (!link) {
+      throw new BadRequestException(`Title "${title.name}" is not assigned to department ${departmentId}`);
+    }
+    return title;
   }
 
   /** `concurrent-duties` spec: exactly one posting per person may be flagged primary. */

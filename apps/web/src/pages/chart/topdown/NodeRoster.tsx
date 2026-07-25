@@ -69,7 +69,7 @@ export function NodeRoster({
           onClick={onExpand}
           className="h-[22px] flex items-center text-[11px] font-semibold text-brand hover:text-brand-dark"
         >
-          ＋{hiddenGroupMembers} 役職者を表示
+          ＋ {hiddenGroupMembers} 役職者を表示
         </button>
       ) : null}
 
@@ -89,7 +89,7 @@ export function NodeRoster({
           <span className={`${TITLE_CELL} text-left`}>課員</span>
           <span className="font-mono text-[11px] text-muted">×{node.staff.length}</span>
           {node.staff.some((member) => member.concurrent) ? (
-            <span className="kenmu-mark text-[10.5px] font-bold text-brand-dark">兼</span>
+            <span className="kenmu-mark text-[10.5px] font-bold text-brand-dark">( 兼 )</span>
           ) : null}
         </button>
       ) : null}

@@ -2,15 +2,19 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 
 import type { ObjectLiteral, Repository } from 'typeorm';
+import { CANONICAL_TITLES, findTitleByLabel } from '@org-chart/domain';
 import { Department } from '../departments/department.entity.ts';
+import { DepartmentTitle } from '../departments/department-title.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 import { EmployeesService } from '../employees/employees.service.ts';
 import { DepartmentsService } from '../departments/departments.service.ts';
 import { OrgChartService } from './org-chart.service.ts';
 import { OrgChartController } from './org-chart.controller.ts';
 import type { ChartPdfService } from './chart-pdf.service.ts';
 import type { ChartNode } from './chart-node.ts';
+import { fakeConfigService } from '../test/fake-config.ts';
 
 /**
  * Minimal in-memory stand-in for the slice of `Repository<T>` the
@@ -31,12 +35,16 @@ function fakeMutableRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
     },
     findOne: async (options: { where: Partial<T> }) => {
       const entries = Object.entries(options.where);
-      return rows.find((row) => entries.every(([key, value]) => asRecord(row)[key] === value)) ?? null;
+      return (
+        rows.find((row) => entries.every(([key, value]) => asRecord(row)[key] === value)) ?? null
+      );
     },
     create: (partial: Partial<T>) => ({ ...partial }) as T,
     save: async (entity: T) => {
       const index = rows.findIndex(
-        (row) => asRecord(row).sysId === asRecord(entity).sysId || asRecord(row).id === asRecord(entity).id,
+        (row) =>
+          asRecord(row).sysId === asRecord(entity).sysId ||
+          asRecord(row).id === asRecord(entity).id,
       );
       if (index === -1) {
         rows.push(entity);
@@ -49,16 +57,23 @@ function fakeMutableRepo<T extends ObjectLiteral>(rows: T[]): Repository<T> {
 }
 
 function dept(id: string, name: string, parentName: string): Department {
-  return { id, name, parentName, head: '', sysId: id, active: true };
+  return { id, name, parentName, head: '', headSysId: null, sysId: id, active: true };
 }
 
-function emp(sysId: string, lastName: string, firstName: string, title: string, departmentId: string): Employee {
+function emp(
+  sysId: string,
+  lastName: string,
+  firstName: string,
+  title: string,
+  departmentId: string,
+): Employee {
   return {
     sysId,
     userId: sysId,
     lastName,
     firstName,
     title,
+    titleId: findTitleByLabel(CANONICAL_TITLES, title)?.id ?? null,
     departmentId,
     department: undefined as unknown as Department,
     active: true,
@@ -78,14 +93,27 @@ function buildHarness() {
   const departments = [dept('1', '営業本部', ''), dept('2', 'システム事業部', '')];
   const employees = [emp('e1', '山田', '太郎', '課長', '1')];
   const assignments: Assignment[] = [];
+  const titles = CANONICAL_TITLES as unknown as Title[];
+  // Both departments may use every title, so any edit passes the "assigned" check.
+  const departmentTitles = ['1', '2'].flatMap((departmentId) =>
+    CANONICAL_TITLES.map((t) => ({ departmentId, titleId: t.id })),
+  ) as unknown as DepartmentTitle[];
 
   const departmentRepo = fakeMutableRepo(departments);
   const employeeRepo = fakeMutableRepo(employees);
   const assignmentRepo = fakeMutableRepo(assignments);
+  const titleRepo = fakeMutableRepo(titles);
+  const departmentTitleRepo = fakeMutableRepo(departmentTitles);
 
-  const employeesService = new EmployeesService(employeeRepo, departmentRepo);
+  const employeesService = new EmployeesService(employeeRepo, departmentRepo, titleRepo, departmentTitleRepo);
   const departmentsService = new DepartmentsService(departmentRepo);
-  const orgChartService = new OrgChartService(departmentRepo, employeeRepo, assignmentRepo);
+  const orgChartService = new OrgChartService(
+    departmentRepo,
+    employeeRepo,
+    assignmentRepo,
+    titleRepo,
+    fakeConfigService(),
+  );
   const orgChartController = new OrgChartController(orgChartService, {} as ChartPdfService);
 
   return { employeesService, departmentsService, orgChartController };
@@ -98,12 +126,15 @@ test('editing an employee (title/department) is reflected the next time the char
   const eigyouBefore = findNode(before.roots, '営業本部');
   assert.equal(eigyouBefore?.managers.find((m) => m.sysId === 'e1')?.title, '課長');
 
-  await employeesService.update('e1', { title: '部長', departmentId: '2' });
+  await employeesService.update('e1', { titleId: 'general-manager', departmentId: '2' });
 
   const after = await orgChartController.getChart();
   const eigyouAfter = findNode(after.roots, '営業本部');
   const systemAfter = findNode(after.roots, 'システム事業部');
-  assert.equal(eigyouAfter?.managers.find((m) => m.sysId === 'e1'), undefined);
+  assert.equal(
+    eigyouAfter?.managers.find((m) => m.sysId === 'e1'),
+    undefined,
+  );
   assert.equal(systemAfter?.managers.find((m) => m.sysId === 'e1')?.title, '部長');
 });
 
@@ -114,7 +145,10 @@ test('deactivating an employee removes them from the chart but keeps the record 
 
   const chart = await orgChartController.getChart();
   const eigyou = findNode(chart.roots, '営業本部');
-  assert.equal(eigyou?.managers.find((m) => m.sysId === 'e1'), undefined);
+  assert.equal(
+    eigyou?.managers.find((m) => m.sysId === 'e1'),
+    undefined,
+  );
 
   const stillStored = await employeesService.findOne('e1');
   assert.equal(stillStored.active, false);

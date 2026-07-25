@@ -1,0 +1,592 @@
+{
+  "titles": {
+    "代表取締役": "Representative Director",
+    "本部長": "Division Manager",
+    "事業部長": "Business Unit Manager",
+    "部長": "General Manager",
+    "課長": "Manager",
+    "担当課長": "Deputy Manager",
+    "主任": "Chief",
+    "主任2": "Senior Chief",
+    "課員": "Employee"
+  },
+  "departments": {
+    "24500": {
+      "_ja": "ITサポート事業部",
+      "name": "IT Support Division",
+      "head": "Kuniyoshi Terunuma"
+    },
+    "24510": {
+      "_ja": "ITサポート事業部 購買調達部",
+      "name": "IT Support Division – Purchasing & Procurement Dept.",
+      "head": "Kuniyoshi Terunuma"
+    },
+    "24350": {
+      "_ja": "SW開発課",
+      "name": "Software Development Section",
+      "head": "Masayasu Nishizawa"
+    },
+    "24351": {
+      "_ja": "SW開発課 1G",
+      "name": "Software Development Section – Group 1",
+      "head": "Riko Chanoki"
+    },
+    "24353": {
+      "_ja": "SW開発課 2G",
+      "name": "Software Development Section – Group 2",
+      "head": "Takahiro Onishi"
+    },
+    "24355": {
+      "_ja": "SW開発課 3G",
+      "name": "Software Development Section – Group 3",
+      "head": "Tomoya Kenmochi"
+    },
+    "24357": {
+      "_ja": "SW開発課 4G",
+      "name": "Software Development Section – Group 4",
+      "head": "Kohei Shido"
+    },
+    "24300": {
+      "_ja": "システム事業部",
+      "name": "System Division",
+      "head": "Koichi Sato"
+    },
+    "24330": {
+      "_ja": "システム課",
+      "name": "System Section",
+      "head": "Satoshi Arita"
+    },
+    "24110": {
+      "_ja": "ソリューション営業部 1課",
+      "name": "Solution Sales Dept. – Section 1",
+      "head": "Keisuke Hamai"
+    },
+    "24111": {
+      "_ja": "ソリューション営業部 1課1G",
+      "name": "Solution Sales Dept. – Section 1 Group 1",
+      "head": "Keisuke Hamai"
+    },
+    "24113": {
+      "_ja": "ソリューション営業部 1課2G",
+      "name": "Solution Sales Dept. – Section 1 Group 2",
+      "head": "Sho Shimajiri"
+    },
+    "24130": {
+      "_ja": "ソリューション営業部 2課",
+      "name": "Solution Sales Dept. – Section 2",
+      "head": "Shinya Yamada"
+    },
+    "24131": {
+      "_ja": "ソリューション営業部 2課1G",
+      "name": "Solution Sales Dept. – Section 2 Group 1",
+      "head": "Kentaro Ito"
+    },
+    "24133": {
+      "_ja": "ソリューション営業部 2課2G",
+      "name": "Solution Sales Dept. – Section 2 Group 2",
+      "head": "Naoya Hayashida"
+    },
+    "24100": {
+      "_ja": "営業本部",
+      "name": "Sales Division",
+      "head": "Yuichiro Sato"
+    },
+    "24103": {
+      "_ja": "営業本部　業務課",
+      "name": "Sales Division – Operations Section",
+      "head": "Yuichiro Sato"
+    },
+    "24101": {
+      "_ja": "営業本部（介護）",
+      "name": "Sales Division – Nursing Care",
+      "head": "Yuichiro Sato"
+    },
+    "24310": {
+      "_ja": "研究開発課",
+      "name": "Research & Development Section",
+      "head": "Shinichi Hiramoto"
+    },
+    "24900": {
+      "_ja": "管理部",
+      "name": "Management Department",
+      "head": "Mikiya Horochi"
+    }
+  },
+  "people": {
+    "2f2ad356c3268e1043a51c777a0131aa": {
+      "_ja": "佐藤 曠弌",
+      "lastName": "Sato",
+      "firstName": "Koichi"
+    },
+    "e9275f28c3e842109af532011501311b": {
+      "_ja": "照沼 邦義",
+      "lastName": "Terunuma",
+      "firstName": "Kuniyoshi"
+    },
+    "fdf388d5c3b106109af5320115013183": {
+      "_ja": "小川 薫",
+      "lastName": "Ogawa",
+      "firstName": "Kaoru"
+    },
+    "2b544019c3b106109af53201150131a7": {
+      "_ja": "楠瀬 文彦",
+      "lastName": "Kusunose",
+      "firstName": "Fumihiko"
+    },
+    "67944019c3b106109af5320115013136": {
+      "_ja": "中嶋 渉",
+      "lastName": "Nakajima",
+      "firstName": "Wataru"
+    },
+    "c1c40819c3b106109af5320115013198": {
+      "_ja": "最上 崇治",
+      "lastName": "Mogami",
+      "firstName": "Takaharu"
+    },
+    "85054819c3b106109af53201150131d0": {
+      "_ja": "土田 晋右",
+      "lastName": "Tsuchida",
+      "firstName": "Shinsuke"
+    },
+    "fcffb616c3e28e1043a51c777a013175": {
+      "_ja": "鈴木 智之",
+      "lastName": "Suzuki",
+      "firstName": "Tomoyuki"
+    },
+    "9e4894afc3e00a10e2c5d1e01501313b": {
+      "_ja": "澤田 寿和",
+      "lastName": "Sawada",
+      "firstName": "Toshikazu"
+    },
+    "49260459c3b106109af5320115013126": {
+      "_ja": "大平 邦治",
+      "lastName": "Ohira",
+      "firstName": "Kuniharu"
+    },
+    "1f7095dd47fd0610d1f9cc39116d4367": {
+      "_ja": "中島 眞澄",
+      "lastName": "Nakajima",
+      "firstName": "Masumi"
+    },
+    "5d611ddd47fd0610d1f9cc39116d43bc": {
+      "_ja": "市川 哲夫",
+      "lastName": "Ichikawa",
+      "firstName": "Tetsuo"
+    },
+    "f381d11147314610d1f9cc39116d4334": {
+      "_ja": "田﨑 智幸",
+      "lastName": "Tazaki",
+      "firstName": "Tomoyuki"
+    },
+    "a262d51147314610d1f9cc39116d439d": {
+      "_ja": "剣持 知也",
+      "lastName": "Kenmochi",
+      "firstName": "Tomoya"
+    },
+    "3ca2dd1147314610d1f9cc39116d4328": {
+      "_ja": "日高 亮太",
+      "lastName": "Hidaka",
+      "firstName": "Ryota"
+    },
+    "8cd29d1147314610d1f9cc39116d43f9": {
+      "_ja": "神宮 知宏",
+      "lastName": "Jingu",
+      "firstName": "Tomohiro"
+    },
+    "4df2151147314610d1f9cc39116d438f": {
+      "_ja": "大西 隆洋",
+      "lastName": "Onishi",
+      "firstName": "Takahiro"
+    },
+    "8613d91147314610d1f9cc39116d4370": {
+      "_ja": "楠 仁",
+      "lastName": "Kusunoki",
+      "firstName": "Hitoshi"
+    },
+    "8953595147314610d1f9cc39116d43b2": {
+      "_ja": "辻本 和晋",
+      "lastName": "Tsujimoto",
+      "firstName": "Kazunobu"
+    },
+    "c683995147314610d1f9cc39116d43e0": {
+      "_ja": "菊池 智行",
+      "lastName": "Kikuchi",
+      "firstName": "Tomoyuki"
+    },
+    "0db3119147314610d1f9cc39116d435e": {
+      "_ja": "濱中 英樹",
+      "lastName": "Hamanaka",
+      "firstName": "Hideki"
+    },
+    "139595d147314610d1f9cc39116d4399": {
+      "_ja": "滝川 佳奈子",
+      "lastName": "Takigawa",
+      "firstName": "Kanako"
+    },
+    "2fe511d147314610d1f9cc39116d432d": {
+      "_ja": "松澤 謙一",
+      "lastName": "Matsuzawa",
+      "firstName": "Kenichi"
+    },
+    "374699d147314610d1f9cc39116d4399": {
+      "_ja": "平本 真一",
+      "lastName": "Hiramoto",
+      "firstName": "Shinichi"
+    },
+    "e5969dd147314610d1f9cc39116d43c7": {
+      "_ja": "西澤 正泰",
+      "lastName": "Nishizawa",
+      "firstName": "Masayasu"
+    },
+    "7de69dd147314610d1f9cc39116d4368": {
+      "_ja": "相武 拓也",
+      "lastName": "Aibu",
+      "firstName": "Takuya"
+    },
+    "f417511547314610d1f9cc39116d43ce": {
+      "_ja": "甲斐 晋之亮",
+      "lastName": "Kai",
+      "firstName": "Shinnosuke"
+    },
+    "9637591547314610d1f9cc39116d439a": {
+      "_ja": "宮島 敬太郎",
+      "lastName": "Miyajima",
+      "firstName": "Keitaro"
+    },
+    "e467591547314610d1f9cc39116d4362": {
+      "_ja": "市田 賢次郎",
+      "lastName": "Ichida",
+      "firstName": "Kenjiro"
+    },
+    "6587191547314610d1f9cc39116d4304": {
+      "_ja": "伊藤 亮",
+      "lastName": "Ito",
+      "firstName": "Ryo"
+    },
+    "947e8b3cc3e082109af53201150131b7": {
+      "_ja": "島尻 翔",
+      "lastName": "Shimajiri",
+      "firstName": "Sho"
+    },
+    "9e7a67e9c3da821043a51c777a01310c": {
+      "_ja": "有賀 大祐",
+      "lastName": "Aruga",
+      "firstName": "Daisuke"
+    },
+    "c6dd276dc3da821043a51c777a013199": {
+      "_ja": "高畑 直輝",
+      "lastName": "Takahata",
+      "firstName": "Naoki"
+    },
+    "b30e276dc3da821043a51c777a0131b5": {
+      "_ja": "高山 美帆",
+      "lastName": "Takayama",
+      "firstName": "Miho"
+    },
+    "63ce63adc3da821043a51c777a0131f4": {
+      "_ja": "森 亮太",
+      "lastName": "Mori",
+      "firstName": "Ryota"
+    },
+    "1a2f676dc3da821043a51c777a0131d1": {
+      "_ja": "吉若 公康",
+      "lastName": "Yoshiwaka",
+      "firstName": "Kimiyasu"
+    },
+    "7c41d77cc3e082109af53201150131d6": {
+      "_ja": "小池 祥平",
+      "lastName": "Koike",
+      "firstName": "Shohei"
+    },
+    "1cff6badc3da821043a51c777a0131b7": {
+      "_ja": "穴沢 翔平",
+      "lastName": "Anazawa",
+      "firstName": "Shohei"
+    },
+    "7e203fadc3da821043a51c777a0131fb": {
+      "_ja": "蟻田 智史",
+      "lastName": "Arita",
+      "firstName": "Satoshi"
+    },
+    "7f40f3edc3da821043a51c777a013170": {
+      "_ja": "下村 愛",
+      "lastName": "Shimomura",
+      "firstName": "Ai"
+    },
+    "07c033edc3da821043a51c777a0131f5": {
+      "_ja": "志藤 浩平",
+      "lastName": "Shido",
+      "firstName": "Kohei"
+    },
+    "0611f3edc3da821043a51c777a013119": {
+      "_ja": "茶之木 理子",
+      "lastName": "Chanoki",
+      "firstName": "Riko"
+    },
+    "e54173edc3da821043a51c777a013172": {
+      "_ja": "薗田 諒",
+      "lastName": "Sonoda",
+      "firstName": "Ryo"
+    },
+    "116133edc3da821043a51c777a0131ef": {
+      "_ja": "鈴木 秀尚",
+      "lastName": "Suzuki",
+      "firstName": "Hidetaka"
+    },
+    "c1913bedc3da821043a51c777a013156": {
+      "_ja": "玉塚 俊平",
+      "lastName": "Tamatsuka",
+      "firstName": "Shunpei"
+    },
+    "bbb13bedc3da821043a51c777a013159": {
+      "_ja": "柴田 つぐみ",
+      "lastName": "Shibata",
+      "firstName": "Tsugumi"
+    },
+    "33e1f321c31e821043a51c777a01319b": {
+      "_ja": "出店 葉子",
+      "lastName": "Idemise",
+      "firstName": "Yoko"
+    },
+    "a112b7edc3da821043a51c777a013109": {
+      "_ja": "出口 敬康",
+      "lastName": "Deguchi",
+      "firstName": "Takayasu"
+    },
+    "1532b321c31e821043a51c777a01314c": {
+      "_ja": "山本 皓太",
+      "lastName": "Yamamoto",
+      "firstName": "Kota"
+    },
+    "0a527321c31e821043a51c777a0131d8": {
+      "_ja": "山本 洸太",
+      "lastName": "Yamamoto",
+      "firstName": "Kohta"
+    },
+    "de461728c3e842109af53201150131e4": {
+      "_ja": "佐藤 悠一郎",
+      "lastName": "Sato",
+      "firstName": "Yuichiro"
+    },
+    "29a23f21c31e821043a51c777a01318c": {
+      "_ja": "石戸 孝典",
+      "lastName": "Ishido",
+      "firstName": "Takanori"
+    },
+    "14e95faac3254e109af53201150131a3": {
+      "_ja": "細根 圭佑",
+      "lastName": "Hosone",
+      "firstName": "Keisuke"
+    },
+    "97a3b761c31e821043a51c777a0131b2": {
+      "_ja": "松川 慧",
+      "lastName": "Matsukawa",
+      "firstName": "Kei"
+    },
+    "f3c33b61c31e821043a51c777a0131a4": {
+      "_ja": "レ　ウ ウェイ",
+      "lastName": "Le",
+      "firstName": "Wei"
+    },
+    "32e33b61c31e821043a51c777a013167": {
+      "_ja": "阿部 千明",
+      "lastName": "Abe",
+      "firstName": "Chiaki"
+    },
+    "5b14fb61c31e821043a51c777a0131fd": {
+      "_ja": "笠見 周平",
+      "lastName": "Kasami",
+      "firstName": "Shuhei"
+    },
+    "41475b28c3e842109af53201150131fe": {
+      "_ja": "林田 直也",
+      "lastName": "Hayashida",
+      "firstName": "Naoya"
+    },
+    "ff547f61c31e821043a51c777a013136": {
+      "_ja": "田母神 彩圭",
+      "lastName": "Tamogami",
+      "firstName": "Ayaka"
+    },
+    "fa74b761c31e821043a51c777a013189": {
+      "_ja": "渡部 健太",
+      "lastName": "Watanabe",
+      "firstName": "Kenta"
+    },
+    "3c94bf61c31e821043a51c777a0131e6": {
+      "_ja": "浅子 健人",
+      "lastName": "Asako",
+      "firstName": "Kento"
+    },
+    "5ab4f761c31e821043a51c777a013145": {
+      "_ja": "加藤 健太",
+      "lastName": "Kato",
+      "firstName": "Kenta"
+    },
+    "17525bfcc3e082109af5320115013104": {
+      "_ja": "山田 真也",
+      "lastName": "Yamada",
+      "firstName": "Shinya"
+    },
+    "12f473a1c31e821043a51c777a013182": {
+      "_ja": "高野 達也",
+      "lastName": "Takano",
+      "firstName": "Tatsuya"
+    },
+    "31153f61c31e821043a51c777a013146": {
+      "_ja": "後小路 悠彦",
+      "lastName": "Goshoji",
+      "firstName": "Yukihiko"
+    },
+    "04357f61c31e821043a51c777a01310b": {
+      "_ja": "荻野 雄大",
+      "lastName": "Ogino",
+      "firstName": "Yudai"
+    },
+    "0c657ba1c31e821043a51c777a0131fc": {
+      "_ja": "堀田 瑞貴",
+      "lastName": "Hotta",
+      "firstName": "Mizuki"
+    },
+    "8c8533a1c31e821043a51c777a013102": {
+      "_ja": "斉藤 玲乃",
+      "lastName": "Saito",
+      "firstName": "Reno"
+    },
+    "50325bfcc3e082109af5320115013100": {
+      "_ja": "濱井 啓介",
+      "lastName": "Hamai",
+      "firstName": "Keisuke"
+    },
+    "c1b5fba1c31e821043a51c777a0131ef": {
+      "_ja": "飯沼 喜章",
+      "lastName": "Iinuma",
+      "firstName": "Yoshiaki"
+    },
+    "6fe533e1c31e821043a51c777a013127": {
+      "_ja": "小長井 素賢",
+      "lastName": "Konagai",
+      "firstName": "Motoyoshi"
+    },
+    "8706bfa1c31e821043a51c777a0131fe": {
+      "_ja": "酒井 亮太",
+      "lastName": "Sakai",
+      "firstName": "Ryota"
+    },
+    "343633e1c31e821043a51c777a01310a": {
+      "_ja": "桃井 陽佑",
+      "lastName": "Momoi",
+      "firstName": "Yosuke"
+    },
+    "a45677e1c31e821043a51c777a013102": {
+      "_ja": "大西 拓",
+      "lastName": "Onishi",
+      "firstName": "Taku"
+    },
+    "ba66b7e1c31e821043a51c777a013113": {
+      "_ja": "山本 祥恵",
+      "lastName": "Yamamoto",
+      "firstName": "Sachie"
+    },
+    "f586f7e1c31e821043a51c777a01317c": {
+      "_ja": "河井 望実",
+      "lastName": "Kawai",
+      "firstName": "Nozomi"
+    },
+    "d915dca4c37c4a109af532011501311a": {
+      "_ja": "井川 尚紀",
+      "lastName": "Igawa",
+      "firstName": "Naoki"
+    },
+    "d8c677e1c31e821043a51c777a0131fc": {
+      "_ja": "鈴木 和司",
+      "lastName": "Suzuki",
+      "firstName": "Kazushi"
+    },
+    "e3d677e1c31e821043a51c777a0131e0": {
+      "_ja": "池田 桐麻",
+      "lastName": "Ikeda",
+      "firstName": "Kirima"
+    },
+    "66073fe1c31e821043a51c777a01315a": {
+      "_ja": "長友 凌也",
+      "lastName": "Nagatomo",
+      "firstName": "Ryoya"
+    },
+    "13273fe1c31e821043a51c777a0131e3": {
+      "_ja": "梅田 啓吾",
+      "lastName": "Umeda",
+      "firstName": "Keigo"
+    },
+    "ad57bfe1c31e821043a51c777a0131a3": {
+      "_ja": "加藤 優佑",
+      "lastName": "Kato",
+      "firstName": "Yusuke"
+    },
+    "e377bfe1c31e821043a51c777a013190": {
+      "_ja": "土屋 諒",
+      "lastName": "Tsuchiya",
+      "firstName": "Ryo"
+    },
+    "ae6297fcc3e082109af5320115013102": {
+      "_ja": "増田 隆平",
+      "lastName": "Masuda",
+      "firstName": "Ryuhei"
+    },
+    "71c73725c31e821043a51c777a01315e": {
+      "_ja": "三宅 智規",
+      "lastName": "Miyake",
+      "firstName": "Tomonori"
+    },
+    "55e7fbe1c31e821043a51c777a013111": {
+      "_ja": "山下 洋輔",
+      "lastName": "Yamashita",
+      "firstName": "Yosuke"
+    },
+    "36083725c31e821043a51c777a013164": {
+      "_ja": "浅田 翔一朗",
+      "lastName": "Asada",
+      "firstName": "Shoichiro"
+    },
+    "afae4f3cc3e082109af5320115013153": {
+      "_ja": "佐藤 晃",
+      "lastName": "Sato",
+      "firstName": "Akira"
+    },
+    "9648f725c31e821043a51c777a0131d1": {
+      "_ja": "木寺 優水",
+      "lastName": "Kidera",
+      "firstName": "Yusui"
+    },
+    "c488ffe1c31e821043a51c777a0131bc": {
+      "_ja": "浦上 詩織",
+      "lastName": "Uragami",
+      "firstName": "Shiori"
+    },
+    "4582dbfcc3e082109af53201150131dd": {
+      "_ja": "伊東 健太郎",
+      "lastName": "Ito",
+      "firstName": "Kentaro"
+    },
+    "e1e87b25c31e821043a51c777a013102": {
+      "_ja": "袰地 幹也",
+      "lastName": "Horochi",
+      "firstName": "Mikiya"
+    },
+    "4709b365c31e821043a51c777a013136": {
+      "_ja": "横田 克昂",
+      "lastName": "Yokota",
+      "firstName": "Katsuaki"
+    },
+    "2e293365c31e821043a51c777a0131e6": {
+      "_ja": "小林 真央",
+      "lastName": "Kobayashi",
+      "firstName": "Mao"
+    },
+    "91497f25c31e821043a51c777a01314a": {
+      "_ja": "塚本 晴佳",
+      "lastName": "Tsukamoto",
+      "firstName": "Haruka"
+    }
+  }
+}

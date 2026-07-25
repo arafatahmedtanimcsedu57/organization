@@ -4,6 +4,7 @@ import { chartApi } from './api/chartApi';
 import { employeesApi } from './api/employeesApi';
 import { departmentsApi } from './api/departmentsApi';
 import { assignmentsApi } from './api/assignmentsApi';
+import { titlesApi } from './api/titlesApi';
 import { historyApi } from './api/historyApi';
 
 /** Server state only: every `packages/domain`-shaped resource is fetched/cached/invalidated
@@ -14,6 +15,7 @@ export const store = configureStore({
     [employeesApi.reducerPath]: employeesApi.reducer,
     [departmentsApi.reducerPath]: departmentsApi.reducer,
     [assignmentsApi.reducerPath]: assignmentsApi.reducer,
+    [titlesApi.reducerPath]: titlesApi.reducer,
     [historyApi.reducerPath]: historyApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -22,6 +24,7 @@ export const store = configureStore({
       employeesApi.middleware,
       departmentsApi.middleware,
       assignmentsApi.middleware,
+      titlesApi.middleware,
       historyApi.middleware,
     ),
 });

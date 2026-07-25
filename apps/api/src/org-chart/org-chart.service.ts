@@ -1,18 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   buildDepartmentTree,
   placeAssignments,
   placeEmployees,
+  resolveDepartmentHeads,
   type Assignment as AssignmentRow,
   type Department as DepartmentRow,
   type Employee as EmployeeRow,
   type OrgModel,
+  type Title as TitleRow,
 } from '@org-chart/domain';
+import type { AppConfig } from '../config/configuration.ts';
 import { Department } from '../departments/department.entity.ts';
 import { Employee } from '../employees/employee.entity.ts';
 import { Assignment } from '../assignments/assignment.entity.ts';
+import { Title } from '../titles/title.entity.ts';
 
 /**
  * `org-chart` capability: loads active departments/employees/assignments from
@@ -25,13 +30,17 @@ export class OrgChartService {
     @InjectRepository(Department) private readonly departmentRepo: Repository<Department>,
     @InjectRepository(Employee) private readonly employeeRepo: Repository<Employee>,
     @InjectRepository(Assignment) private readonly assignmentRepo: Repository<Assignment>,
+    @InjectRepository(Title) private readonly titleRepo: Repository<Title>,
+    private readonly config: ConfigService<AppConfig, true>,
   ) {}
 
   async buildOrgModel(): Promise<OrgModel> {
-    const [departments, employees, assignments] = await Promise.all([
+    const [departments, employees, assignments, titles] = await Promise.all([
       this.departmentRepo.find({ where: { active: true } }),
       this.employeeRepo.find({ where: { active: true } }),
       this.assignmentRepo.find(),
+      // All titles (incl. deactivated) so existing postings still resolve their rank.
+      this.titleRepo.find(),
     ]);
 
     const departmentNameById = new Map(departments.map((d) => [d.id, d.name]));
@@ -41,6 +50,7 @@ export class OrgChartService {
       name: d.name,
       parentName: d.parentName,
       head: d.head,
+      headSysId: d.headSysId ?? undefined,
       sysId: d.sysId,
     }));
 
@@ -56,6 +66,7 @@ export class OrgChartService {
           lastName: e.lastName,
           firstName: e.firstName,
           title: e.title,
+          titleId: e.titleId ?? '',
           departmentName,
         },
       ];
@@ -65,16 +76,32 @@ export class OrgChartService {
       employeeSysId: a.employeeSysId,
       departmentId: a.departmentId,
       title: a.title,
+      titleId: a.titleId ?? '',
       type: a.assignmentType,
     }));
 
+    const titleRows: TitleRow[] = titles.map((t) => ({
+      id: t.id,
+      name: t.name,
+      nameEn: t.nameEn,
+      rank: t.rank,
+      staffLevel: t.staffLevel,
+      active: t.active,
+    }));
+
+    // The DB holds strings in whichever language was seeded; `lang` steers the
+    // display label (JA vs EN) and the display-name overrides.
+    const lang = this.config.get('import.lang', { infer: true });
     const tree = buildDepartmentTree(departmentRows);
-    const memberWarnings = placeEmployees(tree, employeeRows);
-    const assignmentWarnings = placeAssignments(tree, employeeRows, assignmentRows);
+    const memberWarnings = placeEmployees(tree, employeeRows, titleRows, lang);
+    const assignmentWarnings = placeAssignments(tree, employeeRows, assignmentRows, titleRows, lang);
+    // After rosters are placed/ranked, resolve each head from its Sys ID
+    // (falling back to the top-ranked member) - see resolveDepartmentHeads.
+    const headWarnings = resolveDepartmentHeads(tree, employeeRows);
 
     return {
       roots: tree.roots,
-      warnings: [...tree.warnings, ...memberWarnings, ...assignmentWarnings],
+      warnings: [...tree.warnings, ...memberWarnings, ...assignmentWarnings, ...headWarnings],
       stats: {
         departments: departmentRows.length,
         peoplePlaced: employeeRows.length,

@@ -67,6 +67,7 @@ export class UpsertMastersService {
           lastName: r.lastName,
           firstName: r.firstName,
           title: r.title,
+          titleId: r.titleId || null,
           departmentId,
           active: true,
         }),
@@ -76,5 +77,35 @@ export class UpsertMastersService {
     const inserted = resolved.filter((e) => !existingIds.has(e.sysId)).length;
     const warnings = findUnmatchedDepartmentWarnings(rows, departmentIdByName);
     return { inserted, updated: resolved.length - inserted, warnings };
+  }
+
+  /**
+   * Resolves each department's free-text `head` name to an employee `Sys ID` and
+   * persists it as `head_sys_id`, anchoring "who heads this department" to a
+   * stable identifier instead of a hand-typed name. Runs *after* employees are
+   * upserted (the FK requires them to exist). Names matching no employee are
+   * left unresolved - they surface separately via `findPhantomDepartmentHeadWarnings`.
+   */
+  async backfillDepartmentHeads(
+    departments: DepartmentRow[],
+    employees: EmployeeRow[],
+  ): Promise<{ resolved: number; unresolved: number }> {
+    // Match on `firstName + lastName` with whitespace stripped - the same shape
+    // `head` is stored in ("First Last"), mirroring findPhantomDepartmentHeadWarnings.
+    const sysIdByName = new Map(employees.map((e) => [`${e.firstName}${e.lastName}`, e.sysId]));
+
+    let resolved = 0;
+    let unresolved = 0;
+    for (const d of departments) {
+      if (!d.head) continue;
+      const headSysId = sysIdByName.get(d.head.replace(/\s+/g, ''));
+      if (headSysId) {
+        await this.departmentRepo.update(d.id, { headSysId });
+        resolved++;
+      } else {
+        unresolved++;
+      }
+    }
+    return { resolved, unresolved };
   }
 }

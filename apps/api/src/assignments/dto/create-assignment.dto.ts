@@ -11,10 +11,10 @@ export class CreateAssignmentDto {
   @IsNotEmpty()
   departmentId!: string;
 
-  /** Title held *in this department* - may differ from the person's home title. */
+  /** Managed title id held *in this department*; must be assigned to `departmentId`. */
   @IsString()
   @IsNotEmpty()
-  title!: string;
+  titleId!: string;
 
   @IsIn(['primary', 'concurrent'])
   assignmentType!: AssignmentType;

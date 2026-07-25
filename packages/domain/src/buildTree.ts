@@ -28,6 +28,7 @@ export function buildDepartmentTree(departments: Department[]): DepartmentTree {
       id: d.id,
       name: d.name,
       head: d.head,
+      headSysId: d.headSysId,
       managers: [],
       staff: [],
       children: [],

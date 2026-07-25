@@ -16,13 +16,13 @@ export interface TopdownNodeProps {
   selected?: boolean;
   /** Everyone holding a 兼務 posting; their name rows in this card become hover-linkable. */
   kenmuSysIds?: ReadonlySet<string>;
-  /** The hovered person, but only when this card holds them - so a hover elsewhere on the
+  /** The hovered person, but only when this card holds them — so a hover elsewhere on the
    * canvas leaves this card's memoized render untouched. */
   hoveredSysId?: string | null;
   onHoverMember?: (sysId: string | null) => void;
   onSelect?: (item: LayoutNode) => void;
   onToggleExpand?: (id: string) => void;
-  /** Hover in/out - drives the canvas's 兼務 link spotlight. */
+  /** Hover in/out — drives the canvas's 兼務 link spotlight. */
   onHover?: (id: string | null) => void;
 }
 
@@ -70,7 +70,7 @@ function TopdownNodeComponent({
       role="group"
       tabIndex={0}
       data-node-id={node.id}
-      aria-label={`${node.name} - ${memberCount}名`}
+      aria-label={`${node.name} — ${memberCount}名`}
       onClick={() => onSelect?.(item)}
       onMouseEnter={() => onHover?.(node.id)}
       onMouseLeave={() => onHover?.(null)}
@@ -81,20 +81,17 @@ function TopdownNodeComponent({
         }
       }}
       style={style}
-      className={`topdown-node absolute cursor-pointer text-left flex flex-col overflow-hidden rounded-lg border bg-surface shadow-1 transition-shadow duration-150 ease-brand hover:shadow-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+      className={`topdown-node absolute cursor-pointer text-left flex flex-col overflow-hidden rounded-lg bg-surface shadow-sm border transition-shadow duration-150 ease-brand hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
         highlighted || selected
-          ? 'ring-2 ring-brand shadow-2 border-brand'
+          ? 'ring-1 ring-brand shadow-2 border-brand'
           : hasHoveredMember
-            ? 'ring-2 ring-brand/60 shadow-2 border-brand'
+            ? 'ring-1 ring-brand shadow-2 border-brand'
             : 'border-line'
       }`}
     >
-      <span
-        aria-hidden="true"
-        className="absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--rail,var(--color-line-strong))]"
-      />
+      
       <div
-        className={`flex items-center gap-2 pl-[13px] pr-[10px] py-[8px] border-b border-line-2 shrink-0 ${
+        className={`flex items-center gap-2 pl-[13px] pr-[10px] py-[8px]  shrink-0 ${
           node.tier === 'division' ? 'bg-[var(--tint,var(--color-surface-sub))]' : 'bg-surface-sub'
         }`}
       >
@@ -114,9 +111,9 @@ function TopdownNodeComponent({
           type="button"
           onClick={handleExpand}
           title={fullRoster ? 'Collapse roster' : 'Expand roster'}
-          className="shrink-0 rounded-full bg-surface px-1.5 py-0.5 font-mono text-[10.5px] text-muted hover:text-ink"
+          className="shadow-2 shrink-0 rounded-full bg-surface px-1.5 py-0.5 font-mono text-[10.5px] text-[var(--rail,var(--color-line-strong))] hover:text-ink "
         >
-          {memberCount}名
+          {memberCount} 名
         </button>
       </div>
 
