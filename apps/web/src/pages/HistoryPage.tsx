@@ -105,7 +105,7 @@ interface NameLookups {
 }
 
 function formatValue(key: string, value: unknown, lookups: NameLookups): string {
-  if (value === null || value === undefined || value === '') return '—';
+  if (value === null || value === undefined || value === '') return '-';
   if (key === 'departmentId') return lookups.departmentName(String(value));
   if (key === 'employeeSysId') return lookups.employeeName(String(value));
   if (typeof value === 'boolean') return value ? 'Yes' : 'No';

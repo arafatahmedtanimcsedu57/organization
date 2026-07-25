@@ -8,7 +8,7 @@ const NO_MATCHES: ReadonlySet<string> = new Set();
 const noop = () => {};
 
 /**
- * `.topdown-print` — the print/PDF rendering of the chart (`?print=1`): the Top-down layout
+ * `.topdown-print` - the print/PDF rendering of the chart (`?print=1`): the Top-down layout
  * with **every roster expanded in full**, compacted via the vertical-stack rule to a width
  * that fits A4 portrait at a readable scale, then scaled fit-to-width. Height flows onto
  * additional pages; the interactive view's toolbar never renders here.

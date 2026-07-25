@@ -28,9 +28,9 @@ export interface UseEditorPanelOptions<Row, Form> {
   toFormState: (row: Row) => Form;
   /** Synchronous field validation, re-run on every keystroke. */
   validate: (form: Form) => FieldErrors<Form>;
-  /** Create mutation's state — drives `saving`/`saveError` and is reset when a panel opens. */
+  /** Create mutation's state - drives `saving`/`saveError` and is reset when a panel opens. */
   createState: MutationState;
-  /** Update mutation's state — drives `saving`/`saveError` and is reset when a panel opens. */
+  /** Update mutation's state - drives `saving`/`saveError` and is reset when a panel opens. */
   updateState: MutationState;
 }
 
@@ -43,7 +43,7 @@ export interface EditorPanel<Row, Form> {
   isCreating: boolean;
   form: Form;
   setForm: (form: Form) => void;
-  /** Set once the user first attempts to save — gates when field errors are shown. */
+  /** Set once the user first attempts to save - gates when field errors are shown. */
   attemptedSave: boolean;
   /** `true` when `form` differs from the baseline it was opened with. */
   isDirty: boolean;
@@ -69,7 +69,7 @@ export interface EditorPanel<Row, Form> {
  * The create/edit "panel" state machine shared by every admin master-data page
  * (employees, departments, concurrent duties). Owns the panel identity, the working
  * form and its dirty-tracking baseline, deferred validation, and the open/close/
- * discard/save lifecycle — so each page only declares its form shape, validation,
+ * discard/save lifecycle - so each page only declares its form shape, validation,
  * and mutation wiring.
  */
 export function useEditorPanel<Row, Form>({
@@ -96,7 +96,7 @@ export function useEditorPanel<Row, Form>({
 
   // `toFormState` is a pure row→form mapping that callers declare inline, so its identity
   // changes every render. Holding the latest one here keeps it out of the seeding effect's
-  // dependencies — listing it would re-seed on every render and wipe whatever the user is
+  // dependencies - listing it would re-seed on every render and wipe whatever the user is
   // typing. Declared first so this layout effect runs before the seeding one below.
   const toFormStateRef = useRef(toFormState);
   useLayoutEffect(() => {

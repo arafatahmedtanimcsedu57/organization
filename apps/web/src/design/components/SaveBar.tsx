@@ -11,7 +11,7 @@ export interface SaveBarProps {
   discardLabel?: string;
 }
 
-/** `.savebar` — contextual save bar (`Unsaved ▸ Save/Discard`), shown at the top of an edit
+/** `.savebar` - contextual save bar (`Unsaved ▸ Save/Discard`), shown at the top of an edit
  * panel while it has unsaved changes. The `savebar` class is kept as a hook so the print
  * stylesheet can hide it. */
 export function SaveBar({

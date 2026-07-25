@@ -2,7 +2,7 @@
  * Theme (light/dark) plumbing. The `data-theme` flag on <html> is what the CSS reads
  * (see design/tailwind.css `:root[data-theme="dark"]`); this module is the single place that
  * reads/writes it plus the persisted choice. The initial value is also applied pre-paint by the
- * inline script in index.html so there is no flash — `getInitialTheme()` returns the same value,
+ * inline script in index.html so there is no flash - `getInitialTheme()` returns the same value,
  * keeping the store in sync with what that script already set.
  */
 
@@ -18,7 +18,7 @@ export function getInitialTheme(): Theme {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
     if (saved === 'light' || saved === 'dark') return saved;
   } catch {
-    /* storage blocked — fall through to the OS preference */
+    /* storage blocked - fall through to the OS preference */
   }
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -29,6 +29,6 @@ export function applyTheme(theme: Theme): void {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch {
-    /* storage blocked — the DOM flag still applies for this session */
+    /* storage blocked - the DOM flag still applies for this session */
   }
 }

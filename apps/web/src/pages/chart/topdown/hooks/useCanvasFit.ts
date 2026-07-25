@@ -19,7 +19,7 @@ export interface UseCanvasFitOptions {
   zoom: CanvasZoom;
 }
 
-/** Framing helpers — the seam where the zoom behavior meets the current layout. */
+/** Framing helpers - the seam where the zoom behavior meets the current layout. */
 export function useCanvasFit({
   layout,
   nodeById,

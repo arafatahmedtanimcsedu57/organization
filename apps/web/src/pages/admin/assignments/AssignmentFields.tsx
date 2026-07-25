@@ -13,7 +13,7 @@ export interface AssignmentFieldsProps {
   setForm: (form: AssignmentFormState) => void;
   fieldErrors: FieldErrors<AssignmentFormState>;
   attemptedSave: boolean;
-  /** Person and department are fixed once a posting exists — edit its terms, not its identity. */
+  /** Person and department are fixed once a posting exists - edit its terms, not its identity. */
   isCreating: boolean;
   employees: Employee[] | undefined;
   departments: Department[] | undefined;

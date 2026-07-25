@@ -28,7 +28,7 @@ export class Assignment {
   @JoinColumn({ name: 'department_id' })
   department!: Department;
 
-  /** Title held *in this department* — may differ from the home title. */
+  /** Title held *in this department* - may differ from the home title. */
   @Column({ name: 'title', type: 'varchar' })
   title!: string;
 

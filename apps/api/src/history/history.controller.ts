@@ -5,7 +5,7 @@ import { HistoryQueryDto } from './dto/history-query.dto.ts';
 
 /**
  * `change-history` capability: read-only browsing of the audit trail, filterable by entity
- * and time. Deliberately GET-only — no route to edit or delete a `ChangeLog` entry exists.
+ * and time. Deliberately GET-only - no route to edit or delete a `ChangeLog` entry exists.
  */
 @Controller('history')
 export class HistoryController {

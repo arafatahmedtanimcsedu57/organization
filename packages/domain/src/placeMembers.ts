@@ -2,7 +2,7 @@
  * Places each employee's primary posting into their department's roster, ordered by
  * position rank and split into managers vs. staff (課員). Ported from the legacy
  * `src/buildOrg.ts` (rank-ordering / manager-staff-split portion, plus last-name
- * disambiguation — concurrent (兼務) placement is handled separately).
+ * disambiguation - concurrent (兼務) placement is handled separately).
  */
 import { normalizeTitle, POSITION_RANK, STAFF_RANK } from "./config.ts";
 import { computeDisplayNames } from "./disambiguateNames.ts";

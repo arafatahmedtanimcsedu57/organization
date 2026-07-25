@@ -15,7 +15,7 @@ export interface RosterLinesProps {
   printMode?: boolean;
 }
 
-/** `.roster` — the department card's rank-ordered lines: one per title group, managers then staff. */
+/** `.roster` - the department card's rank-ordered lines: one per title group, managers then staff. */
 export function RosterLines({ managers, staff, printMode = false }: RosterLinesProps) {
   const groups = [...groupByTitle(managers), ...groupByTitle(staff)];
   // Keyed by the group's first member: stable when a refetch reorders the roster, unlike

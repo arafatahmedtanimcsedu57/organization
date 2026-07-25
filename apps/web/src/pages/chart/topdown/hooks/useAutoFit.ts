@@ -38,7 +38,7 @@ export function useAutoFit({
   const fittedRef = useRef(false);
 
   // Read through a ref so refitting is driven by the data and the viewport, not by the
-  // identity of `fitToScreen` — that changes on every relayout, which is the anchoring
+  // identity of `fitToScreen` - that changes on every relayout, which is the anchoring
   // case handled separately below.
   const fitToScreenRef = useRef(fitToScreen);
   useEffect(() => {

@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
  * Journey B (task 13.9, `quality-assurance` spec): edit an employee's title in the
  * maintenance UI, confirm the org chart re-renders with the new title, and confirm a
  * change-history entry appears with the before/after. Runs against the real app stack
- * (`docker compose up`), not a mock — see `E2E_BASE_URL` / `playwright.config.ts`.
+ * (`docker compose up`), not a mock - see `E2E_BASE_URL` / `playwright.config.ts`.
  */
 
 function escapeRegExp(value: string): string {

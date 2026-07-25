@@ -16,7 +16,7 @@ function testDatabaseUrl(): string {
   const url = process.env.TEST_DATABASE_URL;
   if (!url) {
     throw new Error(
-      'TEST_DATABASE_URL is not set (see .env.example) — start the ephemeral test db with `npm run test:db:up` in apps/api',
+      'TEST_DATABASE_URL is not set (see .env.example) - start the ephemeral test db with `npm run test:db:up` in apps/api',
     );
   }
   return url;

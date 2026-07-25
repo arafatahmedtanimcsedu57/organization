@@ -15,7 +15,7 @@ export interface KenmuLinksProps {
 }
 
 /**
- * The 兼務 layer — name-to-name curves drawn **on top** of the cards, so a link crossing a
+ * The 兼務 layer - name-to-name curves drawn **on top** of the cards, so a link crossing a
  * card is never hidden behind it. Quiet dotted bead-curves by default; the hovered person's
  * or card's links light up with an arrowhead, a source dot, and a haloed label, while
  * unrelated links recede. `pointer-events-none` keeps the name rows underneath hoverable.

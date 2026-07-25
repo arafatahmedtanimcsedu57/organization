@@ -15,8 +15,8 @@ export interface MemberAnchors {
  * instead of card-to-card.
  *
  * `offsetTop` is a layout coordinate, so the measurements survive the CSS `zoom` bake and
- * the card glide untouched. Re-measuring is keyed to the layout — highlight styling is
- * deliberately layout-neutral (color/underline only), so hover can never move a row — plus
+ * the card glide untouched. Re-measuring is keyed to the layout - highlight styling is
+ * deliberately layout-neutral (color/underline only), so hover can never move a row - plus
  * one pass when webfonts land, since fallback metrics change row heights.
  */
 export function useMemberAnchors(layout: TopdownLayout): MemberAnchors {

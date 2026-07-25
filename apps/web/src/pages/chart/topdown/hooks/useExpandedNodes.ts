@@ -8,7 +8,7 @@ export interface ExpandedNodes {
 
 /**
  * Which cards show their full roster. Expanding is a deliberate view action, so it also
- * runs `onExpand` — the canvas passes `takeControl`, taking the view out of auto-fit.
+ * runs `onExpand` - the canvas passes `takeControl`, taking the view out of auto-fit.
  */
 export function useExpandedNodes(onExpand?: () => void): ExpandedNodes {
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(() => new Set());

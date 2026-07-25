@@ -12,7 +12,7 @@ function getSnapshot(): boolean {
   return window.matchMedia(QUERY).matches;
 }
 
-/** `true` when the OS asks for reduced motion — and it re-renders if that flips mid-session. */
+/** `true` when the OS asks for reduced motion - and it re-renders if that flips mid-session. */
 export function useReducedMotion(): boolean {
   return useSyncExternalStore(subscribe, getSnapshot, () => false);
 }

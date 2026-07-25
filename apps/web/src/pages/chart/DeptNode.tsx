@@ -3,7 +3,7 @@ import type { ChartNode, ChartTier } from '../../store/api/chartNode';
 import { branchColorFor } from './branchColor';
 import { RosterLines } from './RosterLines';
 
-/** `.node` — one department card plus its indented children, recursing down the tree.
+/** `.node` - one department card plus its indented children, recursing down the tree.
  * The branch color is set as `--rail`/`--tint` CSS custom properties once, on the top-level
  * division node; because custom properties inherit, every descendant's rail, accent stripe,
  * and marker pick it up via `var(--rail, …)` without re-setting it at each level. */
@@ -21,7 +21,7 @@ const DEPT =
 
 const DEPT_HEAD_BASE = 'flex items-center gap-2.5 pl-[15px] pr-[13px] border-b border-line-2';
 
-/** Tier styling — division cards are elevated (tinted header, larger name) above department and
+/** Tier styling - division cards are elevated (tinted header, larger name) above department and
  * group cards, so the org tier reads at a glance without reading the labels. */
 const HEAD_TIER: Record<ChartTier, string> = {
   division: 'py-[13px] bg-[var(--tint,var(--color-surface-sub))]',

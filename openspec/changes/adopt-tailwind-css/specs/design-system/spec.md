@@ -2,7 +2,7 @@
 
 ### Requirement: Author all styling with Tailwind CSS utilities
 
-The web application SHALL author all visual styling using **Tailwind CSS utility classes** applied in component markup, rather than hand-written per-screen stylesheets. Bespoke component/screen stylesheets (the former `shell.css`, `components.css`, and `chart.css`) SHALL NOT remain; only a single Tailwind entry stylesheet — carrying the Tailwind import, the theme, a base layer, the bundled fonts, and the print rules — is permitted as authored CSS.
+The web application SHALL author all visual styling using **Tailwind CSS utility classes** applied in component markup, rather than hand-written per-screen stylesheets. Bespoke component/screen stylesheets (the former `shell.css`, `components.css`, and `chart.css`) SHALL NOT remain; only a single Tailwind entry stylesheet - carrying the Tailwind import, the theme, a base layer, the bundled fonts, and the print rules - is permitted as authored CSS.
 
 #### Scenario: A styled component uses utilities in its markup
 

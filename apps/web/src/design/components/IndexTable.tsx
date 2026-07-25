@@ -26,7 +26,7 @@ const TH_BASE =
   'text-[12px] font-semibold text-sub px-4 py-[9px] border-b border-line-2 bg-surface-sub';
 const TD_BASE = 'px-4 py-[11px] border-b border-line-2 align-middle';
 
-/** `.itable` — index table with optional selection + row actions. The `itable` class is kept as a
+/** `.itable` - index table with optional selection + row actions. The `itable` class is kept as a
  * hook (E2E selectors + the print stylesheet); all visual styling is Tailwind utilities. */
 export function IndexTable<Row>({
   columns,
@@ -108,7 +108,7 @@ export interface IndexTableFooterProps {
   children?: ReactNode;
 }
 
-/** `.table-foot` — row-count summary + pager, sits below an `IndexTable`. Kept as a print hook. */
+/** `.table-foot` - row-count summary + pager, sits below an `IndexTable`. Kept as a print hook. */
 export function IndexTableFooter({ summary, children }: IndexTableFooterProps) {
   return (
     <div className="table-foot flex items-center justify-between px-4 py-[11px]">

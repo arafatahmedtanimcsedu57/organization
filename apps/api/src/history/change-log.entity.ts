@@ -5,7 +5,7 @@ export type ChangeLogAction = 'create' | 'update' | 'deactivate';
 
 /**
  * Append-only audit trail. No update/delete repository methods are ever
- * exposed for this entity — that's what makes history immutable.
+ * exposed for this entity - that's what makes history immutable.
  */
 @Entity({ name: 'change_log' })
 export class ChangeLog {

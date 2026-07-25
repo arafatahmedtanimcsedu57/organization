@@ -2,7 +2,7 @@
 
 /** Corner radius for the rounded bends on tree connectors. */
 export const BEND_RADIUS = 9;
-/** Below this radius a bend is not worth drawing — fall back to square corners. */
+/** Below this radius a bend is not worth drawing - fall back to square corners. */
 export const MIN_BEND_RADIUS = 0.5;
 /** Horizontal offset of the indent line a stacked child's └ connector runs down. */
 export const STACK_RAIL_OFFSET = 11;

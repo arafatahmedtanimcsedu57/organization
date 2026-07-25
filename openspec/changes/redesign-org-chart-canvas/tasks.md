@@ -34,7 +34,7 @@
 ## 6. Inline CRUD from the canvas
 
 - [x] 6.1 Add node context actions: Edit department, Add sub-department, Add 兼務 posting, Edit/Deactivate person (roster row).
-- [x] 6.2 Open the shared `useEditorPanel` editor bound to `departmentsApi` / `employeesApi` / `assignmentsApi` — no duplicated CRUD logic.
+- [x] 6.2 Open the shared `useEditorPanel` editor bound to `departmentsApi` / `employeesApi` / `assignmentsApi` - no duplicated CRUD logic.
 - [x] 6.3 Confirm RTK Query tag invalidation refetches `/chart` so the canvas updates without a manual refresh.
 
 ## 7. Horizontal view re-theme and view switching

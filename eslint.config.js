@@ -21,7 +21,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
-  // React rules apply to the SPA only — `apps/api` is NestJS and `packages/*` are plain TS.
+  // React rules apply to the SPA only - `apps/api` is NestJS and `packages/*` are plain TS.
   // `recommended-latest` is the React team's current baseline: the classic Rules of Hooks and
   // exhaustive-deps, plus the React Compiler's purity/memoization checks.
   {

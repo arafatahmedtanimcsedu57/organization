@@ -3,7 +3,7 @@ import type { Member } from '@org-chart/domain';
 export interface MemberNameProps {
   member: Member;
   nodeId: string;
-  /** True when this person holds a 兼務 posting — their row becomes hover-linkable. */
+  /** True when this person holds a 兼務 posting - their row becomes hover-linkable. */
   linkable?: boolean;
   /** True when this person is the one currently hovered (spotlight their every row). */
   highlighted?: boolean;

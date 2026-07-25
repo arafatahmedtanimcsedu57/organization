@@ -5,7 +5,7 @@ import { removeAssignmentsFor } from './assignment-helpers';
  * Journey C (task 13.10, `quality-assurance` spec): add a concurrent (兼務) posting for a
  * person into a second department, and confirm the sourced 兼 chip appears in that
  * department's roster on the chart. Runs against the real app stack (`docker compose up`),
- * not a mock — see `E2E_BASE_URL` / `playwright.config.ts`.
+ * not a mock - see `E2E_BASE_URL` / `playwright.config.ts`.
  */
 
 function escapeRegExp(value: string): string {

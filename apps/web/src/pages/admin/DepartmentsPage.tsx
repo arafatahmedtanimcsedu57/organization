@@ -163,7 +163,7 @@ export function DepartmentsPage() {
     {
       key: 'head',
       header: 'Head',
-      render: (department) => <span className={DEPT}>{department.head || '—'}</span>,
+      render: (department) => <span className={DEPT}>{department.head || '-'}</span>,
     },
     {
       key: 'status',
@@ -179,8 +179,8 @@ export function DepartmentsPage() {
         <SaveBar
           message={
             isCreating
-              ? 'Adding a new department — unsaved changes'
-              : `Editing ${editingDepartment?.name ?? ''} — unsaved changes`
+              ? 'Adding a new department - unsaved changes'
+              : `Editing ${editingDepartment?.name ?? ''} - unsaved changes`
           }
           saving={saving}
           onSave={handleSave}

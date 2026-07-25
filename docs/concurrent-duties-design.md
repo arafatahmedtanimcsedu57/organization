@@ -1,4 +1,4 @@
-# Concurrent Duties (兼務 / Kenmu) — Data Model Design
+# Concurrent Duties (兼務 / Kenmu) - Data Model Design
 
 *Requirement 4 of the Syslabo assignment.* This document proposes how to model people who
 hold posts in more than one department, and explains the minimal implementation shipped in
@@ -8,14 +8,14 @@ this project.
 
 `sys_user` stores exactly **one** `Department` and **one** `Title` per person. The legacy
 hand-made chart, however, shows some people in a second department prefixed with **(兼)**
-(e.g. `(兼)照沼`). That secondary post cannot be represented in — or recovered from — the
+(e.g. `(兼)照沼`). That secondary post cannot be represented in - or recovered from - the
 current `sys_user` data. As a result, an automated chart driven purely by `sys_user` cannot
 reproduce those (兼) entries.
 
 ## Design principle
 
 The Syslabo precautions ask us to **add items rather than modify existing ones**. So instead of
-altering `sys_user` (adding `Department2`, `Title2`, … columns — which does not scale beyond two
+altering `sys_user` (adding `Department2`, `Title2`, … columns - which does not scale beyond two
 posts and denormalizes the data), we introduce a separate **assignment relation** and leave both
 masters untouched.
 
@@ -31,7 +31,7 @@ A many-to-many relation between users and departments. One row per (person, depa
 | `title`           | string    | Position held **in that department** (a person can be 事業部長 in one and 部長 in another). |
 | `is_primary`      | boolean   | Exactly one primary posting per person (their "home").           |
 | `assignment_type` | enum      | `primary` \| `concurrent` (兼務).                                 |
-| `valid_from`      | date?     | Optional effective-dating — enables history (see below).         |
+| `valid_from`      | date?     | Optional effective-dating - enables history (see below).         |
 | `valid_to`        | date?     | Optional; empty = currently active.                              |
 
 ### Why this shape
@@ -68,12 +68,12 @@ xlsx directly and re-run `npm run chart`.
 ## Data-quality findings surfaced while building this
 
 Two (兼) cases from the legacy chart are intentionally **not** seeded, because they reveal
-inconsistencies between the hand-made chart and the master data — exactly the kind of drift an
+inconsistencies between the hand-made chart and the master data - exactly the kind of drift an
 automated, master-driven chart is meant to eliminate:
 
 1. **`ソリューション営業部` is missing from `cmn_department`.** The legacy chart shows it as an
    intermediate 部 (with `(兼)佐藤(悠)` as 部長), and the supplementary reference legend lists it
-   as a department — but there is no such row in the master. Its two課 (`1課`, `2課`) instead point
+   as a department - but there is no such row in the master. Its two課 (`1課`, `2課`) instead point
    directly at `営業本部`. The generator therefore renders them under `営業本部`.
    **Recommendation:** add a `ソリューション営業部` department row (parent `営業本部`) and reparent
    `1課`/`2課` to it; then 悠一郎 佐藤's 部長 兼務 can be added to `user_assignments.xlsx`.

@@ -15,7 +15,7 @@ import type { ChartNode } from './chart-node.ts';
  * Minimal in-memory stand-in for the slice of `Repository<T>` the assignments/org-chart
  * services call, backed by a mutable array so a posting created through
  * `AssignmentsService.create()` is visible to a subsequent
- * `OrgChartService.buildOrgModel()` call — proving a new concurrent posting actually
+ * `OrgChartService.buildOrgModel()` call - proving a new concurrent posting actually
  * reaches chart regeneration, per spec `concurrent-duties` ("Add a concurrent posting":
  * the person appears in the target department prefixed with `(兼)`).
  */

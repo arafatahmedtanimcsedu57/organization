@@ -1,7 +1,20 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { 
+  useCallback, 
+  useEffect, 
+  useRef, 
+  useState, 
+  type RefObject 
+} from 'react';
+
 import { select } from 'd3-selection';
-import { zoom, zoomIdentity, type ZoomBehavior, type ZoomTransform } from 'd3-zoom';
+import { 
+  zoom, 
+  zoomIdentity, 
+  type ZoomBehavior, 
+  type ZoomTransform 
+} from 'd3-zoom';
 import 'd3-transition'; // side-effect: enables selection.transition() for eased zoom
+
 import {
   BAKE_DELAY_MS,
   MAX_SCALE,
@@ -10,6 +23,7 @@ import {
   SUPPORTS_CSS_ZOOM,
   TRANSITION_MS,
 } from '../../../../constants/canvasZoom';
+
 import { useReducedMotion } from './useReducedMotion';
 
 export interface CanvasZoomElements {
@@ -22,19 +36,12 @@ export interface CanvasZoomElements {
 }
 
 export interface CanvasZoom {
-  /** Live transform, readable from callbacks without re-rendering on every zoom frame. */
   transformRef: RefObject<ZoomTransform>;
-  /** Mirrors `userControlled` for cheap checks in hot paths (60Hz zoom events). */
   userControlledRef: RefObject<boolean>;
-  /** Rounded zoom percentage for the toolbar readout. */
   zoomPct: number;
-  /** Scale after the last settled gesture; drives the adaptive stacking budget. */
   settledScale: number;
-  /** False in auto-fit mode (initial load / after "Fit"); true once the user takes over. */
   userControlled: boolean;
-  /** Any deliberate view action (gesture, zoom button, search jump, ＋N) exits auto-fit. */
   takeControl: () => void;
-  /** "Fit" hands the view back to auto-fit mode. */
   releaseControl: () => void;
   transformTo: (transform: ZoomTransform, animate: boolean) => void;
   zoomBy: (factor: number) => void;
@@ -52,7 +59,7 @@ export interface CanvasZoom {
  * Crisp-text strategy: `transform: scale()` rasterizes the cards at layout size and
  * GPU-downscales the bitmap, which blurs text below 100%. So the gesture runs on a fast
  * `transform` (scaled relative to the last baked zoom), and once it settles for a beat the
- * scale is **baked** as CSS `zoom` on the inner layer — real layout at the target size, so
+ * scale is **baked** as CSS `zoom` on the inner layer - real layout at the target size, so
  * glyphs render natively sharp at any zoom. Falls back to pure transform where CSS `zoom`
  * is unsupported.
  *

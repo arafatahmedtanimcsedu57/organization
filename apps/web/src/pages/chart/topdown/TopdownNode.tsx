@@ -16,13 +16,13 @@ export interface TopdownNodeProps {
   selected?: boolean;
   /** Everyone holding a 兼務 posting; their name rows in this card become hover-linkable. */
   kenmuSysIds?: ReadonlySet<string>;
-  /** The hovered person, but only when this card holds them — so a hover elsewhere on the
+  /** The hovered person, but only when this card holds them - so a hover elsewhere on the
    * canvas leaves this card's memoized render untouched. */
   hoveredSysId?: string | null;
   onHoverMember?: (sysId: string | null) => void;
   onSelect?: (item: LayoutNode) => void;
   onToggleExpand?: (id: string) => void;
-  /** Hover in/out — drives the canvas's 兼務 link spotlight. */
+  /** Hover in/out - drives the canvas's 兼務 link spotlight. */
   onHover?: (id: string | null) => void;
 }
 
@@ -47,7 +47,7 @@ function TopdownNodeComponent({
   const { node, fullRoster } = item;
   const { rail, tint } = branchColorFor(item.branchId);
   const memberCount = node.managers.length + node.staff.length;
-  // Ring the card when the hovered person appears in it — so "every other place" pops even
+  // Ring the card when the hovered person appears in it - so "every other place" pops even
   // when the specific name is collapsed behind a ＋N / ×N roster row.
   const hasHoveredMember = hoveredSysId != null;
 
@@ -70,7 +70,7 @@ function TopdownNodeComponent({
       role="group"
       tabIndex={0}
       data-node-id={node.id}
-      aria-label={`${node.name} — ${memberCount}名`}
+      aria-label={`${node.name} - ${memberCount}名`}
       onClick={() => onSelect?.(item)}
       onMouseEnter={() => onHover?.(node.id)}
       onMouseLeave={() => onHover?.(null)}

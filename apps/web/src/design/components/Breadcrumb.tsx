@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export interface BreadcrumbItem {
   label: string;
-  /** Route to link to. Omit for the current (last) page — it renders as plain text. */
+  /** Route to link to. Omit for the current (last) page - it renders as plain text. */
   to?: string;
 }
 

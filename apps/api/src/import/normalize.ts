@@ -33,7 +33,7 @@ function toCp1252Byte(codePoint: number): number | undefined {
  * Repairs values that were UTF-8 encoded then mis-decoded as Windows-1252 during an
  * earlier export (e.g. `sys_user`'s `choice_values` sheet: "å¥³" -> "女", "ç”·" -> "男").
  * Every character must map back to a single byte, and the re-decoded UTF-8 bytes must
- * be valid, or the input is returned unchanged — ordinary Japanese text (multi-byte
+ * be valid, or the input is returned unchanged - ordinary Japanese text (multi-byte
  * code points outside the Latin-1/CP1252 range) is never touched.
  */
 export function repairMojibake(value: string): string {

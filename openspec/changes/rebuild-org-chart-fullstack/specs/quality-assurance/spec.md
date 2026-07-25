@@ -4,17 +4,17 @@
 
 The deliverable SHALL include automated end-to-end tests that drive the real UI through the three primary user journeys and assert their observable outcomes: (A) view and export the chart, (B) edit a master record and see it flow through to the chart and change history, and (C) add a concurrent duty and see it appear on the chart.
 
-#### Scenario: Journey A — view and export the chart
+#### Scenario: Journey A - view and export the chart
 
 - **WHEN** the E2E suite opens the chart screen, toggles Tree ⇄ Network, and triggers "Download PDF"
 - **THEN** both views render and the PDF endpoint returns a valid A3-landscape PDF
 
-#### Scenario: Journey B — edit flows to chart and history
+#### Scenario: Journey B - edit flows to chart and history
 
 - **WHEN** the E2E suite edits an employee's title or department and saves
 - **THEN** the chart reflects the change and a new change-history entry appears showing the actor, timestamp, and before/after
 
-#### Scenario: Journey C — add a concurrent duty
+#### Scenario: Journey C - add a concurrent duty
 
 - **WHEN** the E2E suite adds a concurrent (兼務) posting for a person in a second department
 - **THEN** that department's roster shows the sourced 兼 chip for that person on the chart

@@ -52,9 +52,9 @@
 - [x] 7.2 Set up RTK Query API client (server state) and Zustand store (UI state: filters, selection, print/view mode)
 - [x] 7.3 Wire the dev proxy to the NestJS API and add a root layout placeholder the shell will fill
 
-## 8. Design system foundation (capability: design-system — Organo Admin / Shopify-style)
+## 8. Design system foundation (capability: design-system - Organo Admin / Shopify-style)
 
-- [x] 8.1 Define design tokens as CSS variables (color, type, spacing, radius, shadow) — port from `ui_design/shopify/styles.css`; single source, no per-component overrides
+- [x] 8.1 Define design tokens as CSS variables (color, type, spacing, radius, shadow) - port from `ui_design/shopify/styles.css`; single source, no per-component overrides
 - [x] 8.2 Load Figtree (UI) + Noto Sans JP (Japanese) with system fallbacks; bundle/self-host so the PDF renderer has the fonts offline
 - [x] 8.3 Build the app shell: left nav (Home · Org chart · Employees · Departments · Concurrent duties · Change history · Settings) + top bar (search, notifications, account)
 - [x] 8.4 Build the core component set: Card, Badge (success/info/warn/critical + kenmu), Banner, Button (primary/secondary/plain), IndexTable
@@ -71,7 +71,7 @@
 - [x] 9.5 Render roster lines: position label + wrapped 課員 grid; disambiguated names (given-name initial) and location tags (`【大阪】`)
 - [x] 9.6 Render 兼務 as a sourced chip (dashed connector → chip naming source dept + title), visually distinct from primary members
 - [x] 9.7 Oversized-roster truncation with an expand affordance (`＋N 課員`) in the interactive view only
-- [x] 9.8 Print mode: `?print=1` expands every roster in full (no truncation) and applies the A3 print CSS — this is the route the PDF endpoint (6.2) renders
+- [x] 9.8 Print mode: `?print=1` expands every roster in full (no truncation) and applies the A3 print CSS - this is the route the PDF endpoint (6.2) renders
 - [x] 9.9 Network view: nodes + reporting lines + dashed 兼務 arrows, with an in-place Tree ⇄ Network switch
 - [x] 9.10 Legend + data-issues strip, and a "Download PDF" action calling `GET /chart/pdf`
 
@@ -98,15 +98,15 @@
 - [x] 12.3 Add read-only `GET /history` (filter by entity + time); ensure no edit/delete path exists
 - [x] 12.4 Build the history browser UI (per-entity, reverse-chronological, shows what changed)
 
-## 13. Automated tests — features & user interaction (capability: quality-assurance)
+## 13. Automated tests - features & user interaction (capability: quality-assurance)
 
 - [x] 13.1 Set up the test stack: unit/feature runner (Vitest or Jest) + `supertest` for the API, and `@playwright/test` for browser E2E
 - [x] 13.2 Stand up an ephemeral test database (a Compose test service or throwaway schema) seeded with deterministic fixtures
 - [x] 13.3 Domain unit tests: tree build, rank order, disambiguation, title normalization, 兼 placement (no DB / no framework)
-- [x] 13.4 API feature tests — org-chart: hierarchy, rank order, disambiguation, and `(兼)` placement in the `/chart` JSON
-- [x] 13.5 API feature tests — maintenance: employee/department CRUD plus failure paths (missing department, parent cycle)
-- [x] 13.6 API feature tests — concurrent duties: reject a second primary; a concurrent posting renders in the target department
-- [x] 13.7 API feature tests — history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
+- [x] 13.4 API feature tests - org-chart: hierarchy, rank order, disambiguation, and `(兼)` placement in the `/chart` JSON
+- [x] 13.5 API feature tests - maintenance: employee/department CRUD plus failure paths (missing department, parent cycle)
+- [x] 13.6 API feature tests - concurrent duties: reject a second primary; a concurrent posting renders in the target department
+- [x] 13.7 API feature tests - history: every write logs an entry (actor/ts/before/after) and no edit/delete path exists (immutability)
 - [x] 13.8 E2E journey A (Playwright): open chart, toggle Tree ⇄ Network, "Download PDF" returns a valid A3 PDF
 - [x] 13.9 E2E journey B (Playwright): edit an employee → save → chart updates → a history entry appears with before/after
 - [x] 13.10 E2E journey C (Playwright): add a 兼務 posting → the sourced 兼 chip appears in the target department on the chart

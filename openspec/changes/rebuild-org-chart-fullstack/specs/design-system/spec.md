@@ -16,7 +16,7 @@ The web application SHALL present every screen using the **Organo Admin (Shopify
 
 ### Requirement: Render the org chart as an indented tree of department cards
 
-The chart SHALL render as a **vertically indented tree of department cards** — each department is a card containing its rank-ordered roster, and child departments are indented beneath their parent — rather than a manager-line top-down diagram. Top-level divisions SHALL be separated by clear vertical spacing.
+The chart SHALL render as a **vertically indented tree of department cards** - each department is a card containing its rank-ordered roster, and child departments are indented beneath their parent - rather than a manager-line top-down diagram. Top-level divisions SHALL be separated by clear vertical spacing.
 
 #### Scenario: Nesting reflects hierarchy
 
@@ -53,7 +53,7 @@ Top-level division cards SHALL be visually elevated above nested department and 
 
 ### Requirement: Render 兼務 as a sourced concurrent-duty marker
 
-A concurrent (兼務) posting SHALL render in its target department as a distinct marker that also names its **source** posting — a dashed connector into a chip such as `兼 佐藤(悠) ← 営業本部 本部長` — enriching the reference chart's bare `(兼)` prefix with provenance. The marker SHALL be visually distinct from primary (home-department) members.
+A concurrent (兼務) posting SHALL render in its target department as a distinct marker that also names its **source** posting - a dashed connector into a chip such as `兼 佐藤(悠) ← 営業本部 本部長` - enriching the reference chart's bare `(兼)` prefix with provenance. The marker SHALL be visually distinct from primary (home-department) members.
 
 #### Scenario: A concurrent posting shows its origin
 

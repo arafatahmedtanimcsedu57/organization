@@ -3,7 +3,7 @@
 The org chart is served by `apps/api` as a **department hierarchy** (`GET /chart` →
 `ChartNode[]`, tiers division → department → group, each node carrying `managers[]` + `staff[]`
 rosters). The hierarchy comes from `cmn_department.Parent` + title rank because
-`sys_user.Manager` is empty for every row — there are **no person→person reporting edges** in
+`sys_user.Manager` is empty for every row - there are **no person→person reporting edges** in
 the data. The web app (`apps/web`) renders this two ways today:
 
 - `pages/chart/OrgTree.tsx` → `DeptNode.tsx`: an **indented, left-to-right** tree of department
@@ -31,15 +31,15 @@ for here are not achievable in plain CSS, so that decision is deliberately rever
   fullscreen, via a floating toolbar matching the reference.
 - **Search-to-locate** a person or department (highlight + auto fit-to-node).
 - **Inline CRUD** from a node (edit/deactivate department & people, add child department, add
-  兼務 posting) reusing the existing edit panel and master-data APIs — zero duplicated CRUD.
+  兼務 posting) reusing the existing edit panel and master-data APIs - zero duplicated CRUD.
 - A **re-themed horizontal tree** as the secondary view, matching the reference card aesthetic.
 - **A4 portrait, fit-to-width** PDF.
 
 **Non-Goals:**
-- No person→person org chart (data has no reporting edges) — nodes stay department-based.
+- No person→person org chart (data has no reporting edges) - nodes stay department-based.
 - No "Assign" / effective-date-relationship UI from the mockup (no such feature here).
 - No backend/domain/schema change: `/chart` JSON stays as-is; layout is computed client-side.
-- No new master-data operations — the canvas is a new *entry point* to existing ones.
+- No new master-data operations - the canvas is a new *entry point* to existing ones.
 
 ## Decisions
 
@@ -51,22 +51,22 @@ reporting lines. Alternative (person nodes with synthesized edges) rejected as i
 
 ### 2. Layout: `d3-hierarchy` + `flextree`, rendered as React DOM
 Compute positions with `d3-hierarchy` (`stratify`/`hierarchy`) fed into **`flextree`** (a tidy
-Reingold–Tilford variant that supports **variable node sizes** — needed because department cards
+Reingold–Tilford variant that supports **variable node sizes** - needed because department cards
 differ in height with roster size). Render the resulting nodes as absolutely-positioned React
 DOM cards inside a sized container; draw connectors in an SVG layer beneath them.
 - *Why flextree over vanilla `d3.tree`:* `d3.tree` assumes uniform node size; our cards vary.
 - *Why DOM cards over pure SVG/Canvas:* reuse existing Tailwind card components, keep text
   selectable/accessible, and hang inline-edit affordances off real DOM.
-- *Alternatives considered:* hand-rolled RT compaction (more code/risk, no dep — rejected for
+- *Alternatives considered:* hand-rolled RT compaction (more code/risk, no dep - rejected for
   time and quality); turnkey `d3-org-chart` (imperative D3 that fights React and is hard to theme
-  pixel-exactly — rejected). Import submodules only (`d3-hierarchy`, `d3-flextree`, `d3-zoom`) to
+  pixel-exactly - rejected). Import submodules only (`d3-hierarchy`, `d3-flextree`, `d3-zoom`) to
   keep the bundle small.
 
 ### 3. Window-aware compaction (the "reuse the gaps" behavior)
 flextree already interlocks sibling subtree bounding boxes (that *is* gap reuse). On top of it,
 apply a **subtree-orientation rule**: a subtree whose measured width exceeds a fraction of the
 viewport, or that is deep-and-narrow, is laid out as a **vertical stack** (children below each
-other with elbow connectors) instead of a horizontal fan — reproducing the hybrid in
+other with elbow connectors) instead of a horizontal fan - reproducing the hybrid in
 `org_chart/image.png`. The rule is recomputed on container resize (`ResizeObserver`) so the tree
 re-packs to the current width. Thresholds are tunable constants, snapshot-tested on the real
 20-dept dataset.
@@ -75,7 +75,7 @@ re-packs to the current width. Thresholds are tunable constants, snapshot-tested
 A single transform (`translate(x,y) scale(k)`) applied to the canvas group drives pan/zoom.
 `d3-zoom` handles wheel/drag/pinch and gives programmatic, eased transitions for **fit-to-screen**
 and **fit-to-node** (used by search). The transform lives in a ref/state kept **separate from
-layout** so pan/zoom never triggers relayout — only a cheap `transform` update. Fullscreen uses
+layout** so pan/zoom never triggers relayout - only a cheap `transform` update. Fullscreen uses
 the Fullscreen API on the canvas container. Toolbar = search field, fit-to-screen, zoom-out /
 `k%` / zoom-in, fullscreen (Assign button omitted). `prefers-reduced-motion` disables zoom
 transitions (existing a11y requirement).
@@ -86,7 +86,7 @@ from the `/chart` data. A match highlights the node and calls `fitToNode` to eas
 onto it. Debounced; Enter cycles multiple matches.
 
 ### 6. Inline CRUD reuses `useEditorPanel` + master-data APIs
-A node exposes contextual actions — **Edit department**, **Add sub-department**, **Add 兼務
+A node exposes contextual actions - **Edit department**, **Add sub-department**, **Add 兼務
 posting**, **Edit / Deactivate person** (on a roster row). Each opens the **existing** editor
 panel (extracted in the recent refactor) bound to the existing RTK Query mutations
 (`departmentsApi`, `employeesApi`, `assignmentsApi`). On success, RTK Query tag invalidation
@@ -118,7 +118,7 @@ Connectors live in the same scaled SVG layer, so they scale with the cards.
 - **Very tall roster cards** (e.g. the large ITサポート roster) dominate height and hurt
   packing → *Mitigation:* keep the existing interactive roster-truncation affordance
   (`＋N 課員`), expand fully only for print.
-- **A4 fit-to-width legibility** — scaling a 95-person / 20-dept org to ~190mm can make text
+- **A4 fit-to-width legibility** - scaling a 95-person / 20-dept org to ~190mm can make text
   small → *Mitigation:* fit width but allow multi-page height; enforce a minimum readable scale
   and let content overflow to more pages rather than shrink below it; documented trade-off.
 - **d3-zoom ↔ React** re-render churn → *Mitigation:* transform in a ref, memoized layout, update
@@ -147,7 +147,7 @@ Connectors live in the same scaled SVG layer, so they scale with the cards.
 ## Open Questions
 
 - Exact compaction thresholds (viewport-width fraction, depth/breadth) that switch a subtree to a
-  vertical stack — resolve empirically against the dataset.
+  vertical stack - resolve empirically against the dataset.
 - In-node roster display: full list vs. head + count + expand (interactive), always full (print).
 - Minimum acceptable print scale / max page count for A4 on the largest org.
 - Search scope: department + person name only, or also title/role; multi-match cycling UX.

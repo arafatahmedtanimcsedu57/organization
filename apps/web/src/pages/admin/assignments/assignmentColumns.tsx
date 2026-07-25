@@ -63,7 +63,7 @@ export function assignmentColumns({
       header: 'Valid from / to',
       render: (assignment) => (
         <span className="font-jp text-ink text-[13px]">
-          {assignment.validFrom ?? '—'} → {assignment.validTo ?? '—'}
+          {assignment.validFrom ?? '-'} → {assignment.validTo ?? '-'}
         </span>
       ),
     },

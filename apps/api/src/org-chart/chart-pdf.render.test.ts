@@ -13,7 +13,7 @@ import { SEED_ASSIGNMENTS } from '../import/seed-assignments.data.ts';
 /**
  * `org-chart` capability, task 6.3: verifies the Puppeteer/Chromium PDF pipeline (task 6.1's
  * `fonts-noto-cjk` + task 6.2's renderer) actually produces a correct A4-portrait PDF from the *real*
- * masters — full Japanese names, every roster expanded (no truncation), 兼務 marked distinctly —
+ * masters - full Japanese names, every roster expanded (no truncation), 兼務 marked distinctly -
  * rather than trusting the wiring alone. It renders a minimal print-mode fixture built from the
  * real domain output (the same `@org-chart/domain` pipeline `OrgChartService` uses) instead of
  * going through `ChartPdfService`/HTTP, because the SPA's `/chart?print=1` route (task 9.8) does
@@ -112,7 +112,7 @@ test('the real chart data renders to a valid A4 PDF with full rosters and distin
 
     // Proxy for "no tofu": the CJK font family actually used to paint the page resolved and loaded.
     const fontCheck = await page.evaluate(() => document.fonts.check('16px "Noto Sans CJK JP"'));
-    assert.equal(fontCheck, true, 'Noto Sans CJK JP did not resolve — Japanese text would render as tofu');
+    assert.equal(fontCheck, true, 'Noto Sans CJK JP did not resolve - Japanese text would render as tofu');
   } finally {
     await browser.close();
     fs.rmSync(htmlPath, { force: true });

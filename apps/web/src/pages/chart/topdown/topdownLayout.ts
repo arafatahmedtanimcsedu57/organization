@@ -20,14 +20,14 @@ import type { ChartNode } from '../../../store/api/chartNode';
 /**
  * Top-down layout for the interactive canvas (`chart-canvas` capability).
  *
- * Two mechanisms keep the horizontal footprint — and thus horizontal scrolling —
+ * Two mechanisms keep the horizontal footprint - and thus horizontal scrolling -
  * minimal for the current viewport:
  *
  * 1. `d3-flextree` computes a tidy, variable-node-size Reingold–Tilford layout whose
  *    contour packing interlocks sibling subtree bounding boxes ("reuses the gaps").
  * 2. A **cascading compaction rule** turns subtrees into **vertical indented stacks**
  *    (children below one another, elbow connectors) when fanning them out horizontally
- *    would exceed their share of the viewport width — reproducing the hybrid look of
+ *    would exceed their share of the viewport width - reproducing the hybrid look of
  *    the reference organogram. The cascade works bottom-up: the deepest crowded
  *    subtree stacks first, which shrinks its parent's fanned width, so upper tiers
  *    stay side-by-side whenever possible. A parent that still overflows greedily
@@ -38,7 +38,7 @@ import type { ChartNode } from '../../../store/api/chartNode';
  *    trailing off far to the right.
  *
  * All card metrics and tuning knobs live in `constants/chartLayout.ts`, which the card
- * renderer reads too — the height model here and the rows `TopdownNode` paints must agree.
+ * renderer reads too - the height model here and the rows `TopdownNode` paints must agree.
  */
 
 export interface TopdownLayoutOptions {
@@ -80,7 +80,7 @@ export interface KenmuLink {
   fromId: string;
   toId: string;
   label: string;
-  /** The person's stable id — shared by their primary + concurrent rows, so the UI can
+  /** The person's stable id - shared by their primary + concurrent rows, so the UI can
    * anchor the link name-to-name and cross-highlight every place they appear. */
   sysId: string;
 }

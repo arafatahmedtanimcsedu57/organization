@@ -30,7 +30,7 @@ import {
 } from './assignments/assignmentForm';
 
 /**
- * `/admin/assignments` — the 兼務 master: every user ↔ department ↔ title posting, with the
+ * `/admin/assignments` - the 兼務 master: every user ↔ department ↔ title posting, with the
  * primary/concurrent flag and validity dates. The page owns the panel state machine and the
  * mutations; the table columns and the form fields live beside it.
  */
@@ -116,7 +116,7 @@ export function AssignmentsPage() {
       {panel && isDirty ? (
         <SaveBar
           message={
-            isCreating ? 'Adding a new posting — unsaved changes' : 'Editing posting — unsaved changes'
+            isCreating ? 'Adding a new posting - unsaved changes' : 'Editing posting - unsaved changes'
           }
           saving={saving}
           onSave={handleSave}

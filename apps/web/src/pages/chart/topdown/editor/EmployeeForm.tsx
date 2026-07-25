@@ -12,7 +12,7 @@ import type { EmpForm } from './forms';
 export interface EmployeeFormProps {
   panel: EditorPanel<Employee, EmpForm>;
   departments: Department[];
-  /** Always set — the shell renders this form only once the row has resolved. */
+  /** Always set - the shell renders this form only once the row has resolved. */
   employee: Employee;
   onCancel: () => void;
   onSave: () => void;

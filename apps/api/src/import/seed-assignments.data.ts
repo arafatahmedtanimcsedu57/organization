@@ -5,9 +5,9 @@ import type { Assignment } from '@org-chart/domain';
  * target department exists in `cmn_department` (verifiable against the provided
  * masters). Two further legacy (兼) cases are intentionally NOT seeded here because
  * their target department is absent from the master:
- *   - 佐藤 悠一郎 as 部長 (兼) of「ソリューション営業部」— that 部 node doesn't exist
+ *   - 佐藤 悠一郎 as 部長 (兼) of「ソリューション営業部」- that 部 node doesn't exist
  *     (only its 課/G children do); see docs/concurrent-duties-design.md.
- *   - 佐藤 曠弌 as 事業部長 (兼) of システム事業部 — redundant: he is already the
+ *   - 佐藤 曠弌 as 事業部長 (兼) of システム事業部 - redundant: he is already the
  *     primary member there (代表取締役) in sys_user.
  */
 export const SEED_ASSIGNMENTS: Assignment[] = [

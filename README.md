@@ -1,15 +1,15 @@
 # Organization Chart Auto-Output App
 
 A full-stack app that automatically generates a **printable organization chart** (interactive
-React view → A3 PDF) from the two Syslabo masters — `sys_user` (employees) and `cmn_department`
-(departments) — reproducing the hand-made `組織図(Current Organizational Chart).xlsx`, and adds a
+React view → A3 PDF) from the two Syslabo masters - `sys_user` (employees) and `cmn_department`
+(departments) - reproducing the hand-made `組織図(Current Organizational Chart).xlsx`, and adds a
 maintenance UI with change history and a working concurrent-duties (兼務) model.
 
 Built for the Syslabo assignment. Covers all four requirements:
 
-- **1 & 2** — the chart generator itself, and a reproducible one-command dev environment.
-- **3** — a maintenance UI for employees/departments/assignments with an append-only change-history browser.
-- **4** — concurrent duties (兼務) as a first-class relation, feeding the `(兼)` chips on the chart.
+- **1 & 2** - the chart generator itself, and a reproducible one-command dev environment.
+- **3** - a maintenance UI for employees/departments/assignments with an append-only change-history browser.
+- **4** - concurrent duties (兼務) as a first-class relation, feeding the `(兼)` chips on the chart.
 
 See [`docs/assignment-understanding.md`](docs/assignment-understanding.md) and
 [`docs/concurrent-duties-design.md`](docs/concurrent-duties-design.md) for the background design notes.
@@ -17,9 +17,9 @@ See [`docs/assignment-understanding.md`](docs/assignment-understanding.md) and
 ## Architecture
 
 ```
-apps/api        NestJS REST API — TypeORM + PostgreSQL, xlsx import, org-chart, PDF export
+apps/api        NestJS REST API - TypeORM + PostgreSQL, xlsx import, org-chart, PDF export
                  (Puppeteer), employee/department/assignment CRUD, append-only history.
-apps/web        React SPA (Vite) — interactive org chart (Tree ⇄ Network), admin area for the
+apps/web        React SPA (Vite) - interactive org chart (Tree ⇄ Network), admin area for the
                  masters, history browser. Organo Admin (Shopify/Polaris-style) design system.
 packages/domain Framework-free domain core shared by api and web: department tree, rank
                  ordering, name disambiguation, title normalization, 兼務 placement.
@@ -36,18 +36,18 @@ docker-compose.yml   db (Postgres) + api + web, wired together; a test-only db-t
 ## Setup & usage
 
 ```bash
-cp .env.example .env   # optional — defaults already work
+cp .env.example .env   # optional - defaults already work
 docker compose up --build
 ```
 
 This single command brings up **the database, the API, and the web app**, and the API's
 entrypoint automatically **waits for Postgres, runs migrations, and imports/seeds the masters**
-from `data/*.xlsx` before starting — no separate seed step.
+from `data/*.xlsx` before starting - no separate seed step.
 
 Once it's up:
 
-- **Web app:** http://localhost:5173 — chart at `/chart`, admin at `/admin`, history at `/history`.
-- **API:** http://localhost:3000 — see the controllers below.
+- **Web app:** http://localhost:5173 - chart at `/chart`, admin at `/admin`, history at `/history`.
+- **API:** http://localhost:3000 - see the controllers below.
 
 Stop with `Ctrl+C`, or `docker compose down` (add `-v` to also drop the `db-data` volume and
 start from a clean database next time).
@@ -58,13 +58,13 @@ start from a clean database next time).
 
 Use the **admin UI** at `/admin` (Employees, Departments, Assignments tabs):
 
-- **Employees / Departments** — create, edit, and deactivate. Schema changes are additive-only
+- **Employees / Departments** - create, edit, and deactivate. Schema changes are additive-only
   (new columns, never repurposed ones), per the assignment's precautions.
-- **Assignments** — a person's **primary** posting plus any **concurrent (兼務)** postings.
+- **Assignments** - a person's **primary** posting plus any **concurrent (兼務)** postings.
   Adding a concurrent assignment is what makes a person's `(兼)` chip appear in another
   department on the chart; a second *primary* posting for the same person is rejected.
 - Every create/update/deactivate across these three is recorded automatically; browse it at
-  `/history` (reverse-chronological, before/after, no edit or delete path — the log is
+  `/history` (reverse-chronological, before/after, no edit or delete path - the log is
   append-only by design).
 
 ### API surface (`apps/api`, NestJS)
@@ -79,7 +79,7 @@ Use the **admin UI** at `/admin` (Employees, Departments, Assignments tabs):
 
 ### Domain core (`packages/domain`)
 
-The department tree (parent-by-name from `cmn_department`, **not** `sys_user.Manager` — empty for
+The department tree (parent-by-name from `cmn_department`, **not** `sys_user.Manager` - empty for
 every row), position-rank ordering, shared-last-name disambiguation, and title normalization
 (`主任２` full-width === `主任2`) all live here, framework-free, and are unit-tested directly.
 
@@ -120,7 +120,7 @@ To run a layer individually:
 
 ```bash
 npm test --workspace=@org-chart/domain     # domain unit tests
-npm test --workspace=@org-chart/api        # API feature tests (needs db-test — see below)
+npm test --workspace=@org-chart/api        # API feature tests (needs db-test - see below)
 npx playwright test --config=apps/web/playwright.config.ts   # E2E (needs the full stack running)
 ```
 
@@ -131,8 +131,8 @@ npm run test:db:down --workspace=@org-chart/api  # tear it down
 
 ## Constraints honored
 
-- **Free DBMS** — PostgreSQL.
-- **Additive schema only** — master-table changes add columns rather than modifying existing ones.
-- **UTF-8 output** — the chart and PDF render Japanese correctly.
-- **Originals untouched** — `TryOutProgram/*.xlsx` are read-only reference; `data/*.xlsx` are the
+- **Free DBMS** - PostgreSQL.
+- **Additive schema only** - master-table changes add columns rather than modifying existing ones.
+- **UTF-8 output** - the chart and PDF render Japanese correctly.
+- **Originals untouched** - `TryOutProgram/*.xlsx` are read-only reference; `data/*.xlsx` are the
   working copies actually imported.

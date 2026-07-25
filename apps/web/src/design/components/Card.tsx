@@ -1,7 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
 export interface CardProps extends HTMLAttributes<HTMLElement> {
-  /** Lift on hover — for cards that act as a click target (e.g. a dashboard tile). */
+  /** Lift on hover - for cards that act as a click target (e.g. a dashboard tile). */
   interactive?: boolean;
   children: ReactNode;
 }
@@ -41,7 +41,7 @@ function CardBody({ children }: { children: ReactNode }) {
   return <div className="px-4 pb-4">{children}</div>;
 }
 
-/** A bordered sub-section within a card — stacks for multi-part cards. */
+/** A bordered sub-section within a card - stacks for multi-part cards. */
 function CardSection({ children }: { children: ReactNode }) {
   return <div className="p-4 border-t border-line-2">{children}</div>;
 }
@@ -50,7 +50,7 @@ function CardFooter({ children }: { children: ReactNode }) {
   return <div className="px-4 py-3 border-t border-line-2 flex gap-2 justify-end">{children}</div>;
 }
 
-/** `.card` — white rounded surface with soft shadow. */
+/** `.card` - white rounded surface with soft shadow. */
 export const Card = Object.assign(CardBase, {
   Header: CardHeader,
   Body: CardBody,

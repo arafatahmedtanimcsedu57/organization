@@ -182,8 +182,8 @@ export function EmployeesPage() {
         <SaveBar
           message={
             isCreating
-              ? 'Adding a new employee — unsaved changes'
-              : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} — unsaved changes`
+              ? 'Adding a new employee - unsaved changes'
+              : `Editing ${editingEmployee?.lastName ?? ''} ${editingEmployee?.firstName ?? ''} - unsaved changes`
           }
           saving={saving}
           onSave={handleSave}

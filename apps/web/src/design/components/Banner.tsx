@@ -19,7 +19,7 @@ const TONES: Record<BannerTone, string> = {
   crit: 'bg-crit text-crit-ink shadow-[inset_0_0_0_1px_var(--color-crit-line)]',
 };
 
-/** Banner — info/success/warn/crit callout. */
+/** Banner - info/success/warn/crit callout. */
 export function Banner({ tone = 'info', icon, title, actions, children }: BannerProps) {
   return (
     <div

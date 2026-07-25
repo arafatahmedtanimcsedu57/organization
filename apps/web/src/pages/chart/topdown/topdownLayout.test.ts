@@ -39,7 +39,7 @@ function dept(
   };
 }
 
-/** Four divisions, ~20 departments, one wide roster and one deep branch — the real shape. */
+/** Four divisions, ~20 departments, one wide roster and one deep branch - the real shape. */
 function fixture(): ChartNode[] {
   const sales = dept('d1', '営業本部', 'd1', 'division', [member('佐藤(悠)', '本部長')], 2, [
     dept('d1a', '営業1部', 'd1', 'department', [member('田中', '部長')], 6),

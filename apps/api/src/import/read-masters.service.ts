@@ -18,8 +18,8 @@ const str = (v: unknown): string => (v == null ? '' : normalizeText(String(v)));
 /**
  * Reads the `sys_user` / `cmn_department` xlsx masters (SheetJS, seed-time only) into
  * the shared `@org-chart/domain` row shapes. Only the "Page 1" sheet of each file is
- * read. Every cell is normalized (see `./normalize.ts`) so downstream logic — the
- * database, `@org-chart/domain`, the UI — sees consistent values.
+ * read. Every cell is normalized (see `./normalize.ts`) so downstream logic - the
+ * database, `@org-chart/domain`, the UI - sees consistent values.
  */
 @Injectable()
 export class ReadMastersService {

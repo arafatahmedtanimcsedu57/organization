@@ -1,16 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Breadcrumb, Button, Card, EmptyState, ErrorState, LoadingState } from '../design/components';
-import { PAGE__BIG, PAGE_HEAD, PAGE_TITLE, PH_ACTIONS } from '../design/formStyles';
-import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
-import type { ChartNode } from '../store/api/chartNode';
-import { useUiStore } from '../store/uiStore';
+
 import { DataIssuesStrip } from './chart/DataIssuesStrip';
 import { Legend } from './chart/Legend';
-import { OrgTree } from './chart/OrgTree';
 import { ChartCanvas } from './chart/topdown/ChartCanvas';
 import { CanvasEditor } from './chart/topdown/CanvasEditor';
 import { TopdownPrint } from './chart/topdown/TopdownPrint';
+import { 
+  Breadcrumb, 
+  Card, 
+  EmptyState, 
+  ErrorState, 
+  LoadingState 
+} from '../design/components';
+
+import { useUiStore } from '../store/uiStore';
+import { useGetChartQuery, useGetChartWarningsQuery } from '../store/api/chartApi';
+import type { ChartNode } from '../store/api/chartNode';
+
+import { 
+  PAGE__BIG, 
+  PAGE_HEAD, 
+  PAGE_TITLE, 
+  PH_ACTIONS 
+} from '../design/formStyles';
+
 
 /** Depth-first lookup so the selected node tracks refetched chart data, never a stale object. */
 function findNode(roots: ChartNode[], id: string): ChartNode | null {
@@ -22,18 +36,12 @@ function findNode(roots: ChartNode[], id: string): ChartNode | null {
   return null;
 }
 
-/** `?print=1` is the route the PDF endpoint navigates to: it always renders the **Top-down**
- * layout fit-to-width for A4 portrait with every roster expanded (no truncation), regardless
- * of which view the maintainer had open interactively. The A4/chrome-hiding rules come from
- * the `@media print` stylesheet, which Puppeteer's `page.pdf()` applies automatically. */
 export function ChartPage() {
   const { data, error, isLoading, refetch } = useGetChartQuery();
   const { data: warningsData } = useGetChartWarningsQuery();
   const [searchParams] = useSearchParams();
   const printMode = searchParams.get('print') === '1';
   const setPrintMode = useUiStore((state) => state.setPrintMode);
-  const viewMode = useUiStore((state) => state.viewMode);
-  const setViewMode = useUiStore((state) => state.setViewMode);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,22 +58,8 @@ export function ChartPage() {
           <Breadcrumb items={[{ label: 'Home', to: '/' }, { label: 'Organization chart' }]} />
           <h1 className={PAGE_TITLE}>Organization chart</h1>
         </div>
-        {!printMode ? (
+         {!printMode ? (
           <div className={`${PH_ACTIONS} no-print`} role="group" aria-label="Chart view">
-            <Button
-              variant={viewMode === 'topdown' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setViewMode('topdown')}
-            >
-              Top-down
-            </Button>
-            <Button
-              variant={viewMode === 'horizontal' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setViewMode('horizontal')}
-            >
-              Horizontal
-            </Button>
             <a
               className="inline-flex items-center gap-1.5 h-[28px] px-[10px] rounded-md text-[12px] font-semibold border bg-brand text-white border-brand hover:bg-brand-dark transition-[background,box-shadow,transform] duration-[120ms] ease-brand"
               href="/api/chart/pdf"
@@ -103,9 +97,7 @@ export function ChartPage() {
           </Card.Body>
         ) : printMode ? (
           <TopdownPrint roots={data.roots} />
-        ) : viewMode === 'horizontal' ? (
-          <OrgTree roots={data.roots} printMode={false} />
-        ) : (
+        )  : (
           <ChartCanvas
             roots={data.roots}
             selectedId={selectedId}
@@ -114,7 +106,7 @@ export function ChartPage() {
         )}
       </Card>
 
-      {!printMode && viewMode === 'topdown' && selectedNode ? (
+      {!printMode && selectedNode ? (
         <CanvasEditor node={selectedNode} onClose={() => setSelectedId(null)} />
       ) : null}
     </div>

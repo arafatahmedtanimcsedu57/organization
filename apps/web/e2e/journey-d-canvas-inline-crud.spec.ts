@@ -3,8 +3,8 @@ import { removeAssignmentsFor } from './assignment-helpers';
 
 /**
  * Journey D (`chart-canvas` spec, `redesign-org-chart-canvas`): edit master data directly
- * from the Top-down canvas — select a department node, edit the department, and add a
- * concurrent (兼務) posting — and see the canvas reflect the changes without a manual
+ * from the Top-down canvas - select a department node, edit the department, and add a
+ * concurrent (兼務) posting - and see the canvas reflect the changes without a manual
  * reload. Runs against the real app stack (`docker compose up`), not a mock.
  */
 
@@ -26,7 +26,7 @@ test('select a canvas node, edit the department, and add a 兼務 posting inline
   await editor.getByRole('button', { name: 'Edit department' }).click();
   const headInput = page.locator('#cv-dept-head');
   await expect(headInput).toBeVisible();
-  // The edit section renders only once populated from /departments — never with an empty name.
+  // The edit section renders only once populated from /departments - never with an empty name.
   await expect(page.locator('#cv-dept-name')).not.toHaveValue('');
   const originalHead = await headInput.inputValue();
   const newHead = `E2E統括 ${Date.now() % 100000}`;
@@ -44,8 +44,8 @@ test('select a canvas node, edit the department, and add a 兼務 posting inline
 
   // --- Add a 兼務 posting into this department from the canvas ---
   // The editor's roster is scoped to this selected department; a concurrent posting placed
-  // here adds a distinct 兼 chip to it. (Concurrent postings are freely duplicable — only a
-  // second *primary* is rejected — so the create always succeeds and always adds one chip.)
+  // here adds a distinct 兼 chip to it. (Concurrent postings are freely duplicable - only a
+  // second *primary* is rejected - so the create always succeeds and always adds one chip.)
   const chipsBefore = await editor.locator('.kenmu-mark').count();
 
   await editor.getByRole('button', { name: 'Add posting (兼務)' }).click();

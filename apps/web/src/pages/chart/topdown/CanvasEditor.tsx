@@ -1,23 +1,6 @@
 import { useCallback, useState } from 'react';
-import type { Member } from '@org-chart/domain';
+
 import { Button, Card } from '../../../design/components';
-import type { ChartNode } from '../../../store/api/chartNode';
-import { chartApi } from '../../../store/api/chartApi';
-import {
-  useCreateDepartmentMutation,
-  useDeactivateDepartmentMutation,
-  useGetDepartmentsQuery,
-  useUpdateDepartmentMutation,
-  type Department,
-} from '../../../store/api/departmentsApi';
-import {
-  useDeactivateEmployeeMutation,
-  useGetEmployeesQuery,
-  useUpdateEmployeeMutation,
-  type Employee,
-} from '../../../store/api/employeesApi';
-import { useCreateAssignmentMutation } from '../../../store/api/assignmentsApi';
-import { useAppDispatch } from '../../../store/store';
 import { useEditorPanel } from '../../admin/useEditorPanel';
 import { AssignmentForm } from './editor/AssignmentForm';
 import { DepartmentForm } from './editor/DepartmentForm';
@@ -36,6 +19,26 @@ import {
   type EmpForm,
 } from './editor/forms';
 
+import { useAppDispatch } from '../../../store/store';
+import {
+  useDeactivateEmployeeMutation,
+  useGetEmployeesQuery,
+  useUpdateEmployeeMutation,
+  type Employee,
+} from '../../../store/api/employeesApi';
+import { useCreateAssignmentMutation } from '../../../store/api/assignmentsApi';
+import type { ChartNode } from '../../../store/api/chartNode';
+import { chartApi } from '../../../store/api/chartApi';
+import {
+  useCreateDepartmentMutation,
+  useDeactivateDepartmentMutation,
+  useGetDepartmentsQuery,
+  useUpdateDepartmentMutation,
+  type Department,
+} from '../../../store/api/departmentsApi';
+
+import type { Member } from '@org-chart/domain';
+
 const NO_DEPARTMENTS: Department[] = [];
 const NO_EMPLOYEES: Employee[] = [];
 
@@ -45,14 +48,14 @@ export interface CanvasEditorProps {
 }
 
 /**
- * `.canvas-editor` — inline CRUD for the selected canvas node (`chart-canvas` capability):
+ * `.canvas-editor` - inline CRUD for the selected canvas node (`chart-canvas` capability):
  * edit / deactivate the department, add a sub-department, add a 兼務 posting, and edit /
- * deactivate roster people — all through the same `useEditorPanel` + RTK Query mutations the
+ * deactivate roster people - all through the same `useEditorPanel` + RTK Query mutations the
  * admin pages use.
  *
  * This shell owns the panel state machines and the mutations; the three forms are
  * presentational. `chartApi` is a separate slice whose `Chart` tag the master-data mutations
- * do NOT invalidate, so every successful save here explicitly invalidates it — that is what
+ * do NOT invalidate, so every successful save here explicitly invalidates it - that is what
  * makes the canvas refresh without a manual reload.
  */
 export function CanvasEditor({ node, onClose }: CanvasEditorProps) {

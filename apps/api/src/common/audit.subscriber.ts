@@ -66,7 +66,7 @@ export class AuditSubscriber implements EntitySubscriberInterface {
     });
   }
 
-  /** Assignments have no `active` flag — removal is their only delete-like write, so it's logged as a deactivation. */
+  /** Assignments have no `active` flag - removal is their only delete-like write, so it's logged as a deactivation. */
   async afterRemove(event: RemoveEvent<unknown>): Promise<void> {
     const entityType = AUDITED_ENTITY_TYPES.get(event.metadata.target as Function);
     const removed = event.databaseEntity ?? event.entity;

@@ -1,9 +1,14 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { ZOOM_STEP } from '../../../constants/canvasZoom';
-import type { ChartNode } from '../../../store/api/chartNode';
+import { 
+  useCallback, 
+  useMemo, 
+  useRef, 
+  useState 
+} from 'react';
+
 import { CanvasStage } from './CanvasStage';
 import { CanvasToolbar } from './CanvasToolbar';
 import type { LayoutNode } from './topdownLayout';
+
 import { useAdaptiveLayout } from './hooks/useAdaptiveLayout';
 import { useAutoFit } from './hooks/useAutoFit';
 import { useCanvasFit } from './hooks/useCanvasFit';
@@ -15,6 +20,10 @@ import { useFullscreen } from './hooks/useFullscreen';
 import { useReducedMotion } from './hooks/useReducedMotion';
 import { useViewportSize } from './hooks/useViewportSize';
 
+import type { ChartNode } from '../../../store/api/chartNode';
+
+import { ZOOM_STEP } from '../../../constants/canvasZoom';
+
 export interface ChartCanvasProps {
   roots: ChartNode[];
   selectedId?: string | null;
@@ -22,7 +31,7 @@ export interface ChartCanvasProps {
 }
 
 /**
- * `.topdown-canvas` — the interactive organogram canvas (`chart-canvas` capability): a
+ * `.topdown-canvas` - the interactive organogram canvas (`chart-canvas` capability): a
  * flextree top-down layout on a pannable/zoomable dotted-grid surface with a floating
  * toolbar (search, fit, zoom, fullscreen).
  *

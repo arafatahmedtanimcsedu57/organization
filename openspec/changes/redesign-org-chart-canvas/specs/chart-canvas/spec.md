@@ -4,8 +4,8 @@
 
 The Top-down view SHALL lay out the department hierarchy as a top-down tree using a tidy-tree
 algorithm with **variable node sizes**, packing sibling subtrees so unused horizontal gaps are
-reused, and SHALL stack deep or narrow subtrees vertically so the chart's horizontal footprint —
-and horizontal scrolling — is minimized for the current viewport width. The layout SHALL re-pack
+reused, and SHALL stack deep or narrow subtrees vertically so the chart's horizontal footprint -
+and horizontal scrolling - is minimized for the current viewport width. The layout SHALL re-pack
 when the available width changes.
 
 #### Scenario: Subtrees pack to minimize width
@@ -63,7 +63,7 @@ match SHALL be highlighted and the viewport SHALL ease to fit the matching node.
 ### Requirement: Create and edit master data from the canvas
 
 The canvas SHALL let a maintainer **create, edit, and deactivate** departments and people, and
-**add concurrent (兼務) postings**, directly from a node — reusing the existing master-data edit
+**add concurrent (兼務) postings**, directly from a node - reusing the existing master-data edit
 panel and APIs rather than a separate implementation. Successful changes SHALL be reflected on the
 canvas without a manual refresh.
 

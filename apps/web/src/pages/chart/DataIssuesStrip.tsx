@@ -11,7 +11,7 @@ const KIND_LABEL: Record<BuildWarning['kind'], string> = {
 
 /** `.no-print` data-issues strip: surfaces the build's non-fatal `BuildWarning`s (unmatched
  * departments, unknown titles, orphaned assignments, ...) so the drift in the source masters is
- * diagnosed in the UI rather than hidden. Maintenance-facing only — omitted from the printed/PDF
+ * diagnosed in the UI rather than hidden. Maintenance-facing only - omitted from the printed/PDF
  * chart, which is meant for distribution, not data QA. */
 export function DataIssuesStrip({ warnings }: { warnings: BuildWarning[] }) {
   if (warnings.length === 0) return null;

@@ -41,7 +41,7 @@ export function CanvasStage({
   onToggleExpand,
 }: CanvasStageProps) {
   const byId = useMemo(() => new Map(layout.nodes.map((node) => [node.id, node])), [layout]);
-  /** Everyone who holds a 兼務 posting — their name rows become hover-linkable. */
+  /** Everyone who holds a 兼務 posting - their name rows become hover-linkable. */
   const kenmuSysIds = useMemo(() => new Set(layout.kenmu.map((link) => link.sysId)), [layout]);
   const { containerRef, anchorY } = useMemberAnchors(layout);
 

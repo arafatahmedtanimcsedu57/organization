@@ -6,35 +6,35 @@ Styling for the running app lives entirely in `apps/web`:
 - **Semantic class names** (`.btn`, `.card`, `.dept`, `.dn`, `.rail`, `.savebar`, `.itable`, …) applied across ~23 components and pages, plus small design components (`Button`, `Card`, `Badge`, `Banner`, `IndexTable`, `SaveBar`, state components) that compose those classes.
 - **Print/PDF export** (Puppeteer, A3 landscape) depends on `print.css` + the `@page` rule and on the full-roster print expansion.
 - **Offline Japanese rendering**: fonts are self-hosted via `@fontsource` (Figtree + Noto Sans JP) so Puppeteer renders CJK with **zero network access**.
-- **Playwright E2E** (`apps/web/e2e/*.spec.ts`) selects nodes by **CSS class name** (`.tree`, `.node`, `.dn`, `.network`, `.itable tbody tr`, `.person`, `.dept`, `.line`, `.pos`, `.p.kenmu`, `.kenmu-mark`, `.kenmu-src`) — so class names are load-bearing for the test suite, not just for styling.
+- **Playwright E2E** (`apps/web/e2e/*.spec.ts`) selects nodes by **CSS class name** (`.tree`, `.node`, `.dn`, `.network`, `.itable tbody tr`, `.person`, `.dept`, `.line`, `.pos`, `.p.kenmu`, `.kenmu-mark`, `.kenmu-src`) - so class names are load-bearing for the test suite, not just for styling.
 
-Stack: npm-workspaces monorepo, Vite 8, React 19. Only `apps/web` has CSS; `apps/api` and `packages/domain` have none. The design-system spec requires centralized tokens, an indented tree of cards, color-coded branch rails, sourced 兼務 markers, full-roster print, Tree/Network views, and accessible + print-ready styling — all of which must survive the migration unchanged in outcome.
+Stack: npm-workspaces monorepo, Vite 8, React 19. Only `apps/web` has CSS; `apps/api` and `packages/domain` have none. The design-system spec requires centralized tokens, an indented tree of cards, color-coded branch rails, sourced 兼務 markers, full-roster print, Tree/Network views, and accessible + print-ready styling - all of which must survive the migration unchanged in outcome.
 
 ## Goals / Non-Goals
 
 **Goals:**
 
-- Make **Tailwind CSS the styling authority** across `apps/web` — visual styling expressed as utility classes in JSX.
+- Make **Tailwind CSS the styling authority** across `apps/web` - visual styling expressed as utility classes in JSX.
 - Expose the existing design tokens through Tailwind's `@theme`, **keeping token names and values** so the Organo Admin look is preserved by construction.
 - Keep the app **visually identical** before/after.
 - Keep the **PDF/print export**, **offline CJK fonts**, and **Playwright E2E suite** all passing.
 
 **Non-Goals:**
 
-- No visual redesign, no new palette, no new component library (no shadcn/Radix) — plain Tailwind utilities + the existing small React components.
+- No visual redesign, no new palette, no new component library (no shadcn/Radix) - plain Tailwind utilities + the existing small React components.
 - No changes to `apps/api` or `packages/domain` (they carry no CSS).
-- The static HTML design studies under `ui_design/` are **out of scope** — they are reference prototypes, not part of the shipped app, and keep their own CSS.
+- The static HTML design studies under `ui_design/` are **out of scope** - they are reference prototypes, not part of the shipped app, and keep their own CSS.
 - Not rewriting the Playwright specs (see Decision 4).
 
 ## Decisions
 
 ### 1. Tailwind CSS v4 (CSS-first) over v3 (JS-config)
 
-Use Tailwind **v4** with the first-party **`@tailwindcss/vite`** plugin. Rationale: v4's `@theme` maps our existing CSS-variable tokens **1:1** into utilities, it needs **no `tailwind.config.js`** and no separate PostCSS setup, content is auto-detected, and it integrates with Vite via a single plugin. _Alternative — v3:_ requires `tailwind.config.js`, `postcss.config.js`, and manual `content` globs, and maps our token vars less cleanly. Rejected.
+Use Tailwind **v4** with the first-party **`@tailwindcss/vite`** plugin. Rationale: v4's `@theme` maps our existing CSS-variable tokens **1:1** into utilities, it needs **no `tailwind.config.js`** and no separate PostCSS setup, content is auto-detected, and it integrates with Vite via a single plugin. _Alternative - v3:_ requires `tailwind.config.js`, `postcss.config.js`, and manual `content` globs, and maps our token vars less cleanly. Rejected.
 
 ### 2. Preserve tokens by porting `:root` variables into `@theme`
 
-Port every token in `tokens.css` (`--bg`, `--surface`, `--text-sub`, `--brand`, `--r-lg`, `--shadow-1`, `--sidebar-w`, `--topbar-h`, the font stacks, status tones, …) into an `@theme` block so they become Tailwind utilities (`bg-surface`, `text-sub`, `rounded-lg`, `shadow-1`, `w-sidebar`, etc.) that keep the **same names**. Rationale: guarantees visual parity and keeps a single source of truth for tokens. _Alternative — adopt Tailwind's default palette/scale:_ would shift the look; contradicts the "preserve" goal. Rejected.
+Port every token in `tokens.css` (`--bg`, `--surface`, `--text-sub`, `--brand`, `--r-lg`, `--shadow-1`, `--sidebar-w`, `--topbar-h`, the font stacks, status tones, …) into an `@theme` block so they become Tailwind utilities (`bg-surface`, `text-sub`, `rounded-lg`, `shadow-1`, `w-sidebar`, etc.) that keep the **same names**. Rationale: guarantees visual parity and keeps a single source of truth for tokens. _Alternative - adopt Tailwind's default palette/scale:_ would shift the look; contradicts the "preserve" goal. Rejected.
 
 ### 3. Base-layer concerns stay in one Tailwind entry stylesheet
 
@@ -42,7 +42,7 @@ A new `src/design/tailwind.css` becomes the single entry: `@import 'tailwindcss'
 
 ### 4. Retain the E2E-selected class names as style-free semantic hooks
 
-The Playwright suite selects on `.tree`, `.node`, `.dn`, `.network`, `.itable`, `.person`, `.dept`, `.line`, `.pos`, `.p`, `.kenmu`, `.kenmu-mark`, `.kenmu-src`. Keep these **exact class names in the markup as hooks that carry no CSS**, applying Tailwind utilities alongside them. Rationale: **zero test-file churn** and it honors the quality-assurance guarantee that the suite stays green in CI; the classes become selectors, not styles, so Tailwind remains the styling authority. _Alternative — migrate the E2E hooks to `data-testid`:_ cleaner long-term but edits three spec files and risks destabilizing a currently-green suite; deferred to a follow-up (see Open Questions).
+The Playwright suite selects on `.tree`, `.node`, `.dn`, `.network`, `.itable`, `.person`, `.dept`, `.line`, `.pos`, `.p`, `.kenmu`, `.kenmu-mark`, `.kenmu-src`. Keep these **exact class names in the markup as hooks that carry no CSS**, applying Tailwind utilities alongside them. Rationale: **zero test-file churn** and it honors the quality-assurance guarantee that the suite stays green in CI; the classes become selectors, not styles, so Tailwind remains the styling authority. _Alternative - migrate the E2E hooks to `data-testid`:_ cleaner long-term but edits three spec files and risks destabilizing a currently-green suite; deferred to a follow-up (see Open Questions).
 
 ### 5. DRY variants in TypeScript, not in CSS
 
@@ -69,7 +69,7 @@ Migrate `apps/web/src/**`. Leave `ui_design/` untouched. Rationale: those are th
 4. Delete `shell.css`, `components.css`, `chart.css`, `tokens.css` once their rules are gone; keep print/font concerns only in the entry.
 5. **Verify:** `tsc --noEmit`, `eslint`, `vite build`, the full Playwright E2E suite (all three journeys incl. PDF export), a visual spot-check against the pre-migration UI, and a manual A3 PDF check for Japanese glyphs + full rosters.
 
-**Rollback:** code-only — revert the branch; the deleted CSS files are restored from git. No schema, data, or API changes are involved.
+**Rollback:** code-only - revert the branch; the deleted CSS files are restored from git. No schema, data, or API changes are involved.
 
 ## Open Questions
 

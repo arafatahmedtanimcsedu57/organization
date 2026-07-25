@@ -25,7 +25,7 @@ export interface UseCanvasSearchOptions {
  * Chart search: builds the haystack from the current layout, tracks the focused hit, and
  * frames hits as the user moves between them.
  *
- * Framing is driven by the two events that mean "show me this hit" — typing and cycling —
+ * Framing is driven by the two events that mean "show me this hit" - typing and cycling -
  * rather than by an effect watching the results. An effect would also fire when a relayout
  * rebuilds the result set, yanking the viewport around while the user is reading.
  *
@@ -48,7 +48,7 @@ export function useCanvasSearch({ layout, fitToNode }: UseCanvasSearchOptions): 
   const setQuery = useCallback(
     (next: string) => {
       setQueryState(next);
-      // Resolve against the index this keystroke saw — the same one the render will use.
+      // Resolve against the index this keystroke saw - the same one the render will use.
       const found = findMatches(index, next);
       setCursor({ key: found.join('|'), index: 0 });
       const first = found[0];

@@ -9,7 +9,7 @@ import type { DeptForm } from './forms';
 export interface DepartmentFormProps {
   panel: EditorPanel<Department, DeptForm>;
   departments: Department[];
-  /** The selected node — excluded from the parent list so a department cannot parent itself. */
+  /** The selected node - excluded from the parent list so a department cannot parent itself. */
   nodeId: string;
   nodeName: string;
   onCancel: () => void;

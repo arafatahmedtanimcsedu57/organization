@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-/** All fields optional — a maintainer may update name, parent, and/or head independently. */
+/** All fields optional - a maintainer may update name, parent, and/or head independently. */
 export class UpdateDepartmentDto {
   @IsOptional()
   @IsString()

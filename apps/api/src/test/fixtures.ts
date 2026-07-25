@@ -6,7 +6,7 @@ import type { Assignment } from '../assignments/assignment.entity.ts';
 /**
  * Deterministic dataset the ephemeral test database is reset to before every
  * feature test run: a 3-department tree, a shared-last-name pair (disambiguation),
- * a staff-level roster entry, and one concurrent (兼務) posting — mirroring the
+ * a staff-level roster entry, and one concurrent (兼務) posting - mirroring the
  * legacy chart's `(兼)佐藤(悠)` example so feature tests exercise the same
  * scenarios as the domain unit tests. IDs are fixed strings, never generated, so
  * assertions can hardcode them.

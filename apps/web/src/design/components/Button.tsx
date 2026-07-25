@@ -29,7 +29,7 @@ const SIZES: Record<ButtonSize, string> = {
   sm: 'h-[28px] px-[10px] text-[12px]',
 };
 
-/** Button — secondary/primary/brand/plain/critical/ghostdark (for dark surfaces like the save
+/** Button - secondary/primary/brand/plain/critical/ghostdark (for dark surfaces like the save
  * bar) × md/sm, expressed as Tailwind utilities composed in TS. */
 export function Button({
   variant = 'secondary',

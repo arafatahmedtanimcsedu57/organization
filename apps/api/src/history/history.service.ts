@@ -7,7 +7,7 @@ import type { HistoryQueryDto } from './dto/history-query.dto.ts';
 
 /**
  * `change-history` capability: read-only queries over the append-only `ChangeLog`.
- * No create/update/delete methods exist here — that's what keeps history immutable.
+ * No create/update/delete methods exist here - that's what keeps history immutable.
  */
 @Injectable()
 export class HistoryService {

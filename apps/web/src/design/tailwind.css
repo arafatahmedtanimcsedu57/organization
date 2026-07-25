@@ -1,11 +1,11 @@
 /* =====================================================================
-   ORGANO ADMIN — Tailwind entry (single authored stylesheet)
+   ORGANO ADMIN - Tailwind entry (single authored stylesheet)
    Everything the app needs that is NOT a utility lives here:
      1. the Tailwind import (Preflight + utilities)
-     2. self-hosted fonts (@fontsource — offline, so Puppeteer renders JP)
-     3. @theme — the design tokens, exposed as Tailwind utilities
+     2. self-hosted fonts (@fontsource - offline, so Puppeteer renders JP)
+     3. @theme - the design tokens, exposed as Tailwind utilities
         (bg-surface, text-sub, border-line, rounded-lg, shadow-1, font-jp…)
-     4. @layer base — body defaults, focus ring, selection, reduced motion
+     4. @layer base - body defaults, focus ring, selection, reduced motion
      5. the A3-landscape print rules (chrome hidden, surfaces flattened)
    All component/screen styling is authored as Tailwind utilities in the
    JSX; there are no per-screen stylesheets. Ported from the former
@@ -15,7 +15,7 @@
 @import 'tailwindcss';
 
 /* ---- self-hosted type: Figtree (UI) + Noto Sans JP (Japanese) ----
-   Bundled so the built assets serve from our own origin — no Google
+   Bundled so the built assets serve from our own origin - no Google
    Fonts CDN call, so the Puppeteer PDF renderer needs zero network. */
 @import '@fontsource/figtree/400.css';
 @import '@fontsource/figtree/500.css';
@@ -27,7 +27,7 @@
 @import '@fontsource/noto-sans-jp/700.css';
 
 /* =====================================================================
-   Design tokens — single source of truth, consumed as utilities.
+   Design tokens - single source of truth, consumed as utilities.
    ===================================================================== */
 @theme {
   /* surfaces → bg-bg / bg-surface / bg-surface-sub / bg-surface-hover / bg-surface-press */
@@ -91,11 +91,11 @@
   --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
 }
 
-/* Layout dimensions — referenced via arbitrary utilities
+/* Layout dimensions - referenced via arbitrary utilities
    (grid-cols-[var(--sidebar-w)_1fr], h-[var(--topbar-h)], w-[var(--sidebar-w)]).
    Also the light-mode branch palette + native `color-scheme` (drives form
-   controls, scrollbars). Branch rail/tint are plain CSS vars — not `@theme`
-   tokens — because `branchColorFor` returns `var(--branch-*)` refs so the chart
+   controls, scrollbars). Branch rail/tint are plain CSS vars - not `@theme`
+   tokens - because `branchColorFor` returns `var(--branch-*)` refs so the chart
    recolors with the theme; see pages/chart/branchColor.ts. */
 :root {
   --sidebar-w: 232px;
@@ -117,7 +117,7 @@
 }
 
 /* =====================================================================
-   Dark theme — overrides the `@theme` color/shadow tokens (and the branch
+   Dark theme - overrides the `@theme` color/shadow tokens (and the branch
    palette) under `[data-theme="dark"]` on <html>. Because every component
    styles with the semantic tokens (bg-surface, text-ink, border-line,
    shadow-1…) which compile to `var(--color-…)`, swapping the variables here
@@ -128,25 +128,25 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* surfaces — darkest page, lifting to elevated cards/topbar */
+  /* surfaces - darkest page, lifting to elevated cards/topbar */
   --color-bg: #16181d;
   --color-surface: #1f2229;
   --color-surface-sub: #1a1d23;
   --color-surface-hover: #272b33;
   --color-surface-press: #30353e;
 
-  /* text — soft off-white (not pure #fff) for comfort */
+  /* text - soft off-white (not pure #fff) for comfort */
   --color-ink: #d6d8dc;
   --color-strong: #f3f4f6;
   --color-sub: #9aa0a8;
   --color-muted: #6d747d;
 
-  /* borders — low-contrast hairlines that still read on dark */
+  /* borders - low-contrast hairlines that still read on dark */
   --color-line: #2c3037;
   --color-line-2: #24282e;
   --color-line-strong: #3b414a;
 
-  /* brand + action — brand brightened for dark; brand-dark flips to a LIGHT
+  /* brand + action - brand brightened for dark; brand-dark flips to a LIGHT
      green so `text-brand-dark` on the dark brand-tint stays legible (and the
      brand button simply brightens on hover). action stays a dark, lifted
      neutral so `text-white` on it holds up in both themes. */
@@ -156,7 +156,7 @@
   --color-action: #30343b;
   --color-action-hover: #3a3f47;
 
-  /* status tones — deep tints + light ink (mirrors the light ramps) */
+  /* status tones - deep tints + light ink (mirrors the light ramps) */
   --color-success: #10281c;
   --color-success-ink: #63d69b;
   --color-success-line: #1f5b3d;
@@ -172,13 +172,13 @@
   --color-neutral: #2a2e35;
   --color-neutral-ink: #c3c7cd;
 
-  /* elevation — stronger black + a faint light ring (the light shadows vanish
+  /* elevation - stronger black + a faint light ring (the light shadows vanish
      on dark, and the hairline ring gives cards a visible edge) */
   --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.05);
   --shadow-2: 0 6px 18px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
   --shadow-pop: 0 16px 40px rgba(0, 0, 0, 0.7);
 
-  /* branch palette — rails brightened, tints deepened */
+  /* branch palette - rails brightened, tints deepened */
   --branch-blue-rail: #5b9bff;
   --branch-blue-tint: #15243c;
   --branch-gold-rail: #d4a12b;
@@ -194,7 +194,7 @@
 }
 
 /* =====================================================================
-   Base layer — global element defaults on top of Preflight.
+   Base layer - global element defaults on top of Preflight.
    ===================================================================== */
 @layer base {
   body {
@@ -227,8 +227,8 @@
 }
 
 /* Layout morph: when the chart canvas re-packs (zoom-adaptive relayout, roster
-   expansion), cards glide to their new slots while the connector layer — whose
-   elbow paths can't tween between shapes — stays hidden and fades back in as the
+   expansion), cards glide to their new slots while the connector layer - whose
+   elbow paths can't tween between shapes - stays hidden and fades back in as the
    cards settle. `.layout-animate` is set only by the interactive canvas; the print
    renderer never animates. Durations are neutralized by the reduced-motion rule below. */
 .layout-animate .topdown-node {
@@ -265,13 +265,13 @@
 }
 
 /* =====================================================================
-   Print — A3 landscape. Hide app chrome (structural hook classes are
+   Print - A3 landscape. Hide app chrome (structural hook classes are
    kept in the markup for exactly this), flatten surfaces, and let the
    page expand to fill the sheet. View-specific print rules (e.g. the
    chart's full-roster expansion) layer on top via `print:` utilities.
    ===================================================================== */
 @media print {
-  /* Always print on white paper — force the light palette even if the viewer
+  /* Always print on white paper - force the light palette even if the viewer
      has dark mode on, so a Ctrl+P (and the Puppeteer A3 export) stays legible. */
   :root,
   :root[data-theme='dark'] {

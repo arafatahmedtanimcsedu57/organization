@@ -1,7 +1,7 @@
 import { IsBoolean, IsDateString, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import type { AssignmentType } from '../assignment.entity.ts';
 
-/** All fields optional — a maintainer may update the title, type, dates, and/or primary flag independently. */
+/** All fields optional - a maintainer may update the title, type, dates, and/or primary flag independently. */
 export class UpdateAssignmentDto {
   @IsOptional()
   @IsString()

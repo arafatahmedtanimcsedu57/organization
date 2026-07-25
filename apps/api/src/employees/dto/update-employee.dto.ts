@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-/** All fields optional — a maintainer may update title and/or department independently. */
+/** All fields optional - a maintainer may update title and/or department independently. */
 export class UpdateEmployeeDto {
   @IsOptional()
   @IsString()

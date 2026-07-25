@@ -3,7 +3,7 @@ import { ToolbarButton } from './ToolbarButton';
 export interface CanvasToolbarProps {
   query: string;
   onQueryChange: (query: string) => void;
-  /** Advance to the next hit — bound to Enter in the search field. */
+  /** Advance to the next hit - bound to Enter in the search field. */
   onSubmitSearch: () => void;
   matchCount: number;
   /** Zero-based index of the focused hit. */
@@ -17,7 +17,7 @@ export interface CanvasToolbarProps {
 }
 
 /**
- * `.canvas-toolbar` — the floating search / fit / zoom / fullscreen bar. Its class is what
+ * `.canvas-toolbar` - the floating search / fit / zoom / fullscreen bar. Its class is what
  * `useCanvasZoom`'s d3 filter checks to keep toolbar interactions from drag-panning the
  * canvas underneath, and E2E uses it to read the zoom percentage.
  */

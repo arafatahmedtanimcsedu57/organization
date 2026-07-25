@@ -16,7 +16,7 @@ import type { ChartNode } from './chart-node.ts';
  * Minimal in-memory stand-in for the slice of `Repository<T>` the
  * employees/departments services call, backed by a mutable array so writes
  * made through `EmployeesService`/`DepartmentsService` are visible to a
- * subsequent `OrgChartService.buildOrgModel()` call — proving master edits
+ * subsequent `OrgChartService.buildOrgModel()` call - proving master edits
  * actually reach chart regeneration, per spec `master-data-management`
  * ("Update an employee" / "Non-destructive deactivation" scenarios).
  */

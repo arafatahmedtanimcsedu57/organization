@@ -1,14 +1,14 @@
 ## Why
 
-The web app's styling is ~1,300 lines of hand-authored CSS across six files in `apps/web/src/design/`, consumed through bespoke semantic class names (`.btn`, `.dept`, `.rail`, `.savebar`…) spread over ~23 components. Every visual tweak means round-tripping between a `.tsx` file and a distant stylesheet, class names drift from the markup they style, and there is no shared utility vocabulary. Adopting **Tailwind CSS** puts styling inline with the markup, turns the existing design tokens into first-class theme utilities, and lets any maintainer restyle a component without hunting through custom CSS — while keeping the current Organo Admin look pixel-for-pixel.
+The web app's styling is ~1,300 lines of hand-authored CSS across six files in `apps/web/src/design/`, consumed through bespoke semantic class names (`.btn`, `.dept`, `.rail`, `.savebar`…) spread over ~23 components. Every visual tweak means round-tripping between a `.tsx` file and a distant stylesheet, class names drift from the markup they style, and there is no shared utility vocabulary. Adopting **Tailwind CSS** puts styling inline with the markup, turns the existing design tokens into first-class theme utilities, and lets any maintainer restyle a component without hunting through custom CSS - while keeping the current Organo Admin look pixel-for-pixel.
 
 ## What Changes
 
 - **Add Tailwind CSS v4** and the `@tailwindcss/vite` plugin to `apps/web` (CSS-first config, no `tailwind.config.js` needed).
 - **Map the existing design tokens into Tailwind's `@theme`** so they become utilities (`bg-surface`, `text-sub`, `border`, `rounded-lg`, `shadow-1`, the brand green, the `--sidebar-w`/`--topbar-h` layout vars, etc.). Token names carry over, so the visual language is preserved by construction.
-- **Migrate all styled components/pages from semantic classNames to Tailwind utilities** — the app shell, sidebar, topbar, cards, badges, banners, buttons, save bar, index table, and the entire chart (division/department/group cards, color-coded branch rails, sourced 兼務 chips, roster lines, and the Network view).
+- **Migrate all styled components/pages from semantic classNames to Tailwind utilities** - the app shell, sidebar, topbar, cards, badges, banners, buttons, save bar, index table, and the entire chart (division/department/group cards, color-coded branch rails, sourced 兼務 chips, roster lines, and the Network view).
 - **BREAKING (internal):** remove the hand-written stylesheets `shell.css`, `components.css`, and `chart.css` once their rules are expressed as utilities; fold `tokens.css` into the Tailwind `@theme` entry.
-- **Keep base-layer concerns in the Tailwind CSS entry, not as utilities:** the `fonts.css` `@fontsource` imports and the `@page { size: A3 landscape }` rule stay in the entry stylesheet, and the print hide/flatten rules are re-expressed with Tailwind's `print:` variant plus a small `@layer` block — preserving the Puppeteer PDF export and full-roster print expansion.
+- **Keep base-layer concerns in the Tailwind CSS entry, not as utilities:** the `fonts.css` `@fontsource` imports and the `@page { size: A3 landscape }` rule stay in the entry stylesheet, and the print hide/flatten rules are re-expressed with Tailwind's `print:` variant plus a small `@layer` block - preserving the Puppeteer PDF export and full-roster print expansion.
 - **Preserve accessibility and motion behavior** (visible focus rings, `prefers-reduced-motion`) via Tailwind variants.
 
 ## Capabilities

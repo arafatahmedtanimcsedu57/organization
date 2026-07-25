@@ -31,7 +31,7 @@ export interface BudgetInputs {
  * (zoomed in ⇒ narrower ⇒ more stacking and tighter row wrapping), capped at the overview
  * budget so a zoomed-out view wraps toward the viewport's shape instead of a tall sliver.
  *
- * Pure, and deliberately fed its own previous output — the hysteresis below is what keeps
+ * Pure, and deliberately fed its own previous output - the hysteresis below is what keeps
  * "fit → relayout → refit" from ping-ponging between two wrappings.
  */
 export function nextBudgetWidth({
@@ -56,7 +56,7 @@ export function nextBudgetWidth({
   const desired = quantize(Math.min(visible, cap));
   const previous = current ?? cap;
   // Dead-bands: at the fitted zoom `visible ≈ layout width`, so rounding noise must never
-  // trigger a relayout — only meaningful zoom changes may.
+  // trigger a relayout - only meaningful zoom changes may.
   if (desired >= previous + 2 * BUDGET_QUANTUM) return desired; // zooming out: re-fan wider
   if (desired < previous && visible < currentLayoutWidth - BUDGET_QUANTUM) {
     return desired; // zoomed in far enough that the layout truly overflows: compact
@@ -85,7 +85,7 @@ function useOverviewBudget(roots: ChartNode[], viewport: ViewportSize): number |
         bestScore = score;
         best = candidate;
       }
-      if (aspect >= targetAspect) break; // wide enough — widening further only overshoots
+      if (aspect >= targetAspect) break; // wide enough - widening further only overshoots
       candidate *= OVERVIEW_PROBE_GROWTH; // too tall: widen the rows and retry
     }
     return best;
@@ -127,7 +127,7 @@ export function useAdaptiveLayout({
   );
 
   // The budget is a hysteresis state machine whose next value depends on the width of the
-  // layout the *current* value produced — a genuine feedback loop, so it cannot be derived
+  // layout the *current* value produced - a genuine feedback loop, so it cannot be derived
   // in a single pass. Reconciling after commit is the least-bad of the three options: doing
   // it during render needs a render-phase setState or a ref written during render (both
   // impure), and pushing it into the resize/gesture callbacks would spread the layout logic

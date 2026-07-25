@@ -2,9 +2,9 @@
 
 ### Requirement: Render the org chart as an indented tree of department cards
 
-The **Horizontal** chart view SHALL render as a **vertically indented tree of department cards** —
+The **Horizontal** chart view SHALL render as a **vertically indented tree of department cards** -
 each department is a card containing its rank-ordered roster, and child departments are indented
-beneath their parent — restyled to the organogram card aesthetic (avatar-style department header,
+beneath their parent - restyled to the organogram card aesthetic (avatar-style department header,
 soft shadow, dotted-grid canvas, orthogonal elbow connectors). It is the **secondary** view; the
 default is the compact Top-down tree (see the `chart-canvas` capability). Top-level divisions SHALL
 be separated by clear vertical spacing.

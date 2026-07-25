@@ -22,7 +22,7 @@ export interface NodeRosterProps {
 }
 
 /**
- * The card body: one line per manager title-group, then the staff — either listed in full
+ * The card body: one line per manager title-group, then the staff - either listed in full
  * or collapsed behind a `×N` row. Surplus title-groups hide behind a `＋N` expander.
  *
  * Row counts here mirror `cardHeight()` exactly; both read the same constants, because a

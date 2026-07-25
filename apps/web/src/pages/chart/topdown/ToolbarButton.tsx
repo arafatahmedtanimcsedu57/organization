@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 export interface ToolbarButtonProps {
-  /** Used as both the tooltip and the accessible name — the face is a bare glyph. */
+  /** Used as both the tooltip and the accessible name - the face is a bare glyph. */
   label: string;
   onClick: () => void;
   children: ReactNode;

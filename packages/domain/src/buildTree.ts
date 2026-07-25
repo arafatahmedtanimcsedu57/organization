@@ -1,12 +1,12 @@
 /**
  * Department tree builder: links departments by parent name (never by
- * sys_user.Manager, which is empty for every row — see CLAUDE.md).
+ * sys_user.Manager, which is empty for every row - see CLAUDE.md).
  */
 import type { BuildWarning, Department, OrgNode } from "./model.ts";
 
 export interface DepartmentTree {
   roots: OrgNode[];
-  /** Department nodes keyed by `Department.name` — the join key from `Employee.departmentName`. */
+  /** Department nodes keyed by `Department.name` - the join key from `Employee.departmentName`. */
   byName: Map<string, OrgNode>;
   /** Department nodes keyed by `Department.id`. */
   byId: Map<string, OrgNode>;

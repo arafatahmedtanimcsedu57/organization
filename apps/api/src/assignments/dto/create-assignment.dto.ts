@@ -11,7 +11,7 @@ export class CreateAssignmentDto {
   @IsNotEmpty()
   departmentId!: string;
 
-  /** Title held *in this department* — may differ from the person's home title. */
+  /** Title held *in this department* - may differ from the person's home title. */
   @IsString()
   @IsNotEmpty()
   title!: string;

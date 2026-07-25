@@ -1,7 +1,7 @@
 import type { ChartNode } from '../../store/api/chartNode';
 import { branchColorFor } from './branchColor';
 
-/** `.legend` — explains the chart's visual conventions (branch color per top-level division,
+/** `.legend` - explains the chart's visual conventions (branch color per top-level division,
  * the dashed 兼務 chip/arrow) so a printed or exported chart is self-explanatory without the
  * interactive UI around it. Renders in both interactive and print mode. */
 export function Legend({ roots }: { roots: ChartNode[] }) {
@@ -32,7 +32,7 @@ export function Legend({ roots }: { roots: ChartNode[] }) {
           <span className="p kenmu inline-flex items-baseline gap-1 py-[1px] px-2 border border-dashed border-brand rounded-full bg-brand-tint text-brand-dark font-jp text-[13.5px]">
             <span className="kenmu-mark font-bold">兼</span>
           </span>
-          兼務（concurrent duty — chip names the source department + title）
+          兼務（concurrent duty - chip names the source department + title）
         </span>
       </div>
     </div>
