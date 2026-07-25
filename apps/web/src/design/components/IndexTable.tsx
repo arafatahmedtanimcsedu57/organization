@@ -23,7 +23,7 @@ export interface IndexTableProps<Row> {
 }
 
 const TH_BASE =
-  'text-[12px] font-semibold text-sub px-4 py-[9px] border-b border-line-2 bg-surface-sub';
+  'text-[12px] text-nowrap font-semibold text-sub px-4 py-[9px] border-b border-line-2 bg-surface-sub';
 const TD_BASE = 'px-4 py-[11px] border-b border-line-2 align-middle';
 
 /** `.itable` - index table with optional selection + row actions. The `itable` class is kept as a
@@ -57,7 +57,7 @@ export function IndexTable<Row>({
               {column.header}
             </th>
           ))}
-          {rowActions ? <th style={{ width: 44 }} /> : null}
+          {rowActions ? <th style={{ width: 44 }} className={`${TH_BASE}`} /> : null}
         </tr>
       </thead>
       <tbody>
