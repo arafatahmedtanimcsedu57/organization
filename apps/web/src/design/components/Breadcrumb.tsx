@@ -27,7 +27,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
-            <Fragment key={`${item.label}-${index}`}>
+            <Fragment key={item.to ?? item.label}>
               <li>
                 {item.to && !isLast ? (
                   <Link to={item.to} className={LINK}>

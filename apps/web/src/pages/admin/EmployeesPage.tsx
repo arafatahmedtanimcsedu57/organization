@@ -28,6 +28,7 @@ import {
   PERSON_SUB,
   DEPT,
 } from '../../design/formStyles';
+import { optionList } from '../../design/optionList';
 import {
   useCreateEmployeeMutation,
   useDeactivateEmployeeMutation,
@@ -305,13 +306,15 @@ export function EmployeesPage() {
                 <option value="" disabled>
                   Select a department…
                 </option>
-                {(departments ?? [])
-                  .filter((department) => department.active || department.id === form.departmentId)
-                  .map((department) => (
+                {optionList(
+                  departments,
+                  (department) => department.active || department.id === form.departmentId,
+                  (department) => (
                     <option key={department.id} value={department.id}>
                       {department.name}
                     </option>
-                  ))}
+                  ),
+                )}
               </select>
               {attemptedSave && fieldErrors.departmentId ? (
                 <div className={FIELD_ERR}>{fieldErrors.departmentId}</div>

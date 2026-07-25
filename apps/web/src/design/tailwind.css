@@ -226,6 +226,32 @@
   }
 }
 
+/* Layout morph: when the chart canvas re-packs (zoom-adaptive relayout, roster
+   expansion), cards glide to their new slots while the connector layer — whose
+   elbow paths can't tween between shapes — stays hidden and fades back in as the
+   cards settle. `.layout-animate` is set only by the interactive canvas; the print
+   renderer never animates. Durations are neutralized by the reduced-motion rule below. */
+.layout-animate .topdown-node {
+  transition:
+    left 0.7s cubic-bezier(0.4, 0, 0.15, 1),
+    top 0.7s cubic-bezier(0.4, 0, 0.15, 1),
+    height 0.7s cubic-bezier(0.4, 0, 0.15, 1),
+    box-shadow 0.15s var(--ease-brand, ease);
+}
+@keyframes edges-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* Connectors can't tween between elbow shapes, so they wait out the card glide, then
+   fade back in as everything settles (kept in step with the 0.7s card transition). */
+.layout-animate .edges-morph {
+  animation: edges-fade-in 0.35s ease 0.5s backwards;
+}
+
 /* Motion-safe: honor prefers-reduced-motion by neutralizing animation. */
 @media (prefers-reduced-motion: reduce) {
   *,

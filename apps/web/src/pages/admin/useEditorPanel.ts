@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
 /** Field-level validation errors keyed by form field. */
 export type FieldErrors<Form> = Partial<Record<keyof Form, string>>;
@@ -94,7 +94,10 @@ export function useEditorPanel<Row, Form>({
   const fieldErrors = validate(form);
   const hasFieldErrors = Object.keys(fieldErrors).length > 0;
 
-  useEffect(() => {
+  // Seeding the draft from the record the panel points at. `useLayoutEffect`, not
+  // `useEffect`: a passive effect runs after paint, so opening an editor would show one
+  // frame of the *previous* record's values before the seed lands.
+  useLayoutEffect(() => {
     if (isCreating) {
       setForm(emptyForm);
       setBaseline(emptyForm);
@@ -105,9 +108,8 @@ export function useEditorPanel<Row, Form>({
       setBaseline(state);
       setAttemptedSave(false);
     }
-    // `emptyForm`/`toFormState` are stable module-level values; re-syncing is driven by
-    // which record the panel points at.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // `emptyForm`/`toFormState` are stable module-level values; re-syncing is deliberately
+    // driven only by which record the panel points at.
   }, [panel, editingRow]);
 
   function openCreate() {

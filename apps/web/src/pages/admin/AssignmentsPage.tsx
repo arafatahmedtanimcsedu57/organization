@@ -1,6 +1,4 @@
-import { POSITION_RANK } from '@org-chart/domain';
 import {
-  Badge,
   Breadcrumb,
   Button,
   Card,
@@ -10,80 +8,32 @@ import {
   LoadingState,
   SaveBar,
 } from '../../design/components';
-import type { IndexTableColumn } from '../../design/components';
-import {
-  PAGE,
-  PAGE_HEAD,
-  PH_ACTIONS,
-  PAGE_TITLE,
-  FIELD,
-  LABEL,
-  INPUT,
-  FIELD_ERR,
-  TWO,
-  PERSON,
-  DEPT,
-} from '../../design/formStyles';
+import { PAGE, PAGE_HEAD, PH_ACTIONS, PAGE_TITLE } from '../../design/formStyles';
 import {
   useCreateAssignmentMutation,
   useGetAssignmentsQuery,
   useRemoveAssignmentMutation,
   useUpdateAssignmentMutation,
   type Assignment,
-  type AssignmentType,
 } from '../../store/api/assignmentsApi';
-import { useGetEmployeesQuery, type Employee } from '../../store/api/employeesApi';
+import { useGetEmployeesQuery } from '../../store/api/employeesApi';
 import { useGetDepartmentsQuery } from '../../store/api/departmentsApi';
-import { errorMessage } from '../../store/api/errorMessage';
-import { useEditorPanel, type FieldErrors } from './useEditorPanel';
+import { useEditorPanel } from './useEditorPanel';
+import { AssignmentFields } from './assignments/AssignmentFields';
+import { assignmentColumns } from './assignments/assignmentColumns';
+import {
+  EMPTY_FORM,
+  personName,
+  toFormState,
+  validate,
+  type AssignmentFormState,
+} from './assignments/assignmentForm';
 
-interface AssignmentFormState {
-  employeeSysId: string;
-  departmentId: string;
-  title: string;
-  assignmentType: AssignmentType;
-  isPrimary: boolean;
-  validFrom: string;
-  validTo: string;
-}
-
-const EMPTY_FORM: AssignmentFormState = {
-  employeeSysId: '',
-  departmentId: '',
-  title: '',
-  assignmentType: 'concurrent',
-  isPrimary: false,
-  validFrom: '',
-  validTo: '',
-};
-
-function toFormState(assignment: Assignment): AssignmentFormState {
-  return {
-    employeeSysId: assignment.employeeSysId,
-    departmentId: assignment.departmentId,
-    title: assignment.title,
-    assignmentType: assignment.assignmentType,
-    isPrimary: assignment.isPrimary,
-    validFrom: assignment.validFrom ?? '',
-    validTo: assignment.validTo ?? '',
-  };
-}
-
-function personName(employee: Employee | undefined, sysId: string): string {
-  return employee ? `${employee.lastName} ${employee.firstName}` : sysId;
-}
-
-function validate(form: AssignmentFormState): FieldErrors<AssignmentFormState> {
-  const errors: FieldErrors<AssignmentFormState> = {};
-  if (!form.employeeSysId) errors.employeeSysId = 'Person is required.';
-  if (!form.departmentId) errors.departmentId = 'Department is required.';
-  if (!form.title.trim()) errors.title = 'Title is required.';
-  if (form.validFrom && form.validTo && form.validFrom > form.validTo) {
-    errors.validTo = 'Valid-to must be on or after valid-from.';
-  }
-  return errors;
-}
-
+/**
+ * `/admin/assignments` — the 兼務 master: every user ↔ department ↔ title posting, with the
+ * primary/concurrent flag and validity dates. The page owns the panel state machine and the
+ * mutations; the table columns and the form fields live beside it.
+ */
 export function AssignmentsPage() {
   const { data: assignments, error, isLoading, refetch } = useGetAssignmentsQuery();
   const { data: employees } = useGetEmployeesQuery();
@@ -151,80 +101,29 @@ export function AssignmentsPage() {
     const employee = employees?.find(
       (candidate) => candidate.sysId === editingAssignment.employeeSysId,
     );
-    if (
-      !window.confirm(
-        `Remove this posting for ${personName(employee, editingAssignment.employeeSysId)}?`,
-      )
-    ) {
-      return;
-    }
+    const confirmed = window.confirm(
+      `Remove this posting for ${personName(employee, editingAssignment.employeeSysId)}?`,
+    );
+    if (!confirmed) return;
     await removeAssignment(editingAssignment.id);
     closePanel();
   }
 
-  const employeeName = (sysId: string) =>
-    personName(
-      employees?.find((employee) => employee.sysId === sysId),
-      sysId,
-    );
-  const departmentName = (departmentId: string) =>
-    departments?.find((department) => department.id === departmentId)?.name ?? departmentId;
-
-  const columns: IndexTableColumn<Assignment>[] = [
-    {
-      key: 'person',
-      header: 'Person',
-      render: (assignment) => (
-        <span className={PERSON}>{employeeName(assignment.employeeSysId)}</span>
-      ),
-    },
-    {
-      key: 'department',
-      header: 'Department',
-      render: (assignment) => (
-        <span className={DEPT}>{departmentName(assignment.departmentId)}</span>
-      ),
-    },
-    {
-      key: 'title',
-      header: 'Title',
-      render: (assignment) => <Badge plain>{assignment.title}</Badge>,
-    },
-    {
-      key: 'type',
-      header: 'Type',
-      render: (assignment) =>
-        assignment.assignmentType === 'concurrent' ? (
-          <Badge tone="kenmu">兼務</Badge>
-        ) : (
-          <Badge tone="brand">Primary</Badge>
-        ),
-    },
-    {
-      key: 'valid',
-      header: 'Valid from / to',
-      render: (assignment) => (
-        <span className="font-jp text-ink text-[13px]">
-          {assignment.validFrom ?? '—'} → {assignment.validTo ?? '—'}
-        </span>
-      ),
-    },
-  ];
+  const columns = assignmentColumns({ employees, departments });
 
   return (
     <div className={PAGE}>
       {panel && isDirty ? (
         <SaveBar
           message={
-            isCreating
-              ? 'Adding a new posting — unsaved changes'
-              : `Editing posting — unsaved changes`
+            isCreating ? 'Adding a new posting — unsaved changes' : 'Editing posting — unsaved changes'
           }
           saving={saving}
           onSave={handleSave}
           onDiscard={discardChanges}
         />
       ) : null}
+
       <div className={PAGE_HEAD}>
         <div>
           <Breadcrumb
@@ -278,148 +177,16 @@ export function AssignmentsPage() {
         <Card>
           <Card.Header title={isCreating ? 'Add posting' : 'Edit posting'} />
           <Card.Section>
-            <div className={TWO}>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-person">
-                  Person
-                </label>
-                <select
-                  id="asn-person"
-                  className={INPUT}
-                  value={form.employeeSysId}
-                  disabled={!isCreating}
-                  onChange={(event) => setForm({ ...form, employeeSysId: event.target.value })}
-                >
-                  <option value="" disabled>
-                    Select a person…
-                  </option>
-                  {(employees ?? [])
-                    .filter((employee) => employee.active || employee.sysId === form.employeeSysId)
-                    .map((employee) => (
-                      <option key={employee.sysId} value={employee.sysId}>
-                        {employee.lastName} {employee.firstName} ({employee.userId})
-                      </option>
-                    ))}
-                </select>
-                {attemptedSave && fieldErrors.employeeSysId ? (
-                  <div className={FIELD_ERR}>{fieldErrors.employeeSysId}</div>
-                ) : null}
-              </div>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-department">
-                  Department
-                </label>
-                <select
-                  id="asn-department"
-                  className={INPUT}
-                  value={form.departmentId}
-                  disabled={!isCreating}
-                  onChange={(event) => setForm({ ...form, departmentId: event.target.value })}
-                >
-                  <option value="" disabled>
-                    Select a department…
-                  </option>
-                  {(departments ?? [])
-                    .filter(
-                      (department) => department.active || department.id === form.departmentId,
-                    )
-                    .map((department) => (
-                      <option key={department.id} value={department.id}>
-                        {department.name}
-                      </option>
-                    ))}
-                </select>
-                {attemptedSave && fieldErrors.departmentId ? (
-                  <div className={FIELD_ERR}>{fieldErrors.departmentId}</div>
-                ) : null}
-              </div>
-            </div>
-            <div className={FIELD}>
-              <label className={LABEL} htmlFor="asn-title">
-                Title in this department 役職
-              </label>
-              <input
-                id="asn-title"
-                className={INPUT}
-                list="position-ranks"
-                value={form.title}
-                onChange={(event) => setForm({ ...form, title: event.target.value })}
-              />
-              <datalist id="position-ranks">
-                {POSITION_RANK.map((rank) => (
-                  <option key={rank} value={rank} />
-                ))}
-              </datalist>
-              {attemptedSave && fieldErrors.title ? (
-                <div className={FIELD_ERR}>{fieldErrors.title}</div>
-              ) : null}
-            </div>
-            <div className={TWO}>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-type">
-                  Posting type
-                </label>
-                <select
-                  id="asn-type"
-                  className={INPUT}
-                  value={form.assignmentType}
-                  onChange={(event) => {
-                    const assignmentType = event.target.value as AssignmentType;
-                    setForm({
-                      ...form,
-                      assignmentType,
-                      isPrimary: assignmentType === 'primary' ? form.isPrimary : false,
-                    });
-                  }}
-                >
-                  <option value="concurrent">Concurrent (兼務)</option>
-                  <option value="primary">Primary</option>
-                </select>
-              </div>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-is-primary">
-                  <input
-                    id="asn-is-primary"
-                    type="checkbox"
-                    checked={form.isPrimary}
-                    disabled={form.assignmentType !== 'primary'}
-                    onChange={(event) => setForm({ ...form, isPrimary: event.target.checked })}
-                    className="mr-1.5"
-                  />
-                  Primary posting (home department)
-                </label>
-              </div>
-            </div>
-            <div className={TWO}>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-valid-from">
-                  Valid from
-                </label>
-                <input
-                  id="asn-valid-from"
-                  type="date"
-                  className={INPUT}
-                  value={form.validFrom}
-                  onChange={(event) => setForm({ ...form, validFrom: event.target.value })}
-                />
-              </div>
-              <div className={FIELD}>
-                <label className={LABEL} htmlFor="asn-valid-to">
-                  Valid to
-                </label>
-                <input
-                  id="asn-valid-to"
-                  type="date"
-                  className={INPUT}
-                  value={form.validTo}
-                  onChange={(event) => setForm({ ...form, validTo: event.target.value })}
-                />
-                {attemptedSave && fieldErrors.validTo ? (
-                  <div className={FIELD_ERR}>{fieldErrors.validTo}</div>
-                ) : null}
-              </div>
-            </div>
-            {saveError ? <div className={FIELD_ERR}>{errorMessage(saveError)}</div> : null}
+            <AssignmentFields
+              form={form}
+              setForm={setForm}
+              fieldErrors={fieldErrors}
+              attemptedSave={attemptedSave}
+              isCreating={isCreating}
+              employees={employees}
+              departments={departments}
+              saveError={saveError}
+            />
           </Card.Section>
           <Card.Footer>
             {!isCreating ? (

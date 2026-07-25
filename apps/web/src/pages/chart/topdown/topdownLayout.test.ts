@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import type { Member } from '@org-chart/domain';
+import { CARD_WIDTH } from '../../../constants/chartLayout';
 import type { ChartNode } from '../../../store/api/chartNode';
-import { computeTopdownLayout, cardHeight, CARD_WIDTH } from './topdownLayout';
+import { computeTopdownLayout, cardHeight } from './topdownLayout';
 
 /** Task 2.5: layout invariants on a dataset shaped like the real 20-department masters. */
 
@@ -133,10 +134,42 @@ describe('computeTopdownLayout', () => {
     expect(compact.width).toBeLessThan(fanned.width);
   });
 
-  test('narrower viewports never widen the layout', () => {
+  test('cascade stacks the deepest crowded subtree, not its whole branch', () => {
+    // At 1600px the 5-group SW開発課 must compact, but its parent SW開発部 keeps
+    // QA課 fanned beside the stack instead of collapsing into one giant list.
+    const layout = computeTopdownLayout(fixture(), { viewportWidth: 1600 });
+    const byId = new Map(layout.nodes.map((n) => [n.id, n]));
+    expect(byId.get('d2a1a')!.stacked).toBe(true); // group inside the stacked SW開発課
+    expect(byId.get('d2a')!.stacked).toBe(false); // SW開発部 itself stays fanned
+    expect(byId.get('d2a2')!.stacked).toBe(false); // QA課 remains its own column
+    expect(byId.get('d2a2')!.y).toBeGreaterThan(byId.get('d2a')!.y); // still a child tier
+  });
+
+  test('wraps the division forest into rows instead of one long strip', () => {
+    const layout = computeTopdownLayout(fixture(), { viewportWidth: 1200 });
+    const rootYs = ['d1', 'd2', 'd3', 'd4'].map(
+      (id) => layout.nodes.find((n) => n.id === id)!.y,
+    );
+    // With a 1200px budget the four divisions cannot share one row…
+    expect(new Set(rootYs).size).toBeGreaterThan(1);
+    // …and the whole diagram stays near the budget instead of sprawling sideways.
+    expect(layout.width).toBeLessThanOrEqual(1200 + CARD_WIDTH);
+    // Unbounded layouts still produce the classic single row.
+    const fanned = computeTopdownLayout(fixture());
+    const fannedYs = ['d1', 'd2', 'd3', 'd4'].map(
+      (id) => fanned.nodes.find((n) => n.id === id)!.y,
+    );
+    expect(new Set(fannedYs).size).toBe(1);
+  });
+
+  test('narrower viewports never meaningfully widen the layout', () => {
     const wide = computeTopdownLayout(fixture(), { viewportWidth: 1600 });
     const narrow = computeTopdownLayout(fixture(), { viewportWidth: 900 });
-    expect(narrow.width).toBeLessThanOrEqual(wide.width);
+    // Differently-shaped stacks interlock differently under flextree's contour
+    // packing (± a few dozen px), so allow that noise but no real widening.
+    expect(narrow.width).toBeLessThanOrEqual(wide.width + 60);
+    // Compaction trades width for height: the narrow layout must be the taller one.
+    expect(narrow.height).toBeGreaterThanOrEqual(wide.height);
   });
 
   test('full rosters grow cards; expandedIds grows just that node', () => {

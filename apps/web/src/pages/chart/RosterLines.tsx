@@ -1,30 +1,11 @@
 import { useState } from 'react';
-import type { Member } from '@org-chart/domain';
 import { Button } from '../../design/components';
-
-interface RosterLineGroup {
-  title: string;
-  members: Member[];
-}
+import type { Member } from '@org-chart/domain';
+import { groupByTitle, memberListKey } from './rosterGroups';
 
 /** Above this many people in one title group, the interactive view collapses the
  * surplus behind a `＋N` expand affordance; print mode (9.8) always renders in full. */
 const ROSTER_TRUNCATE_THRESHOLD = 12;
-
-/** Collapses consecutive same-title members (rank-ordered, so same-title runs are adjacent)
- * into one roster line, e.g. a `課長 / 主任` line listing both position holders. */
-function groupByTitle(members: Member[]): RosterLineGroup[] {
-  const groups: RosterLineGroup[] = [];
-  for (const member of members) {
-    const last = groups[groups.length - 1];
-    if (last && last.title === member.title) {
-      last.members.push(member);
-    } else {
-      groups.push({ title: member.title, members: [member] });
-    }
-  }
-  return groups;
-}
 
 export interface RosterLinesProps {
   managers: Member[];
@@ -37,14 +18,19 @@ export interface RosterLinesProps {
 /** `.roster` — the department card's rank-ordered lines: one per title group, managers then staff. */
 export function RosterLines({ managers, staff, printMode = false }: RosterLinesProps) {
   const groups = [...groupByTitle(managers), ...groupByTitle(staff)];
-  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  // Keyed by the group's first member: stable when a refetch reorders the roster, unlike
+  // the group's position in the list.
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
   if (groups.length === 0) return null;
 
   return (
     <div className="pt-[6px] px-[13px] pb-[11px] flex flex-col">
-      {groups.map((group, i) => {
+      {groups.map((group) => {
+        const groupKey = memberListKey(group.members, group.title);
         const isTruncated =
-          !printMode && !expanded.has(i) && group.members.length > ROSTER_TRUNCATE_THRESHOLD;
+          !printMode &&
+          !expanded.has(groupKey) &&
+          group.members.length > ROSTER_TRUNCATE_THRESHOLD;
         const visible = isTruncated
           ? group.members.slice(0, ROSTER_TRUNCATE_THRESHOLD)
           : group.members;
@@ -53,7 +39,7 @@ export function RosterLines({ managers, staff, printMode = false }: RosterLinesP
         return (
           <div
             className="line grid grid-cols-[96px_1fr] gap-3 items-baseline py-1 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-line-2"
-            key={`${group.title}-${i}`}
+            key={groupKey}
           >
             <span className="pos text-[11.5px] text-sub font-semibold">{group.title}</span>
             <div className="flex flex-wrap gap-x-[10px] gap-y-[5px] items-center">
@@ -79,7 +65,7 @@ export function RosterLines({ managers, staff, printMode = false }: RosterLinesP
                   variant="plain"
                   size="sm"
                   className="!h-auto py-0.5 !rounded-full"
-                  onClick={() => setExpanded((prev) => new Set(prev).add(i))}
+                  onClick={() => setExpanded((prev) => new Set(prev).add(groupKey))}
                 >
                   ＋{hiddenCount} {group.title}
                 </Button>

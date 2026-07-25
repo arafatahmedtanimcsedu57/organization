@@ -22,6 +22,7 @@ import {
   UID,
   DEPT,
 } from '../../design/formStyles';
+import { optionList } from '../../design/optionList';
 import {
   useCreateDepartmentMutation,
   useDeactivateDepartmentMutation,
@@ -55,11 +56,14 @@ function descendantNames(name: string, departments: Department[]): Set<string> {
   const descendants = new Set<string>();
   let frontier = [name];
   while (frontier.length) {
-    const children = departments.filter((department) => frontier.includes(department.parentName));
-    frontier = children
-      .map((child) => child.name)
-      .filter((childName) => !descendants.has(childName));
-    frontier.forEach((childName) => descendants.add(childName));
+    const nextFrontier: string[] = [];
+    for (const department of departments) {
+      if (!frontier.includes(department.parentName)) continue;
+      if (descendants.has(department.name)) continue;
+      nextFrontier.push(department.name);
+    }
+    frontier = nextFrontier;
+    for (const childName of frontier) descendants.add(childName);
   }
   return descendants;
 }
@@ -264,17 +268,17 @@ export function DepartmentsPage() {
                 onChange={(event) => setForm({ ...form, parentName: event.target.value })}
               >
                 <option value="">No parent (root)</option>
-                {(departments ?? [])
-                  .filter(
-                    (department) =>
-                      (department.active || department.name === form.parentName) &&
-                      !excludedParentNames.has(department.name),
-                  )
-                  .map((department) => (
+                {optionList(
+                  departments,
+                  (department) =>
+                    (department.active || department.name === form.parentName) &&
+                    !excludedParentNames.has(department.name),
+                  (department) => (
                     <option key={department.id} value={department.name}>
                       {department.name}
                     </option>
-                  ))}
+                  ),
+                )}
               </select>
             </div>
             <div className={FIELD}>

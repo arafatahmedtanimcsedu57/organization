@@ -81,6 +81,7 @@ export function IndexTable<Row>({
                     }`}
                     role="checkbox"
                     aria-checked={selected}
+                    aria-label={selected ? 'Deselect row' : 'Select row'}
                     onClick={() => onToggleRow?.(key)}
                   />
                 </td>

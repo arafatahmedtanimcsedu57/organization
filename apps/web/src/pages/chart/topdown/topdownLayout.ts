@@ -1,4 +1,20 @@
 import { flextree, type FlextreeNode } from 'd3-flextree';
+import {
+  CARD_PAD_Y,
+  CARD_WIDTH,
+  HEADER_HEIGHT,
+  MAX_MANAGER_ROWS,
+  PADDING,
+  ROOT_GAP,
+  ROSTER_LINE_HEIGHT,
+  ROW_GAP,
+  SIBLING_GAP,
+  STACK_GAP,
+  STACK_INDENT,
+  STACK_VIEWPORT_FRACTION,
+  STAFF_NAMES_PER_LINE,
+  TIER_GAP,
+} from '../../../constants/chartLayout';
 import type { ChartNode } from '../../../store/api/chartNode';
 
 /**
@@ -9,40 +25,21 @@ import type { ChartNode } from '../../../store/api/chartNode';
  *
  * 1. `d3-flextree` computes a tidy, variable-node-size Reingold–Tilford layout whose
  *    contour packing interlocks sibling subtree bounding boxes ("reuses the gaps").
- * 2. A compaction rule turns a subtree into a **vertical indented stack** (children
- *    below one another, elbow connectors) whenever fanning it out horizontally would
- *    exceed its share of the viewport width — reproducing the hybrid look of the
- *    reference organogram. The thresholds below are the tunable knobs.
+ * 2. A **cascading compaction rule** turns subtrees into **vertical indented stacks**
+ *    (children below one another, elbow connectors) when fanning them out horizontally
+ *    would exceed their share of the viewport width — reproducing the hybrid look of
+ *    the reference organogram. The cascade works bottom-up: the deepest crowded
+ *    subtree stacks first, which shrinks its parent's fanned width, so upper tiers
+ *    stay side-by-side whenever possible. A parent that still overflows greedily
+ *    stacks its widest child subtrees one at a time, and collapses into a single
+ *    list only as a last resort. The thresholds below are the tunable knobs.
+ * 3. **Row wrapping**: the division forest greedily wraps into rows that fit the
+ *    budget, so a wide organization grows downward (natural scrolling) instead of
+ *    trailing off far to the right.
+ *
+ * All card metrics and tuning knobs live in `constants/chartLayout.ts`, which the card
+ * renderer reads too — the height model here and the rows `TopdownNode` paints must agree.
  */
-
-/** Card width (all cards share one width so columns align). */
-export const CARD_WIDTH = 236;
-/** Header block: department name + head + count badge. */
-const HEADER_HEIGHT = 52;
-/** One roster line (a title group, the staff line, or the expander). */
-const ROSTER_LINE_HEIGHT = 22;
-/** Vertical padding inside a card. */
-const CARD_PAD_Y = 10;
-/** Vertical gap between a card and its children row (the connector run). */
-const TIER_GAP = 48;
-/** Horizontal gap between adjacent sibling subtrees. */
-const SIBLING_GAP = 28;
-/** Outer padding around the whole diagram. */
-const PADDING = 40;
-
-/* --- compaction knobs (task 2.3) --- */
-/** A fanned subtree may take at most this fraction of the viewport before it stacks. */
-const STACK_VIEWPORT_FRACTION = 0.85;
-/** Indent per depth level inside a vertical stack. */
-const STACK_INDENT = 22;
-/** Vertical gap between cards inside a stack. */
-const STACK_GAP = 12;
-
-/* --- roster display model (kept in sync with TopdownNode's rendering) --- */
-/** Manager title-groups shown before the surplus collapses behind the `＋N` expander. */
-export const MAX_MANAGER_ROWS = 4;
-/** Estimated staff names per wrapped line when a roster renders in full. */
-const STAFF_NAMES_PER_LINE = 3;
 
 export interface TopdownLayoutOptions {
   /** Available width in px; drives the stacking budget. Omit for “never stack”. */
@@ -83,6 +80,9 @@ export interface KenmuLink {
   fromId: string;
   toId: string;
   label: string;
+  /** The person's stable id — shared by their primary + concurrent rows, so the UI can
+   * anchor the link name-to-name and cross-highlight every place they appear. */
+  sysId: string;
 }
 
 export interface TopdownLayout {
@@ -119,17 +119,6 @@ export function cardHeight(node: ChartNode, fullRoster: boolean): number {
   return HEADER_HEIGHT + rows * ROSTER_LINE_HEIGHT + CARD_PAD_Y * 2;
 }
 
-/** Number of leaf departments under a node (the node itself if childless). */
-function leafCount(node: ChartNode): number {
-  if (node.children.length === 0) return 1;
-  return node.children.reduce((sum, child) => sum + leafCount(child), 0);
-}
-
-/** A subtree's width if fanned out fully horizontally (every leaf its own column). */
-function fanWidth(node: ChartNode): number {
-  return leafCount(node) * (CARD_WIDTH + SIBLING_GAP);
-}
-
 /** One card already positioned inside a stacked subtree, relative to the stack's top-left. */
 interface StackPlacement {
   node: ChartNode;
@@ -145,6 +134,15 @@ interface Datum {
   size: [number, number];
   children: Datum[];
   stack?: StackPlacement[];
+  /** Width of this datum's laid-out subtree (a stack's box, or the fanned children row). */
+  subtreeWidth: number;
+}
+
+/** Width of a fanned children row (contour-packed lower bound flextree can only beat). */
+function fannedWidth(children: Datum[]): number {
+  if (children.length === 0) return CARD_WIDTH;
+  const sum = children.reduce((acc, child) => acc + child.subtreeWidth, 0);
+  return Math.max(CARD_WIDTH, sum + SIBLING_GAP * (children.length - 1));
 }
 
 export function computeTopdownLayout(
@@ -173,83 +171,149 @@ export function computeTopdownLayout(
     return { placements, width: CARD_WIDTH + maxDepth * STACK_INDENT, height: cursorY - STACK_GAP };
   }
 
-  /** Depth 0 = divisions (never stacked); deeper subtrees stack when they blow the budget. */
+  /** The whole subtree under `node` as one indented-list box. */
+  function stackDatum(node: ChartNode): Datum {
+    const { placements, width, height } = buildStack(node);
+    return { node, size: [width, height + TIER_GAP], children: [], stack: placements, subtreeWidth: width };
+  }
+
+  /**
+   * Bottom-up cascade (depth 0 = divisions, which never stack themselves): children are
+   * resolved first, so a deep subtree that stacked already reads as one narrow box here.
+   * An overflowing parent then greedily stacks its widest fanned children until it fits,
+   * and only collapses into a single list itself when even that is not enough.
+   */
   function toDatum(node: ChartNode, depth: number): Datum {
-    if (depth >= 1 && node.children.length > 0 && fanWidth(node) > stackBudget) {
-      const { placements, width, height } = buildStack(node);
-      return { node, size: [width, height + TIER_GAP], children: [], stack: placements };
+    const children = node.children.map((child) => toDatum(child, depth + 1));
+    let width = fannedWidth(children);
+    if (children.length > 0 && width > stackBudget) {
+      const tried = new Set<number>();
+      while (width > stackBudget) {
+        let widest = -1;
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i]!;
+          if (child.stack || child.children.length === 0 || tried.has(i)) continue;
+          if (widest < 0 || child.subtreeWidth > children[widest]!.subtreeWidth) widest = i;
+        }
+        if (widest < 0) break;
+        tried.add(widest);
+        const stacked = stackDatum(children[widest]!.node!);
+        if (stacked.subtreeWidth < children[widest]!.subtreeWidth) {
+          children[widest] = stacked;
+          width = fannedWidth(children);
+        }
+      }
+      if (depth >= 1 && width > stackBudget) return stackDatum(node);
     }
     return {
       node,
       size: [CARD_WIDTH, cardHeight(node, isFull(node)) + TIER_GAP],
-      children: node.children.map((child) => toDatum(child, depth + 1)),
+      children,
+      subtreeWidth: width,
     };
   }
 
-  // A zero-size virtual root lets flextree lay out the whole forest at once.
-  const rootDatum: Datum = { node: null, size: [0, 0], children: roots.map((r) => toDatum(r, 0)) };
-  const layout = flextree<Datum>({
-    children: (d) => (d.children.length ? d.children : null),
-    nodeSize: (n) => n.data.size,
-    spacing: () => SIBLING_GAP,
-  });
-  const tree = layout.hierarchy(rootDatum);
-  layout(tree);
+  // Wrap the division forest into rows that fit the budget: a wide organization
+  // grows downward instead of trailing off to the right. No budget = one row.
+  const rootDatums = roots.map((r) => toDatum(r, 0));
+  const rowBudget = viewportWidth ?? Infinity;
+  const rows: Datum[][] = [];
+  let row: Datum[] = [];
+  let rowWidth = 0;
+  for (const datum of rootDatums) {
+    const grown = rowWidth + ROOT_GAP + datum.subtreeWidth;
+    if (row.length > 0 && grown > rowBudget) {
+      rows.push(row);
+      row = [datum];
+      rowWidth = datum.subtreeWidth;
+    } else {
+      row.push(datum);
+      rowWidth = row.length === 1 ? datum.subtreeWidth : grown;
+    }
+  }
+  if (row.length > 0) rows.push(row);
 
   const nodes: LayoutNode[] = [];
   const edges: LayoutEdge[] = [];
   const nameToId = new Map<string, string>();
+  let rowY = 0;
 
-  tree.each((hnode: FlextreeNode<Datum>) => {
-    const chart = hnode.data.node;
-    if (!chart) return; // the virtual root
-    const parentChart = hnode.parent?.data.node;
-
-    if (hnode.data.stack) {
-      // Emit every card of the stacked subtree; flextree positioned the box's center.
-      const boxLeft = hnode.x - hnode.data.size[0] / 2;
-      for (const placement of hnode.data.stack) {
-        nameToId.set(placement.node.name, placement.node.id);
-        nodes.push({
-          id: placement.node.id,
-          node: placement.node,
-          x: boxLeft + placement.relX,
-          y: hnode.y + placement.relY,
-          width: CARD_WIDTH,
-          height: placement.height,
-          fullRoster: isFull(placement.node),
-          stacked: placement.relX > 0,
-          branchId: placement.node.branchId,
-        });
-        const parentId = placement.parentId ?? parentChart?.id ?? null;
-        if (parentId) {
-          edges.push({
-            id: `${parentId}->${placement.node.id}`,
-            fromId: parentId,
-            toId: placement.node.id,
-            kind: placement.parentId ? 'stack' : 'fan',
-          });
-        }
-      }
-      return;
-    }
-
-    nameToId.set(chart.name, chart.id);
-    nodes.push({
-      id: chart.id,
-      node: chart,
-      x: hnode.x - CARD_WIDTH / 2,
-      y: hnode.y,
-      width: CARD_WIDTH,
-      height: cardHeight(chart, isFull(chart)),
-      fullRoster: isFull(chart),
-      stacked: false,
-      branchId: chart.branchId,
+  // Each row is laid out by its own flextree pass under a zero-size virtual root,
+  // then shifted below the previous row.
+  for (const rowDatums of rows) {
+    const rootDatum: Datum = { node: null, size: [0, 0], children: rowDatums, subtreeWidth: 0 };
+    const layout = flextree<Datum>({
+      children: (d) => (d.children.length ? d.children : null),
+      nodeSize: (n) => n.data.size,
+      spacing: (a, b) => (a.depth === 1 && b.depth === 1 ? ROOT_GAP : SIBLING_GAP),
     });
-    if (parentChart) {
-      edges.push({ id: `${parentChart.id}->${chart.id}`, fromId: parentChart.id, toId: chart.id, kind: 'fan' });
+    const tree = layout.hierarchy(rootDatum);
+    layout(tree);
+
+    const rowNodes: LayoutNode[] = [];
+    tree.each((hnode: FlextreeNode<Datum>) => {
+      const chart = hnode.data.node;
+      if (!chart) return; // the virtual root
+      const parentChart = hnode.parent?.data.node;
+
+      if (hnode.data.stack) {
+        // Emit every card of the stacked subtree; flextree positioned the box's center.
+        const boxLeft = hnode.x - hnode.data.size[0] / 2;
+        for (const placement of hnode.data.stack) {
+          const stackedNode = placement.node;
+          const stackedId = stackedNode.id;
+          nameToId.set(stackedNode.name, stackedId);
+          rowNodes.push({
+            id: stackedId,
+            node: stackedNode,
+            x: boxLeft + placement.relX,
+            y: hnode.y + placement.relY,
+            width: CARD_WIDTH,
+            height: placement.height,
+            fullRoster: isFull(stackedNode),
+            stacked: placement.relX > 0,
+            branchId: stackedNode.branchId,
+          });
+          const parentId = placement.parentId ?? parentChart?.id ?? null;
+          if (parentId) {
+            edges.push({
+              id: `${parentId}->${stackedId}`,
+              fromId: parentId,
+              toId: stackedId,
+              kind: placement.parentId ? 'stack' : 'fan',
+            });
+          }
+        }
+        return;
+      }
+
+      nameToId.set(chart.name, chart.id);
+      rowNodes.push({
+        id: chart.id,
+        node: chart,
+        x: hnode.x - CARD_WIDTH / 2,
+        y: hnode.y,
+        width: CARD_WIDTH,
+        height: cardHeight(chart, isFull(chart)),
+        fullRoster: isFull(chart),
+        stacked: false,
+        branchId: chart.branchId,
+      });
+      if (parentChart) {
+        edges.push({ id: `${parentChart.id}->${chart.id}`, fromId: parentChart.id, toId: chart.id, kind: 'fan' });
+      }
+    });
+
+    // Left-align the row and drop it below the previous one.
+    const rowMinX = Math.min(...rowNodes.map((n) => n.x));
+    const rowMinY = Math.min(...rowNodes.map((n) => n.y));
+    for (const n of rowNodes) {
+      n.x -= rowMinX;
+      n.y += rowY - rowMinY;
     }
-  });
+    rowY = Math.max(...rowNodes.map((n) => n.y + n.height)) + ROW_GAP;
+    nodes.push(...rowNodes);
+  }
 
   // 兼務 cross-links: resolve each concurrent member's source department name to a node.
   const kenmu: KenmuLink[] = [];
@@ -267,6 +331,7 @@ export function computeTopdownLayout(
         fromId,
         toId: node.id,
         label: member.sourceTitle ? `${member.displayName} ・ ${member.sourceTitle}` : member.displayName,
+        sysId: member.sysId,
       });
     }
   }
